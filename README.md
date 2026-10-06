@@ -2,7 +2,7 @@
 
 在 **my-ai-sandbox（mas）容器内**安装并管理 Ollama、llama.cpp 和 Codex CLI。
 
-当前发布目标：**0.1.1 test**。两种底座可共存，通过 `maa` 选择一个当前底座和模型，并同步 `codex-local`。
+当前发布目标：**0.1.2 test**。两种底座可共存，通过 `maa` 选择一个当前底座和模型，并同步 `codex-local`。
 
 ## Install
 
@@ -19,6 +19,8 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/insta
 ```bash
 curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/install.sh | bash -s -- --components none
 ```
+
+已有底座和模型时，也可用上述 `--components none` 命令升级 maa，保留已下载模型和配置。
 
 安装完成后运行：
 
@@ -73,11 +75,17 @@ GPU 层数、采样、对话模板、服务地址没有修改入口，保留模�
 
 “暂停”释放资源，但保留选择和自启动目标；“启动”恢复。空闲卸载保留底座服务，下一次请求由底座重新加载。`codex-local` 不在暂停状态下暗中启动模型。
 
+管理操作立即显示阶段和累计耗时，终端内每秒刷新同一行，结束显示成功、失败或中断。原生安装器和模型下载保留自己的进度输出；期间 maa 让出显示，完成后继续累计计时。非终端仅输出开始和结束提示到 stderr，CLI 的 stdout JSON 保持可解析。
+
 ## Codex
 
 YOLO 只管理全局 `approval_policy = "never"` 和 `sandbox_mode = "danger-full-access"`。首次开启保存原值及存在状态，重复开启不覆盖备份；关闭恢复原值，原来没有的键删除。其他 TOML 配置保留。尊重 `CODEX_HOME`。
 
 `codex-local` 使用专用 `maa-local.config.toml` profile，不覆盖普通 Codex 的模型设置，也不强制 YOLO 启动参数。模型与有效上下文同步，自动压缩阈值固定为有效上下文的 90%（262144 对应 235929）。推理档位按选定字符串传递，支持情况由客户端、底座和模型决定。
+
+专用 profile 配合 `--no-daemon` 使用 Codex embedded 模式。maa 生成仅包含当前本地模型的 `model_catalog_json`，`/model` 显示原模型名称，实际请求使用底座的准确 ID；普通 Codex 的模型目录保持独立。目录包含项目自行编写的基础编码指引和已实现的文本/工具元数据，不包含本机全局工作规范或云模型提示词。
+
+入口先检查当前服务和模型。Ollama 模型已驻留时不重建配置别名、不重复加载；空闲卸载后唤醒原别名。llama.cpp 已加载时直接检查，休眠时唤醒后同步实际上下文。真正重新加载仍需要时间，启动阶段会显示累计耗时。
 
 本地 Responses 接口适配普通/命名空间函数、custom 工具、工具结果回放、文本和 reasoning 流式事件。不能通过 codex-local 的模型/provider 参数绕开当前选择。
 
@@ -119,4 +127,4 @@ codex-local exec --skip-git-repo-check 'Explain this directory.'
 curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/test.sh | bash
 ```
 
-入口下载同版本测试包，运行 portable/PTY 检查与两个小模型的原生接口、Codex、暂停恢复及失败回滚检查，保存 JSON 报告，最后暂停模型。大模型、MTP 实际速度和全 GPU 装载仍需使用自己的模型验收。已核验范围见 [IMPLEMENTED.md](IMPLEMENTED.md)，开发说明见 [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)。
+入口下载同版本测试包，运行 portable/PTY 检查与两个小模型的原生接口、真实 Codex `/model`、驻留复用、空闲唤醒、暂停恢复及失败回滚检查，保存 JSON 报告，最后暂停模型。测试产生的坏 GGUF 与登记记录在失败时也会清理；旧测试遗留文件只在路径、内容、登记身份均符合旧测试签名且未被选中时清理，保留用户的同名真实模型。大模型、MTP 实际速度和全 GPU 装载仍需使用自己的模型验收。已核验范围见 [IMPLEMENTED.md](IMPLEMENTED.md)，开发说明见 [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)。

@@ -8,6 +8,7 @@ import subprocess
 import time
 from urllib.parse import urlparse
 from .http import request
+from .output import stage
 from .settings import draft_kv, duration
 from .store import Error
 
@@ -127,7 +128,7 @@ def wait_api(url, process, timeout=180):
     raise Error(f'Backend readiness timed out: {last}')
 
 
-def ollama_load(target):
+def ollama_prepare(target):
     endpoint, model, values = ollama_endpoint(), target['model'], target['settings']
     info = request(endpoint + '/api/show', {'model': model['name']}, timeout=60)
     inventory = request(endpoint + '/api/tags')['models']
@@ -140,23 +141,53 @@ def ollama_load(target):
         candidates = int(preset.group(1)) if preset else 0
         params['draft_num_predict'] = (candidates or 4) if values['mtp'] else 0
     alias = 'maa-' + model['key'] + ':latest'
+    stage('准备 Ollama 模型配置')
     request(endpoint + '/api/create', {'model': alias, 'from': model['name'],
                                       'parameters': params, 'stream': False}, timeout=600)
+    return alias, info.get('parameters', '')
+
+
+def ollama_wake(alias, values):
+    stage('加载 Ollama 模型')
+    endpoint = ollama_endpoint()
     request(endpoint + '/api/generate', {'model': alias, 'prompt': '', 'stream': False,
                                         'keep_alive': values['keep_alive']}, timeout=600)
-    result = ollama_observe(alias)
-    result['preset_parameters'] = info.get('parameters', '')
+    return ollama_observe(alias)
+
+
+def ollama_load(target):
+    alias, preset = ollama_prepare(target)
+    result = ollama_wake(alias, target['settings'])
+    result['preset_parameters'] = preset
     return result
 
 
-def ollama_observe(alias):
+def ollama_current(target, runtime):
+    """Observe a resident model; waking an expired model never recreates it."""
+    stage('检查当前 Ollama 模型')
+    alias = runtime['model']
+    rows = request(ollama_endpoint() + '/api/tags')['models']
+    original = next((row for row in rows if row['name'] == target['model']['name']), None)
+    adapted = next((row for row in rows if row['name'] == alias), None)
+    if not original or original.get('digest') != target['model'].get('digest') or not adapted:
+        raise Error('Ollama model changed or adaptation alias is missing; select it again in maa')
+    if runtime.get('native_digest') and adapted.get('digest') != runtime['native_digest']:
+        raise Error('Ollama adaptation configuration changed; select the model again in maa')
+    result = ollama_observe(alias, missing_ok=True)
+    return result if result is not None else ollama_wake(alias, target['settings'])
+
+
+def ollama_observe(alias, missing_ok=False):
     for model in request(ollama_endpoint() + '/api/ps')['models']:
         if model.get('name') == alias or model.get('model') == alias:
             context = model.get('context_length')
             if type(context) is not int or context <= 0:
                 raise Error('Ollama /api/ps did not report effective context_length')
             return {'model': alias, 'context': context, 'upstream': ollama_endpoint(),
+                    'native_digest': model.get('digest'),
                     'resources': {k: model.get(k) for k in ('size', 'size_vram', 'expires_at')}}
+    if missing_ok:
+        return None
     raise Error('Selected Ollama model is not loaded (it may have expired); start it again')
 
 

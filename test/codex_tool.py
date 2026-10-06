@@ -29,10 +29,11 @@ def main():
                 chunk = {'choices': [{'delta': {'content': 'Done.'}, 'finish_reason': 'stop'}]}
             else:
                 tools = body.get('tools', [])
-                fn = next(t['function'] for t in tools if t['function']['name'].endswith('exec_command'))
+                fn = next(t['function'] for t in tools if t['function']['name'].endswith(('exec_command', 'shell_command')))
+                key = 'cmd' if fn['name'].endswith('exec_command') else 'command'
                 chunk = {'choices': [{'delta': {'tool_calls': [{'index': 0, 'id': 'call_real_exec',
                      'function': {'name': fn['name'], 'arguments': json.dumps({
-                         'cmd': 'printf MAA_REAL_CODEX_TOOL_OK > codex-proof.txt; cat codex-proof.txt'})}}]},
+                         key: 'printf MAA_REAL_CODEX_TOOL_OK > codex-proof.txt; cat codex-proof.txt'})}}]},
                      'finish_reason': 'tool_calls'}]}
             self.send_response(200)
             self.send_header('Content-Type', 'text/event-stream')
@@ -45,13 +46,13 @@ def main():
     for instance in (native, adapter):
         threading.Thread(target=instance.serve_forever, daemon=True).start()
     try:
-        with tempfile.TemporaryDirectory(prefix='maa-real-codex-tool-') as folder:
+        with tempfile.TemporaryDirectory(prefix='.maa-real-codex-tool-', dir=Path.home()) as folder:
             folder = Path(folder)
             os.environ['CODEX_HOME'] = str(folder / 'codex')
             codex.home().mkdir()
             (codex.home() / 'config.toml').write_text('approval_policy="never"\nsandbox_mode="danger-full-access"\n')
             codex.profile(runtime, {'reasoning': 'default'})
-            result = subprocess.run([codex.executable(), '--profile', 'maa-local', 'exec', '--skip-git-repo-check',
+            result = subprocess.run([codex.executable(), '--no-daemon', '--profile', 'maa-local', 'exec', '--skip-git-repo-check',
                 '--ephemeral', '-C', str(folder), 'Use a shell tool to print MAA_REAL_CODEX_TOOL_OK, then answer done.'],
                 capture_output=True, text=True, stdin=subprocess.DEVNULL, timeout=120)
             assert result.returncode == 0, result.stdout + result.stderr

@@ -14,6 +14,7 @@ from .backends import (llama_arguments, llama_observe, ollama_capabilities, chec
                        binary, ollama_environment, ollama_endpoint, ollama_load, stop_process, wait_api, llama_endpoint)
 from .models import verify_file
 from .store import Error, Store, atomic, write
+from .output import stage
 
 UNIT = 'maa.service'
 
@@ -90,22 +91,20 @@ WantedBy=multi-user.target
     def start(self):
         self.ensure()
         self.store.path('runtime.json').unlink(missing_ok=True)
+        stage('启动底座服务')
         privileged(['systemctl', 'restart', UNIT])
 
     def wait(self, target):
         from .store import read
         deadline = time.monotonic() + int(os.environ.get('MAA_START_TIMEOUT', '600'))
         stamp = fingerprint(target)
-        progress = time.monotonic()
+        stage('等待底座启动和模型加载；原生日志：maa logs')
         while time.monotonic() < deadline:
             runtime = read(self.store.path('runtime.json'))
             if runtime and runtime.get('fingerprint') == stamp:
                 if runtime.get('error'):
                     raise Error(runtime['error'])
                 return runtime
-            if time.monotonic() - progress >= 10:
-                print('等待底座启动和模型加载；原生日志：maa logs', file=sys.stderr, flush=True)
-                progress = time.monotonic()
             time.sleep(.2)
         raise Error('Model startup timed out; run maa logs to inspect the native diagnostic')
 
@@ -182,6 +181,7 @@ def serve(store=None):
                 offloads = re.findall(r'offloaded\s+(\d+)/(\d+)\s+layers to GPU', text)
                 runtime['resources']['gpu_layers'] = list(map(int, offloads[-1])) if offloads else None
             runtime.update(backend=model['backend'], key=model['key'], fingerprint=stamp,
+                           display_name=model['name'],
                            base_url='http://127.0.0.1:18443/v1', pid=os.getpid(),
                            capabilities={'hosted_web_search': False, 'stateless_responses': True})
             adapter = bridge.server(runtime)

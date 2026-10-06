@@ -1,0 +1,685 @@
+{
+  "version": "0.1.2",
+  "started": "2026-10-06T10:36:09.132200+00:00",
+  "checks": [
+    {
+      "name": "installed-version",
+      "status": "passed",
+      "detail": "0.1.2"
+    },
+    {
+      "name": "hf-exact-download",
+      "status": "passed",
+      "detail": {
+        "key": "07591f8b732c1e7241bfe575",
+        "backend": "llamacpp",
+        "name": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+        "path": "/home/sandbox/.local/state/my-ai-agent/models/66204dcd0d42165045cefdeb/Qwen3-0.6B-Q4_K_M.gguf",
+        "file_identity": [
+          2096,
+          226796,
+          396705472,
+          1791282761847197189
+        ],
+        "sha256": "ac2d97712095a558e31573f62f466a3f9d93990898b0ec79d7c974c1780d524a",
+        "metadata": {
+          "general.architecture": "qwen3",
+          "general.type": "model",
+          "general.name": "Qwen3-0.6B",
+          "general.basename": "Qwen3-0.6B",
+          "general.quantized_by": "Unsloth",
+          "general.size_label": "0.6B",
+          "general.repo_url": "https://huggingface.co/unsloth",
+          "qwen3.block_count": 28,
+          "qwen3.context_length": 40960,
+          "qwen3.embedding_length": 1024,
+          "qwen3.feed_forward_length": 3072,
+          "qwen3.attention.head_count": 16,
+          "qwen3.attention.head_count_kv": 8,
+          "qwen3.rope.freq_base": 1000000.0,
+          "qwen3.attention.layer_norm_rms_epsilon": 9.999999974752427e-07,
+          "qwen3.attention.key_length": 128,
+          "qwen3.attention.value_length": 128,
+          "tokenizer.ggml.model": "gpt2",
+          "tokenizer.ggml.pre": "qwen2",
+          "tokenizer.ggml.eos_token_id": 151645,
+          "tokenizer.ggml.padding_token_id": 151654,
+          "tokenizer.ggml.add_bos_token": false,
+          "tokenizer.chat_template": "{%- if tools %}\n    {{- '<|im_start|>system\\n' }}\n    {%- if messages[0].role == 'system' %}\n        {{- messages[0].content + '\\n\\n' }}\n    {%- endif %}\n    {{- \"# Tools\\n\\nYou may call one or more functions to assist with the user query.\\n\\nYou are provided with function signatures within <tools></tools> XML tags:\\n<tools>\" }}\n    {%- for tool in tools %}\n        {{- \"\\n\" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- \"\\n</tools>\\n\\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\\n<tool_call>\\n{\\\"name\\\": <function-name>, \\\"arguments\\\": <args-json-object>}\\n</tool_call><|im_end|>\\n\" }}\n{%- else %}\n    {%- if messages[0].role == 'system' %}\n        {{- '<|im_start|>system\\n' + messages[0].content + '<|im_end|>\\n' }}\n    {%- endif %}\n{%- endif %}\n{%- set ns = namespace(multi_step_tool=true, last_query_index=messages|length - 1) %}\n{%- for forward_message in messages %}\n    {%- set index = (messages|length - 1) - loop.index0 %}\n    {%- set message = messages[index] %}\n    {%- set current_content = message.content if message.content is defined and message.content is not none else '' %}\n    {%- set tool_start = '<tool_response>' %}\n    {%- set tool_start_length = tool_start|length %}\n    {%- set start_of_message = current_content[:tool_start_length] %}\n    {%- set tool_end = '</tool_response>' %}\n    {%- set tool_end_length = tool_end|length %}\n    {%- set start_pos = (current_content|length) - tool_end_length %}\n    {%- if start_pos < 0 %}\n        {%- set start_pos = 0 %}\n    {%- endif %}\n    {%- set end_of_message = current_content[start_pos:] %}\n    {%- if ns.multi_step_tool and message.role == \"user\" and not(start_of_message == tool_start and end_of_message == tool_end) %}\n        {%- set ns.multi_step_tool = false %}\n        {%- set ns.last_query_index = index %}\n    {%- endif %}\n{%- endfor %}\n{%- for message in messages %}\n    {%- if (message.role == \"user\") or (message.role == \"system\" and not loop.first) %}\n        {{- '<|im_start|>' + message.role + '\\n' + message.content + '<|im_end|>' + '\\n' }}\n    {%- elif message.role == \"assistant\" %}\n        {%- set m_content = message.content if message.content is defined and message.content is not none else '' %}\n        {%- set content = m_content %}\n        {%- set reasoning_content = '' %}\n        {%- if message.reasoning_content is defined and message.reasoning_content is not none %}\n            {%- set reasoning_content = message.reasoning_content %}\n        {%- else %}\n            {%- if '</think>' in m_content %}\n                {%- set content = (m_content.split('</think>')|last).lstrip('\\n') %}\n                {%- set reasoning_content = (m_content.split('</think>')|first).rstrip('\\n') %}\n                {%- set reasoning_content = (reasoning_content.split('<think>')|last).lstrip('\\n') %}\n            {%- endif %}\n        {%- endif %}\n        {%- if loop.index0 > ns.last_query_index %}\n            {%- if loop.last or (not loop.last and (not reasoning_content.strip() == '')) %}\n                {{- '<|im_start|>' + message.role + '\\n<think>\\n' + reasoning_content.strip('\\n') + '\\n</think>\\n\\n' + content.lstrip('\\n') }}\n            {%- else %}\n                {{- '<|im_start|>' + message.role + '\\n' + content }}\n            {%- endif %}\n        {%- else %}\n            {{- '<|im_start|>' + message.role + '\\n' + content }}\n        {%- endif %}\n        {%- if message.tool_calls %}\n            {%- for tool_call in message.tool_calls %}\n                {%- if (loop.first and content) or (not loop.first) %}\n                    {{- '\\n' }}\n                {%- endif %}\n                {%- if tool_call.function %}\n                    {%- set tool_call = tool_call.function %}\n                {%- endif %}\n                {{- '<tool_call>\\n{\"name\": \"' }}\n                {{- tool_call.name }}\n                {{- '\", \"arguments\": ' }}\n                {%- if tool_call.arguments is string %}\n                    {{- tool_call.arguments }}\n                {%- else %}\n                    {{- tool_call.arguments | tojson }}\n                {%- endif %}\n                {{- '}\\n</tool_call>' }}\n            {%- endfor %}\n        {%- endif %}\n        {{- '<|im_end|>\\n' }}\n    {%- elif message.role == \"tool\" %}\n        {%- if loop.first or (messages[loop.index0 - 1].role != \"tool\") %}\n            {{- '<|im_start|>user' }}\n        {%- endif %}\n        {{- '\\n<tool_response>\\n' }}\n        {{- message.content }}\n        {{- '\\n</tool_response>' }}\n        {%- if loop.last or (messages[loop.index0 + 1].role != \"tool\") %}\n            {{- '<|im_end|>\\n' }}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '<|im_start|>assistant\\n' }}\n    {%- if enable_thinking is defined and enable_thinking is false %}\n        {{- '<think>\\n\\n</think>\\n\\n' }}\n    {%- endif %}\n{%- endif %}",
+          "general.quantization_version": 2,
+          "general.file_type": 15,
+          "quantize.imatrix.file": "Qwen3-0.6B-GGUF/imatrix_unsloth.dat",
+          "quantize.imatrix.dataset": "unsloth_calibration_Qwen3-0.6B.txt",
+          "quantize.imatrix.entries_count": 196,
+          "quantize.imatrix.chunks_count": 688,
+          "maa.mtp_supported": false
+        },
+        "mtp_supported": false,
+        "source": "hf",
+        "repo": "unsloth/Qwen3-0.6B-GGUF",
+        "filename": "Qwen3-0.6B-Q4_K_M.gguf",
+        "revision": "50968a4468ef4233ed78cd7c3de230dd1d61a56b"
+      }
+    },
+    {
+      "name": "ollama-native-pull",
+      "status": "passed",
+      "detail": {
+        "key": "09dadb68b4448ec5239f2adb",
+        "backend": "ollama",
+        "name": "qwen3:0.6b",
+        "digest": "7df6b6e09427a769808717c0a93cadc4ae99ed4eb8bf5ca557c90846becea435",
+        "metadata": {
+          "general.architecture": "qwen3",
+          "general.basename": "Qwen3",
+          "general.file_type": 15,
+          "general.license": "apache-2.0",
+          "general.parameter_count": 751632384,
+          "general.quantization_version": 2,
+          "general.size_label": "0.6B",
+          "general.type": "model",
+          "qwen3.attention.head_count": 16,
+          "qwen3.attention.head_count_kv": 8,
+          "qwen3.attention.key_length": 128,
+          "qwen3.attention.layer_norm_rms_epsilon": 1e-06,
+          "qwen3.attention.value_length": 128,
+          "qwen3.block_count": 28,
+          "qwen3.context_length": 40960,
+          "qwen3.embedding_length": 1024,
+          "qwen3.feed_forward_length": 3072,
+          "qwen3.rope.freq_base": 1000000,
+          "tokenizer.ggml.add_bos_token": false,
+          "tokenizer.ggml.bos_token_id": 151643,
+          "tokenizer.ggml.eos_token_id": 151645,
+          "tokenizer.ggml.merges": [],
+          "tokenizer.ggml.model": "gpt2",
+          "tokenizer.ggml.padding_token_id": 151643,
+          "tokenizer.ggml.pre": "qwen2",
+          "tokenizer.ggml.token_type": [],
+          "tokenizer.ggml.tokens": []
+        },
+        "mtp_supported": false,
+        "source": "ollama",
+        "capabilities": [
+          "completion",
+          "tools",
+          "thinking"
+        ]
+      }
+    },
+    {
+      "name": "hf-invalid-file-rejected",
+      "status": "passed",
+      "detail": "[进行中] 安装 / 登记模型 — 已等待 0.0 秒\n[失败] 安装 / 登记模型：核对 Hugging Face 仓库和精确文件 — 耗时 0.1 秒\nmaa: Exact GGUF file not found: unsloth/Qwen3-0.6B-GGUF/not-present.gguf\n"
+    },
+    {
+      "name": "llamacpp-select",
+      "status": "passed",
+      "detail": {
+        "selected": {
+          "model": {
+            "key": "07591f8b732c1e7241bfe575",
+            "backend": "llamacpp",
+            "name": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+            "path": "/home/sandbox/.local/state/my-ai-agent/models/66204dcd0d42165045cefdeb/Qwen3-0.6B-Q4_K_M.gguf",
+            "file_identity": [
+              2096,
+              226796,
+              396705472,
+              1791282761847197189
+            ],
+            "sha256": "ac2d97712095a558e31573f62f466a3f9d93990898b0ec79d7c974c1780d524a",
+            "metadata": {
+              "general.architecture": "qwen3",
+              "general.type": "model",
+              "general.name": "Qwen3-0.6B",
+              "general.basename": "Qwen3-0.6B",
+              "general.quantized_by": "Unsloth",
+              "general.size_label": "0.6B",
+              "general.repo_url": "https://huggingface.co/unsloth",
+              "qwen3.block_count": 28,
+              "qwen3.context_length": 40960,
+              "qwen3.embedding_length": 1024,
+              "qwen3.feed_forward_length": 3072,
+              "qwen3.attention.head_count": 16,
+              "qwen3.attention.head_count_kv": 8,
+              "qwen3.rope.freq_base": 1000000.0,
+              "qwen3.attention.layer_norm_rms_epsilon": 9.999999974752427e-07,
+              "qwen3.attention.key_length": 128,
+              "qwen3.attention.value_length": 128,
+              "tokenizer.ggml.model": "gpt2",
+              "tokenizer.ggml.pre": "qwen2",
+              "tokenizer.ggml.eos_token_id": 151645,
+              "tokenizer.ggml.padding_token_id": 151654,
+              "tokenizer.ggml.add_bos_token": false,
+              "tokenizer.chat_template": "{%- if tools %}\n    {{- '<|im_start|>system\\n' }}\n    {%- if messages[0].role == 'system' %}\n        {{- messages[0].content + '\\n\\n' }}\n    {%- endif %}\n    {{- \"# Tools\\n\\nYou may call one or more functions to assist with the user query.\\n\\nYou are provided with function signatures within <tools></tools> XML tags:\\n<tools>\" }}\n    {%- for tool in tools %}\n        {{- \"\\n\" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- \"\\n</tools>\\n\\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\\n<tool_call>\\n{\\\"name\\\": <function-name>, \\\"arguments\\\": <args-json-object>}\\n</tool_call><|im_end|>\\n\" }}\n{%- else %}\n    {%- if messages[0].role == 'system' %}\n        {{- '<|im_start|>system\\n' + messages[0].content + '<|im_end|>\\n' }}\n    {%- endif %}\n{%- endif %}\n{%- set ns = namespace(multi_step_tool=true, last_query_index=messages|length - 1) %}\n{%- for forward_message in messages %}\n    {%- set index = (messages|length - 1) - loop.index0 %}\n    {%- set message = messages[index] %}\n    {%- set current_content = message.content if message.content is defined and message.content is not none else '' %}\n    {%- set tool_start = '<tool_response>' %}\n    {%- set tool_start_length = tool_start|length %}\n    {%- set start_of_message = current_content[:tool_start_length] %}\n    {%- set tool_end = '</tool_response>' %}\n    {%- set tool_end_length = tool_end|length %}\n    {%- set start_pos = (current_content|length) - tool_end_length %}\n    {%- if start_pos < 0 %}\n        {%- set start_pos = 0 %}\n    {%- endif %}\n    {%- set end_of_message = current_content[start_pos:] %}\n    {%- if ns.multi_step_tool and message.role == \"user\" and not(start_of_message == tool_start and end_of_message == tool_end) %}\n        {%- set ns.multi_step_tool = false %}\n        {%- set ns.last_query_index = index %}\n    {%- endif %}\n{%- endfor %}\n{%- for message in messages %}\n    {%- if (message.role == \"user\") or (message.role == \"system\" and not loop.first) %}\n        {{- '<|im_start|>' + message.role + '\\n' + message.content + '<|im_end|>' + '\\n' }}\n    {%- elif message.role == \"assistant\" %}\n        {%- set m_content = message.content if message.content is defined and message.content is not none else '' %}\n        {%- set content = m_content %}\n        {%- set reasoning_content = '' %}\n        {%- if message.reasoning_content is defined and message.reasoning_content is not none %}\n            {%- set reasoning_content = message.reasoning_content %}\n        {%- else %}\n            {%- if '</think>' in m_content %}\n                {%- set content = (m_content.split('</think>')|last).lstrip('\\n') %}\n                {%- set reasoning_content = (m_content.split('</think>')|first).rstrip('\\n') %}\n                {%- set reasoning_content = (reasoning_content.split('<think>')|last).lstrip('\\n') %}\n            {%- endif %}\n        {%- endif %}\n        {%- if loop.index0 > ns.last_query_index %}\n            {%- if loop.last or (not loop.last and (not reasoning_content.strip() == '')) %}\n                {{- '<|im_start|>' + message.role + '\\n<think>\\n' + reasoning_content.strip('\\n') + '\\n</think>\\n\\n' + content.lstrip('\\n') }}\n            {%- else %}\n                {{- '<|im_start|>' + message.role + '\\n' + content }}\n            {%- endif %}\n        {%- else %}\n            {{- '<|im_start|>' + message.role + '\\n' + content }}\n        {%- endif %}\n        {%- if message.tool_calls %}\n            {%- for tool_call in message.tool_calls %}\n                {%- if (loop.first and content) or (not loop.first) %}\n                    {{- '\\n' }}\n                {%- endif %}\n                {%- if tool_call.function %}\n                    {%- set tool_call = tool_call.function %}\n                {%- endif %}\n                {{- '<tool_call>\\n{\"name\": \"' }}\n                {{- tool_call.name }}\n                {{- '\", \"arguments\": ' }}\n                {%- if tool_call.arguments is string %}\n                    {{- tool_call.arguments }}\n                {%- else %}\n                    {{- tool_call.arguments | tojson }}\n                {%- endif %}\n                {{- '}\\n</tool_call>' }}\n            {%- endfor %}\n        {%- endif %}\n        {{- '<|im_end|>\\n' }}\n    {%- elif message.role == \"tool\" %}\n        {%- if loop.first or (messages[loop.index0 - 1].role != \"tool\") %}\n            {{- '<|im_start|>user' }}\n        {%- endif %}\n        {{- '\\n<tool_response>\\n' }}\n        {{- message.content }}\n        {{- '\\n</tool_response>' }}\n        {%- if loop.last or (messages[loop.index0 + 1].role != \"tool\") %}\n            {{- '<|im_end|>\\n' }}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '<|im_start|>assistant\\n' }}\n    {%- if enable_thinking is defined and enable_thinking is false %}\n        {{- '<think>\\n\\n</think>\\n\\n' }}\n    {%- endif %}\n{%- endif %}",
+              "general.quantization_version": 2,
+              "general.file_type": 15,
+              "quantize.imatrix.file": "Qwen3-0.6B-GGUF/imatrix_unsloth.dat",
+              "quantize.imatrix.dataset": "unsloth_calibration_Qwen3-0.6B.txt",
+              "quantize.imatrix.entries_count": 196,
+              "quantize.imatrix.chunks_count": 688,
+              "maa.mtp_supported": false
+            },
+            "mtp_supported": false,
+            "source": "hf",
+            "repo": "unsloth/Qwen3-0.6B-GGUF",
+            "filename": "Qwen3-0.6B-Q4_K_M.gguf",
+            "revision": "50968a4468ef4233ed78cd7c3de230dd1d61a56b"
+          },
+          "settings": {
+            "context": 32768,
+            "kv": "q8_0",
+            "flash_attention": true,
+            "fit": true,
+            "reserve_mib": 0,
+            "keep_alive": "5m",
+            "mtp": false,
+            "mtp_kv": "follow",
+            "reasoning": "default"
+          }
+        },
+        "running": true,
+        "runtime": {
+          "model": "07591f8b732c1e7241bfe575",
+          "context": 32768,
+          "upstream": "http://127.0.0.1:8080",
+          "resources": {
+            "sleeping": false,
+            "total_slots": 1,
+            "model_path": "/home/sandbox/.local/state/my-ai-agent/models/66204dcd0d42165045cefdeb/Qwen3-0.6B-Q4_K_M.gguf",
+            "gpu_layers": null
+          },
+          "backend": "llamacpp",
+          "key": "07591f8b732c1e7241bfe575",
+          "fingerprint": "b01896000397c23708519b142e8b7c8c0f569d290a185c495e9b4cc618622cbd",
+          "display_name": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+          "base_url": "http://127.0.0.1:18443/v1",
+          "pid": 2949,
+          "capabilities": {
+            "hosted_web_search": false,
+            "stateless_responses": true
+          }
+        },
+        "yolo": {
+          "enabled": true,
+          "managed": true
+        }
+      }
+    },
+    {
+      "name": "llamacpp-catalog",
+      "status": "passed",
+      "detail": {
+        "model": "07591f8b732c1e7241bfe575",
+        "display_name": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+        "context": 32768
+      }
+    },
+    {
+      "name": "llamacpp-responses",
+      "status": "passed",
+      "detail": {
+        "nonstream": {
+          "id": "resp_080d84066622483e81e32d3d024f30d2",
+          "object": "response",
+          "created_at": 1791282983,
+          "model": "07591f8b732c1e7241bfe575",
+          "status": "completed",
+          "output": [
+            {
+              "id": "msg_3b6495281dd54f05b1d5d961833b9c90",
+              "type": "message",
+              "role": "assistant",
+              "status": "completed",
+              "content": [
+                {
+                  "type": "output_text",
+                  "text": "Hello! 😊",
+                  "annotations": []
+                }
+              ]
+            }
+          ],
+          "error": null,
+          "usage": {
+            "input_tokens": 18,
+            "output_tokens": 5,
+            "total_tokens": 23
+          }
+        },
+        "stream_completed": true
+      }
+    },
+    {
+      "name": "llamacpp-native-function-call",
+      "status": "passed",
+      "detail": {
+        "call": {
+          "id": "resp_f3c90559071b427c8cd54de36ead0320",
+          "object": "response",
+          "created_at": 1791282983,
+          "model": "07591f8b732c1e7241bfe575",
+          "status": "completed",
+          "output": [
+            {
+              "id": "fc_79f6b7dbc441459a96fe8cedf1e14f10",
+              "type": "function_call",
+              "call_id": "vIMVi6epx4FWp6Lt6VammNNwl2WCuBCL",
+              "name": "get_weather",
+              "arguments": "{\"city\": \"London\"}",
+              "status": "completed"
+            }
+          ],
+          "error": null,
+          "usage": {
+            "input_tokens": 166,
+            "output_tokens": 20,
+            "total_tokens": 186
+          }
+        },
+        "replay": {
+          "id": "resp_30e07d29f23b47c98af1ed2e2abbc4c8",
+          "object": "response",
+          "created_at": 1791282983,
+          "model": "07591f8b732c1e7241bfe575",
+          "status": "completed",
+          "output": [
+            {
+              "id": "msg_6d090c68b09a4de09c3a68779a7b8d64",
+              "type": "message",
+              "role": "assistant",
+              "status": "completed",
+              "content": [
+                {
+                  "type": "output_text",
+                  "text": "The weather in London is 18 degrees Celsius.",
+                  "annotations": []
+                }
+              ]
+            }
+          ],
+          "error": null,
+          "usage": {
+            "input_tokens": 203,
+            "output_tokens": 12,
+            "total_tokens": 215
+          }
+        }
+      }
+    },
+    {
+      "name": "llamacpp-codex-cli",
+      "status": "passed",
+      "detail": {
+        "output": "MAA_NATIVE_OK.\n",
+        "diagnostic": "[进行中] 启动 codex-local — 已等待 0.0 秒\n[成功] 启动 codex-local：同步 Codex 本地配置和模型目录 — 耗时 0.0 秒\nReading additional input from stdin...\nOpenAI Codex v0.160.1\n--------\nworkdir: /tmp/maa-codex-native-pv0zmxmk\nmodel: 07591f8b732c1e7241bfe575\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a110c9-3356-7a43-8555-60e412193d94\n--------\nuser\nReply with MAA_NATIVE_OK. Do not use tools.\nOkay, let me start by understanding the user's request. They mentioned \"MAA_NATIVE_OK\" and said not to use any tools. I need to confirm that MAA_NATIVE_OK is the correct response. Since the user provided the environment context and specified not to use tools, my reply should be straightforward and confirm the status without any function calls. I should make sure to stick to the guidelines provided and avoid any tool-related actions.\n\ncodex\nMAA_NATIVE_OK.\ntokens used\n5,445\n"
+      }
+    },
+    {
+      "name": "llamacpp-codex-model-picker",
+      "status": "passed",
+      "detail": {
+        "local_only": true,
+        "warnings_absent": true,
+        "elapsed_seconds": 1.795,
+        "picker": "Select Model and Effort  › 1. unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf (current)  Local model selected by my-ai-agent; native reasoning support varies.                               enter select · esc back                                                                                                                                       "
+      }
+    },
+    {
+      "name": "ollama-select",
+      "status": "passed",
+      "detail": {
+        "selected": {
+          "model": {
+            "key": "09dadb68b4448ec5239f2adb",
+            "backend": "ollama",
+            "name": "qwen3:0.6b",
+            "digest": "7df6b6e09427a769808717c0a93cadc4ae99ed4eb8bf5ca557c90846becea435",
+            "metadata": {
+              "general.architecture": "qwen3",
+              "general.basename": "Qwen3",
+              "general.file_type": 15,
+              "general.license": "apache-2.0",
+              "general.parameter_count": 751632384,
+              "general.quantization_version": 2,
+              "general.size_label": "0.6B",
+              "general.type": "model",
+              "qwen3.attention.head_count": 16,
+              "qwen3.attention.head_count_kv": 8,
+              "qwen3.attention.key_length": 128,
+              "qwen3.attention.layer_norm_rms_epsilon": 1e-06,
+              "qwen3.attention.value_length": 128,
+              "qwen3.block_count": 28,
+              "qwen3.context_length": 40960,
+              "qwen3.embedding_length": 1024,
+              "qwen3.feed_forward_length": 3072,
+              "qwen3.rope.freq_base": 1000000,
+              "tokenizer.ggml.add_bos_token": false,
+              "tokenizer.ggml.bos_token_id": 151643,
+              "tokenizer.ggml.eos_token_id": 151645,
+              "tokenizer.ggml.merges": [],
+              "tokenizer.ggml.model": "gpt2",
+              "tokenizer.ggml.padding_token_id": 151643,
+              "tokenizer.ggml.pre": "qwen2",
+              "tokenizer.ggml.token_type": [],
+              "tokenizer.ggml.tokens": []
+            },
+            "mtp_supported": false,
+            "source": "ollama",
+            "capabilities": [
+              "completion",
+              "tools",
+              "thinking"
+            ]
+          },
+          "settings": {
+            "context": 32768,
+            "kv": "q8_0",
+            "flash_attention": true,
+            "fit": true,
+            "reserve_mib": 0,
+            "keep_alive": "5m",
+            "mtp": false,
+            "mtp_kv": "follow",
+            "reasoning": "default"
+          }
+        },
+        "running": true,
+        "runtime": {
+          "model": "maa-09dadb68b4448ec5239f2adb:latest",
+          "context": 32768,
+          "upstream": "http://127.0.0.1:11434",
+          "native_digest": "30f845245f887b5b88b0b6b9ab4ba91d79739cc94d84247566814a6fd44bf6a7",
+          "resources": {
+            "size": 2652257648,
+            "size_vram": 2652257648,
+            "expires_at": "2026-10-06T10:41:46.417750011Z"
+          },
+          "preset_parameters": "top_p                          0.95\nrepeat_penalty                 1\nstop                           \"<|im_start|>\"\nstop                           \"<|im_end|>\"\ntemperature                    0.6\ntop_k                          20",
+          "backend": "ollama",
+          "key": "09dadb68b4448ec5239f2adb",
+          "fingerprint": "cf5db80f9e6a03437ff7c1e5c091447faf12bfeb40732889894a245439300d9d",
+          "display_name": "qwen3:0.6b",
+          "base_url": "http://127.0.0.1:18443/v1",
+          "pid": 3386,
+          "capabilities": {
+            "hosted_web_search": false,
+            "stateless_responses": true
+          }
+        },
+        "yolo": {
+          "enabled": true,
+          "managed": true
+        }
+      }
+    },
+    {
+      "name": "ollama-catalog",
+      "status": "passed",
+      "detail": {
+        "model": "maa-09dadb68b4448ec5239f2adb:latest",
+        "display_name": "qwen3:0.6b",
+        "context": 32768
+      }
+    },
+    {
+      "name": "ollama-responses",
+      "status": "passed",
+      "detail": {
+        "nonstream": {
+          "id": "resp_5b36810666ef4dfd849815abdc6595db",
+          "object": "response",
+          "created_at": 1791283022,
+          "model": "maa-09dadb68b4448ec5239f2adb:latest",
+          "status": "completed",
+          "output": [
+            {
+              "id": "msg_3831d182f981425481b1461698c3a10c",
+              "type": "message",
+              "role": "assistant",
+              "status": "completed",
+              "content": [
+                {
+                  "type": "output_text",
+                  "text": "Hello! 😊",
+                  "annotations": []
+                }
+              ]
+            }
+          ],
+          "error": null,
+          "usage": {
+            "input_tokens": 22,
+            "output_tokens": 5,
+            "total_tokens": 27
+          }
+        },
+        "stream_completed": true
+      }
+    },
+    {
+      "name": "ollama-native-function-call",
+      "status": "passed",
+      "detail": {
+        "call": {
+          "id": "resp_014c78d12ccf41cf9a41cc62c0e287bd",
+          "object": "response",
+          "created_at": 1791283028,
+          "model": "maa-09dadb68b4448ec5239f2adb:latest",
+          "status": "completed",
+          "output": [
+            {
+              "id": "fc_070cd59c5d58458aabe5b13ad667fbc9",
+              "type": "function_call",
+              "call_id": "call_p86un2y9",
+              "name": "get_weather",
+              "arguments": "{\"city\":\"London\"}",
+              "status": "completed"
+            }
+          ],
+          "error": null,
+          "usage": {
+            "input_tokens": 147,
+            "output_tokens": 20,
+            "total_tokens": 167
+          }
+        },
+        "replay": {
+          "id": "resp_88d0b59402ed444b9694ebb563a8e573",
+          "object": "response",
+          "created_at": 1791283028,
+          "model": "maa-09dadb68b4448ec5239f2adb:latest",
+          "status": "completed",
+          "output": [
+            {
+              "id": "msg_7bc922ed9e8445cab81f5288fad0f0a5",
+              "type": "message",
+              "role": "assistant",
+              "status": "completed",
+              "content": [
+                {
+                  "type": "output_text",
+                  "text": "The weather in London is 18 degrees Celsius.",
+                  "annotations": []
+                }
+              ]
+            }
+          ],
+          "error": null,
+          "usage": {
+            "input_tokens": 183,
+            "output_tokens": 12,
+            "total_tokens": 195
+          }
+        }
+      }
+    },
+    {
+      "name": "ollama-codex-cli",
+      "status": "passed",
+      "detail": {
+        "output": "MAA_NATIVE_OK\n",
+        "diagnostic": "[进行中] 启动 codex-local — 已等待 0.0 秒\n[成功] 启动 codex-local：同步 Codex 本地配置和模型目录 — 耗时 0.0 秒\nReading additional input from stdin...\nOpenAI Codex v0.160.1\n--------\nworkdir: /tmp/maa-codex-native-yczrknnw\nmodel: maa-09dadb68b4448ec5239f2adb:latest\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a110c9-e159-7850-8998-2fcc30a64a6c\n--------\nuser\nReply with MAA_NATIVE_OK. Do not use tools.\nOkay, let me see. The user is asking for MAA_NATIVE_OK. They provided some environment context with cwd, shell, date, timezone, and filesystem. But the instructions say to use the tools if needed, but the task is straightforward here. Since the user just wants confirmation, there's no need to call any functions. Just output MAA_NATIVE_OK.\n\ncodex\nMAA_NATIVE_OK\ntokens used\n4,876\n"
+      }
+    },
+    {
+      "name": "ollama-codex-model-picker",
+      "status": "passed",
+      "detail": {
+        "local_only": true,
+        "warnings_absent": true,
+        "elapsed_seconds": 1.777,
+        "picker": "Select Model and Effort  › 1. qwen3:0.6b (current)  Local model selected by my-ai-agent; native reasoning support varies.                                                                   enter select · esc back                                                                                                                                       "
+      }
+    },
+    {
+      "name": "ollama-resident-entry-reuses-alias",
+      "status": "passed",
+      "detail": {
+        "alias_unchanged": true,
+        "woke": false,
+        "elapsed_seconds": 0.746,
+        "diagnostic": "[进行中] 启动 codex-local — 已等待 0.0 秒\n[成功] 启动 codex-local：同步 Codex 本地配置和模型目录 — 耗时 0.0 秒\nReading additional input from stdin...\nOpenAI Codex v0.160.1\n--------\nworkdir: /tmp/maa-codex-native-kitwcq7d\nmodel: maa-09dadb68b4448ec5239f2adb:latest\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a110c9-ecc4-73e3-9906-d032cc82f1e2\n--------\nuser\nReply with MAA_NATIVE_OK. Do not use tools.\nOkay, let me see what the user wants. They provided an environment context and asked to reply with MAA_NATIVE_OK. Since nothing is required from the tools, I just need to confirm that the MAA is set correctly. No function calls needed here. Just a simple confirmation.\n\ncodex\nMAA_NATIVE_OK\ntokens used\n4,859\n"
+      }
+    },
+    {
+      "name": "ollama-expired-entry-wakes-existing-alias",
+      "status": "passed",
+      "detail": {
+        "alias_unchanged": true,
+        "woke": true,
+        "elapsed_seconds": 2.819,
+        "diagnostic": "[进行中] 启动 codex-local — 已等待 0.0 秒\n[成功] 启动 codex-local：同步 Codex 本地配置和模型目录 — 耗时 1.7 秒\nReading additional input from stdin...\nOpenAI Codex v0.160.1\n--------\nworkdir: /tmp/maa-codex-native-i6088iao\nmodel: maa-09dadb68b4448ec5239f2adb:latest\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a110c9-f6e1-7770-95a7-fba28aefdb80\n--------\nuser\nReply with MAA_NATIVE_OK. Do not use tools.\nOkay, the user provided an environment context and wants me to respond with MAA_NATIVE_OK. Let me check the tools again. The tools are for various functions like imagegen, openai-docs, skill-creator, etc., but the user just asked for MAA_NATIVE_OK. Since there are no specific commands needed here, I should just confirm that the native environment is set up correctly, not using any tools. I'll make sure to use the relevant skills if it's needed, but in this case, the answer is straightforward.\n\ncodex\nMAA_NATIVE_OK. The current setup is in a local filesystem sandbox with unrestricted permissions, and all relevant tools have been configured according to the provided instructions. No further action is required.\ntokens used\n4,946\n"
+      }
+    },
+    {
+      "name": "pause-start-retains-target",
+      "status": "passed",
+      "detail": {
+        "selected": {
+          "model": {
+            "key": "09dadb68b4448ec5239f2adb",
+            "backend": "ollama",
+            "name": "qwen3:0.6b",
+            "digest": "7df6b6e09427a769808717c0a93cadc4ae99ed4eb8bf5ca557c90846becea435",
+            "metadata": {
+              "general.architecture": "qwen3",
+              "general.basename": "Qwen3",
+              "general.file_type": 15,
+              "general.license": "apache-2.0",
+              "general.parameter_count": 751632384,
+              "general.quantization_version": 2,
+              "general.size_label": "0.6B",
+              "general.type": "model",
+              "qwen3.attention.head_count": 16,
+              "qwen3.attention.head_count_kv": 8,
+              "qwen3.attention.key_length": 128,
+              "qwen3.attention.layer_norm_rms_epsilon": 1e-06,
+              "qwen3.attention.value_length": 128,
+              "qwen3.block_count": 28,
+              "qwen3.context_length": 40960,
+              "qwen3.embedding_length": 1024,
+              "qwen3.feed_forward_length": 3072,
+              "qwen3.rope.freq_base": 1000000,
+              "tokenizer.ggml.add_bos_token": false,
+              "tokenizer.ggml.bos_token_id": 151643,
+              "tokenizer.ggml.eos_token_id": 151645,
+              "tokenizer.ggml.merges": [],
+              "tokenizer.ggml.model": "gpt2",
+              "tokenizer.ggml.padding_token_id": 151643,
+              "tokenizer.ggml.pre": "qwen2",
+              "tokenizer.ggml.token_type": [],
+              "tokenizer.ggml.tokens": []
+            },
+            "mtp_supported": false,
+            "source": "ollama",
+            "capabilities": [
+              "completion",
+              "tools",
+              "thinking"
+            ]
+          },
+          "settings": {
+            "context": 32768,
+            "kv": "q8_0",
+            "flash_attention": true,
+            "fit": true,
+            "reserve_mib": 0,
+            "keep_alive": "5m",
+            "mtp": false,
+            "mtp_kv": "follow",
+            "reasoning": "default"
+          }
+        },
+        "running": true,
+        "runtime": {
+          "model": "maa-09dadb68b4448ec5239f2adb:latest",
+          "context": 32768,
+          "upstream": "http://127.0.0.1:11434",
+          "native_digest": "30f845245f887b5b88b0b6b9ab4ba91d79739cc94d84247566814a6fd44bf6a7",
+          "resources": {
+            "size": 2652257648,
+            "size_vram": 2652257648,
+            "expires_at": "2026-10-06T10:42:19.57485924Z"
+          },
+          "preset_parameters": "repeat_penalty                 1\nstop                           \"<|im_start|>\"\nstop                           \"<|im_end|>\"\ntemperature                    0.6\ntop_k                          20\ntop_p                          0.95",
+          "backend": "ollama",
+          "key": "09dadb68b4448ec5239f2adb",
+          "fingerprint": "cf5db80f9e6a03437ff7c1e5c091447faf12bfeb40732889894a245439300d9d",
+          "display_name": "qwen3:0.6b",
+          "base_url": "http://127.0.0.1:18443/v1",
+          "pid": 4421,
+          "capabilities": {
+            "hosted_web_search": false,
+            "stateless_responses": true
+          }
+        },
+        "yolo": {
+          "enabled": true,
+          "managed": true
+        }
+      }
+    },
+    {
+      "name": "native-load-failure-rollback",
+      "status": "passed",
+      "detail": "[进行中] 应用模型配置 — 已等待 0.0 秒\n[失败] 应用模型配置：等待底座启动和模型加载；原生日志：maa logs — 耗时 4.7 秒\nmaa: Switch failed: Native backend exited with code 1; inspect maa logs\nead_kv             = 8\nprint_info: n_rot                 = 128\nprint_info: n_swa                 = 0\nprint_info: is_swa_any            = 0\nprint_info: non_causal_type       = 0\nprint_info: n_embd_head_k         = 128\nprint_info: n_embd_head_v         = 128\nprint_info: n_gqa                 = 2\nprint_info: n_embd_k_gqa          = 1024\nprint_info: n_embd_v_gqa          = 1024\nprint_info: f_norm_eps            = 0.0e+00\nprint_info: f_norm_rms_eps        = 1.0e-06\nprint_info: f_clamp_kqv           = 0.0e+00\nprint_info: f_max_alibi_bias      = 0.0e+00\nprint_info: f_logit_scale         = 0.0e+00\nprint_info: f_attn_scale          = 0.0e+00\nprint_info: f_attn_value_scale    = 0.0000\nprint_info: n_ff                  = 3072\nprint_info: n_expert              = 0\nprint_info: n_expert_used         = 0\nprint_info: n_expert_groups       = 0\nprint_info: n_group_used          = 0\nprint_info: causal attn           = 1\nprint_info: pooling type          = -1\nprint_info: rope type             = 2\nprint_info: rope scaling          = linear\nprint_info: freq_base_train       = 1000000.0\nprint_info: freq_scale_train      = 1\nprint_info: n_ctx_orig_yarn       = 40960\nprint_info: rope_yarn_log_mul     = 0.0000\nprint_info: rope_finetuned        = unknown\nprint_info: model type            = 0.6B\nprint_info: model params          = 751.63 M\nprint_info: general.name          = Qwen3 0.6B\nprint_info: vocab type            = BPE\nprint_info: n_vocab               = 151936\nprint_info: n_merges              = 151387\nprint_info: BOS token             = 151643 '<|endoftext|>'\nprint_info: EOS token             = 151645 '<|im_end|>'\nprint_info: EOT token             = 151645 '<|im_end|>'\nprint_info: PAD token             = 151643 '<|endoftext|>'\nprint_info: LF token              = 198 'Ċ'\nprint_info: FIM PRE token         = 151659 '<|fim_prefix|>'\nprint_info: FIM SUF token         = 151661 '<|fim_suffix|>'\nprint_info: FIM MID token         = 151660 '<|fim_middle|>'\nprint_info: FIM PAD token         = 151662 '<|fim_pad|>'\nprint_info: FIM REP token         = 151663 '<|repo_name|>'\nprint_info: FIM SEP token         = 151664 '<|file_sep|>'\nprint_info: EOG token             = 128247 '</s>'\nprint_info: EOG token             = 151643 '<|endoftext|>'\nprint_info: EOG token             = 151645 '<|im_end|>'\nprint_info: EOG token             = 151662 '<|fim_pad|>'\nprint_info: EOG token             = 151663 '<|repo_name|>'\nprint_info: EOG token             = 151664 '<|file_sep|>'\nprint_info: max token length      = 256\nload_tensors: loading model tensors, this can take a while... (load_mode = mmap)\nload_tensors: offloading output layer to GPU\nload_tensors: offloading 27 repeating layers to GPU\nload_tensors: offloaded 29/29 layers to GPU\nload_tensors:   CPU_Mapped model buffer size =    83.46 MiB\nload_tensors:        CUDA0 model buffer size =   409.29 MiB\ncmn  common_init_: added </s> logit bias = -inf\ncmn  common_init_: added <|endoftext|> logit bias = -inf\ncmn  common_init_: added <|im_end|> logit bias = -inf\ncmn  common_init_: added <|fim_pad|> logit bias = -inf\ncmn  common_init_: added <|repo_name|> logit bias = -inf\ncmn  common_init_: added <|file_sep|> logit bias = -inf\nllama_context: constructing llama_context\nllama_context: n_seq_max             = 1\nllama_context: n_ctx                 = 32768\nllama_context: n_ctx_seq             = 32768\nllama_context: n_batch               = 1024\nllama_context: n_ubatch              = 1024\nllama_context: causal_attn           = 1\nllama_context: flash_attn            = enabled\nllama_context: kv_unified            = false\nllama_context: freq_base             = 1000000.0\nllama_context: freq_scale            = 1\nllama_context: n_rs_seq              = 0\nllama_context: n_outputs_max         = 1\nllama_context: n_outputs_max_per_seq = 1\nllama_context: n_ctx_seq (32768) < n_ctx_train (40960) -- the full capacity of the model will not be utilized\nllama_context:  CUDA_Host  output buffer size =     0.58 MiB\nllama_kv_cache:      CUDA0 KV buffer size =  1904.00 MiB\nllama_kv_cache: size = 1904.00 MiB ( 32768 cells,  28 layers,  1/1 seqs), K (q8_0):  952.00 MiB, V (q8_0):  952.00 MiB\nllama_kv_cache: attn_rot_k = 1, n_embd_head_k_all = 128\nllama_kv_cache: attn_rot_v = 1, n_embd_head_k_all = 128\nsched_reserve: reserving ...\nresolve_fused_ops: resolving fused DeepSeek V4 HC support:\nresolve_fused_ops: fused DeepSeek V4 HC pre enabled\nresolve_fused_ops: fused DeepSeek V4 HC comb enabled\nresolve_fused_ops: fused DeepSeek V4 HC post enabled\nsched_reserve:      CUDA0 compute buffer size =   216.10 MiB\nsched_reserve:  CUDA_Host compute buffer size =    72.10 MiB\nsched_reserve: graph: nodes = 1322, splits = 2, input objects = 4, input tensors = 8\nsched_reserve: reserve took 21.12 ms, sched copies = 1\ncmn          init: llama threadpool init, n_threads = 16\ncmn  common_init_: warming up the model with an empty run - please wait ... (--no-warmup to disable)\nsrv    load_model: initializing, n_slots = 1, n_ctx_slot = 32768, kv_unified = 'false'\nspec common_specu: no implementations specified for speculative decoding\nslot   load_model: id  0 | task -1 | new slot, n_ctx = 32768\nsrv    load_model: prompt cache is enabled, size limit: 8192 MiB\nsrv    load_model: use `--cache-ram 0` to disable the prompt cache\nsrv    load_model: for more info see https://github.com/ggml-org/llama.cpp/pull/16391\nsrv    load_model: context checkpoints enabled, max = 32, min spacing = 8192\nsrv          init: idle slots will be saved to prompt cache upon starting a new task\nsrv          init: init: chat template, example_format: '<|im_start|>system\nYou are a helpful assistant<|im_end|>\n<|im_start|>user\nHello<|im_end|>\n<|im_start|>assistant\nHi there<|im_end|>\n<|im_start|>user\nHow are you?<|im_end|>\n<|im_start|>assistant\n'\nsrv          init: init: chat template, thinking = 0\nsrv          init: preserve_reasoning kwarg: not supported by template\nsrv  llama_server: model loaded\nsrv  llama_server: listening on http://127.0.0.1:46545\nsrv  update_slots: all slots are idle\ntime=2026-10-06T10:37:19.574Z level=INFO source=llama_server.go:1374 msg=\"llama-server started in 0.75 seconds\"\ntime=2026-10-06T10:37:19.574Z level=INFO source=images.go:395 msg=\"template selection\" model=registry.ollama.ai/library/maa-09dadb68b4448ec5239f2adb:latest selected=go_template renderer=\"\" parser=\"\" go_template=\"[completion tools thinking]\" chat_template=\"[tools thinking completion]\" harmony=null renderer_parser=null\ntime=2026-10-06T10:37:19.574Z level=INFO source=sched.go:733 msg=\"loaded runners\" count=1\ntime=2026-10-06T10:37:19.574Z level=INFO source=llama_server.go:1307 msg=\"waiting for llama-server to start responding\"\ntime=2026-10-06T10:37:19.574Z level=INFO source=llama_server.go:1374 msg=\"llama-server started in 0.75 seconds\"\n[GIN] 2026/10/06 - 10:37:19 | 200 |  1.462272052s |       127.0.0.1 | POST     \"/api/generate\"\n[GIN] 2026/10/06 - 10:37:19 | 200 |     108.808µs |       127.0.0.1 | GET      \"/api/ps\"\n\n=== my-ai-agent launch bad-native.gguf ===\n0.00.002.543 I srv  llama_server: initializing ...\n0.00.064.959 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)\n0.00.065.351 W srv  llama_server: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)\n0.00.067.395 I srv    load_model: loading model '/tmp/maa-native-invalid-obztxwcw/bad-native.gguf'\n0.00.067.495 E llama_model_load: error loading model: unknown model architecture: ''\n0.00.067.498 E llama_model_load_from_file_impl: failed to load model\n0.00.067.510 E common_fit_params: encountered an error while trying to fit params to free device memory: failed to load model\n0.00.067.524 E llama_model_load: error loading model: unknown model architecture: ''\n0.00.067.524 E llama_model_load_from_file_impl: failed to load model\n0.00.067.525 E cmn  common_init_: failed to load model '/tmp/maa-native-invalid-obztxwcw/bad-native.gguf'\n0.00.067.525 E srv    load_model: failed to load model, '/tmp/maa-native-invalid-obztxwcw/bad-native.gguf'\n0.00.067.526 I srv    operator(): operator(): cleaning up before exit...\n0.00.067.908 E srv  llama_server: exiting due to model loading error\n\nPrevious service restored.\n"
+    },
+    {
+      "name": "invalid-fixture-cleaned",
+      "status": "passed",
+      "detail": {
+        "cleaned": true
+      }
+    },
+    {
+      "name": "yolo-off",
+      "status": "passed",
+      "detail": {
+        "enabled": false,
+        "managed": false
+      }
+    },
+    {
+      "name": "yolo-on",
+      "status": "passed",
+      "detail": {
+        "enabled": true,
+        "managed": true
+      }
+    }
+  ],
+  "cleanup": [
+    {
+      "fixture": "bad-native.gguf",
+      "key": "e3bf30ca46bbda10f26ccc08",
+      "registry_removed": true,
+      "temporary_directory": true
+    },
+    {
+      "selected_target_paused": true
+    }
+  ],
+  "finished": "2026-10-06T10:37:25.565044+00:00"
+}

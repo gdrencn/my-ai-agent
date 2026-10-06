@@ -4,7 +4,7 @@ import subprocess
 from . import __version__, codex, install, menu
 from .i18n import t
 from .manager import Manager
-from .output import say
+from .output import say, operation
 from .settings import DEFAULTS, KV, KEEP, EFFORT, settings
 from .store import Error
 
@@ -110,17 +110,19 @@ def main(ui):
             if focused == 'install':
                 component = choose(ui, t('install'), [('all', '全部安装'), ('ollama', 'Ollama'),
                                                       ('llamacpp', 'llama.cpp'), ('codex', 'Codex CLI')])
-                with manager.store.lock(), manager.maintenance():
+                with operation(t('install')), manager.store.lock(), manager.maintenance():
                     install.component(component)
                 say(t('done'))
             elif focused == 'add':
                 add_model(ui, manager)
             elif focused == 'select':
-                rows = manager.inventory(backend(ui))
+                selected_backend = backend(ui)
+                rows = manager.inventory(selected_backend)
                 if not rows:
                     say(t('empty'))
                     continue
-                key = choose(ui, t('model_title'), [(row['key'], row['name']) for row in rows])
+                key = choose(ui, t('ollama_model_title' if selected_backend == 'ollama' else 'model_title'),
+                             [(row['key'], row['name']) for row in rows])
                 select_model(ui, manager, key)
                 say(t('done'))
             elif focused == 'configure':
@@ -134,10 +136,13 @@ def main(ui):
                 say(t('done'))
             elif focused == 'yolo':
                 enabled = choose(ui, t('yolo'), [(True, t('on')), (False, t('off'))], codex.yolo_state()['enabled'])
-                codex.yolo(enabled)
+                with operation(t('yolo')):
+                    codex.yolo(enabled)
                 say(t('done'))
             elif focused == 'status':
-                say(json.dumps(manager.status(), ensure_ascii=False, indent=2))
+                with operation(t('status')):
+                    result = manager.status()
+                say(json.dumps(result, ensure_ascii=False, indent=2))
             elif focused == 'about':
                 say('my-ai-agent / maa ' + __version__)
             choose(ui, t('result'), [])

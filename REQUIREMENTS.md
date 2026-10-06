@@ -1,6 +1,16 @@
-# my-ai-agent Requirements — 0.1.1 test
+# my-ai-agent Requirements — 0.1.2 test
 
 用户于 2026-10-06 确认最终方案并授权开发及发布 0.1.1 test。自动压缩比例首版固定 90%，不添加未确认的比例修改入口。实现及验证见 IMPLEMENTED.md。
+
+## 0.1.2 corrections
+
+用户授权修复 0.1.1 验收中收集的问题；新版本发布为独立 0.1.2 test，不替换 0.1.1。
+
+1. codex-local 专用模型目录只包含当前模型，内部 ID 与真实请求匹配，显示原模型名称。目录同步实际上下文及已实现的文本/函数工具能力，不声明图像或托管搜索支持；推理档位仍保持既定选项，不保证原生支持。切换失败恢复先前 profile 和模型目录，普通 Codex 配置保持独立。真实 Codex /model 验证只显示本地模型且不再出现 fallback metadata 警告。
+2. codex-local 对已驻留且配置一致的目标只做检查，不重复创建 Ollama 别名或请求加载。空闲卸载后按原配置唤醒，并更新实际上下文；暂停目标仍拒绝暗中启动。核验官方显式 embedded/no-daemon 模式，若支持则用于专用 profile 以避免自动回退提示，不过滤 Codex 诊断。
+3. 所有可能阻塞的管理操作立即反馈，终端中同一行每秒刷新阶段和累计耗时，结束显示成功、失败或中断及总耗时。失败恢复纳入同一计时流程。原生安装/下载进度保持可见，与计时行不互相覆盖。非终端输出不包含控制码，不污染 CLI stdout JSON；非终端不打印重复计时行。
+4. 模型选择页面按底座显示文案，llama.cpp 不显示 Ollama 暂停提示。
+5. 原生测试无论成功或失败都清理自己创建的坏 GGUF、登记记录和失败配置；保留用户模型与已选择的正常测试模型，报告明确记录清理结果。真实测试还核验已驻留启动不会重建别名、空闲卸载唤醒、两条启动提示和实际 /model 界面。
 
 ## Scope
 
@@ -78,7 +88,7 @@ llama.cpp 配置 context、main K/V、flash attention、fit、reserve、sleep id
 5. 核验 YOLO 两键恢复、重复开启、无关 TOML 保留、跨进程备份。
 6. 核验本地 Responses 对话、流式、工具调用及 context/90% 同步。
 7. PTY 验证导航、输入编辑、窄终端、取消和终端恢复；结构化输出无控制码。
-8. 可重现构建、校验和、包边界、安装版本；不可变 v0.1.1 GitHub prerelease，回下载比较字节。stable 等待用户验收。
+8. 可重现构建、校验和、包边界、安装版本；不可变 v0.1.2 GitHub prerelease，回下载比较字节。stable 等待用户验收。
 9. IMPLEMENTED.md 区分 portable/native/fault-injected/user-reported 证据，不宣称未实测的大模型/GPU/MTP 结果。
 
 ## Official references

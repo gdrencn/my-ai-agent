@@ -10,6 +10,7 @@ import urllib.request
 from . import codex
 from .service import Controller, privileged
 from .store import Error, Store, atomic
+from .output import operation, stage, native_output
 
 URLS = {'ollama': 'https://ollama.com/install.sh',
         'llamacpp': 'https://llama.app/install.sh',
@@ -41,17 +42,25 @@ def require_container():
 
 
 def component(name):
+    with operation('安装底座 / Codex CLI'):
+        _component(name)
+
+
+def _component(name):
     require_container()
     names = list(URLS) if name == 'all' else [name]
     for item in names:
-        print(f'官方安装：{item} — {URLS[item]}', flush=True)
+        stage(f'下载安装程序：{item}')
         with tempfile.NamedTemporaryFile(suffix='.sh') as source:
             # Use the official command's curl behavior (redirects and TLS). Some
             # official CDN frontends reject Python's default HTTP user agent.
             subprocess.run(['curl', '-fsSL', URLS[item], '-o', source.name], check=True)
             env = dict(os.environ, CODEX_NON_INTERACTIVE='true')
             try:
-                subprocess.run(['sh', source.name], env=env, cwd=Path.home(), check=True)
+                stage(f'官方安装：{item}')
+                with native_output():
+                    print(f'官方安装：{item} — {URLS[item]}', flush=True)
+                    subprocess.run(['sh', source.name], env=env, cwd=Path.home(), check=True)
             finally:
                 if item == 'ollama' and Path('/etc/systemd/system/ollama.service').exists():
                     # Also quiesce a partially installed official daemon on error.

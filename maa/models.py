@@ -13,6 +13,7 @@ from .backends import binary, ollama_endpoint, ollama_environment, wait_api, sto
 from .gguf import metadata
 from .http import request
 from .store import Error, identity
+from .output import stage, native_output
 
 
 def file_identity(path):
@@ -26,6 +27,7 @@ def verify_file(model):
 
 
 def local_model(path, backend='llamacpp', name=None):
+    stage('读取 GGUF 元数据和计算模型身份')
     path = Path(path).expanduser().resolve(strict=True)
     if not path.is_file():
         raise Error('Model path must be a regular GGUF file')
@@ -60,6 +62,7 @@ def ollama_session(log):
 
 
 def ollama_inventory(store):
+    stage('读取 Ollama 原生模型清单')
     rows = request(ollama_endpoint() + '/api/tags')['models']
     result = []
     for row in rows:
@@ -91,7 +94,9 @@ def ollama_install(store, name, gguf=None):
         cmd = [binary('ollama'), 'create', name, '-f', str(spec)]
     else:
         cmd = [binary('ollama'), 'pull', name]
-    subprocess.run(cmd, check=True, env=ollama_environment())
+    stage('执行 Ollama 原生下载 / 导入')
+    with native_output():
+        subprocess.run(cmd, check=True, env=ollama_environment())
     models = ollama_inventory(store)
     normalized = name if ':' in name else name + ':latest'
     try:
@@ -111,6 +116,7 @@ def hf_input(repo, filename):
 
 
 def hf_download(store, repo, filename):
+    stage('核对 Hugging Face 仓库和精确文件')
     hf_input(repo, filename)
     headers = {}
     if os.environ.get('HF_TOKEN'):
@@ -151,7 +157,9 @@ def hf_download(store, repo, filename):
         config = '' if not headers else 'header = ' + json.dumps('Authorization: ' + headers['Authorization']) + '\n'
         if config:
             cmd[1:1] = ['--config', '-']
-        completed = subprocess.run(cmd, input=config, text=True)
+        stage('下载 GGUF：' + name)
+        with native_output():
+            completed = subprocess.run(cmd, input=config, text=True)
         if completed.returncode:
             raise Error(f'HF download failed (curl {completed.returncode}); partial retained for retry: {partial}')
         if partial.stat().st_size == 0:

@@ -28,7 +28,8 @@ MESSAGES = {
     'positive': '正', 'nonnegative': '非负',
     'no_target': '尚未选择模型。', 'running': '运行中', 'stopped': '已暂停 / 停止',
     'current': '当前目标：{backend} / {model} / {status}',
-    'model_title': '请选择本地模型；读取 Ollama 清单时会暂时暂停并恢复当前服务。',
+    'model_title': '请选择 llama.cpp 已下载或登记的本地 GGUF 模型。',
+    'ollama_model_title': '请选择本地模型；读取 Ollama 清单时会暂时暂停并恢复当前服务。',
     'result': '结果', 'error': '错误：{error}',
 }
 

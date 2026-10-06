@@ -66,6 +66,31 @@ class Terminal(unittest.TestCase):
         value = self.session(operation, b'\x1b', 'Cancel model', (6, 20))
         self.assertIn('CANCELLED', value)
 
+    def test_wait_refreshes_one_line_and_keeps_native_output(self):
+        operation = ("import time\nfrom maa.output import operation, stage, native_output\n"
+                     "with operation('加载模型'):\n"
+                     " stage('准备')\n time.sleep(1.2)\n"
+                     " with native_output():\n  print('NATIVE_DOWNLOAD', flush=True)\n"
+                     " stage('核验')\n time.sleep(1.1)\n")
+        output = self.session(operation, b'', '加载模型', (12, 60))
+        self.assertIn('已等待 1.', output)
+        self.assertIn('核验', output)
+        self.assertIn('[成功]', output)
+        self.assertIn('NATIVE_DOWNLOAD', output)
+        self.assertGreater(output.count('\r\x1b[2K'), 3)
+        self.assertLess(output.count('\n'), 8)
+
+    def test_failed_wait_keeps_elapsed_and_restores_prompt(self):
+        operation = ("from maa.output import operation, stage\n"
+                     "try:\n with operation('等待故障'):\n"
+                     "  stage('恢复原目标')\n  raise ValueError('expected')\n"
+                     "except ValueError:\n print('RECOVERED')\n")
+        output = self.session(operation, b'', '等待故障', (6, 80))
+        self.assertIn('[失败]', output)
+        self.assertIn('恢复原目标', output)
+        self.assertIn('已等待', output)
+        self.assertIn('RECOVERED', output)
+
 
 if __name__ == '__main__':
     unittest.main()

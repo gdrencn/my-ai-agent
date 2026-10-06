@@ -1,0 +1,72 @@
+{
+  "version": "0.1.2",
+  "at": "2026-10-06T10:44:50.691848+00:00",
+  "status": "passed",
+  "asset_sha256": {
+    "maa-test.pyz": "2d5134077f8903a891b0325f9e5d0ed5afdbc3ce29188347d0a8e074e9e5d97f",
+    "bootstrap.py": "29be87f1d96b102eead25f33edf77f37affda5bec710420c6eda11e2f4a7ed6b",
+    "maa.pyz": "00feeecd2ce235ea792661c31c76b21d7a44a7b10d7455e3c304bd58571fc8ea",
+    "SHA256SUMS": "b072d6751ae668c49e171c3732de1f5b019b2b3042f6e7fa24948a5a2c445911",
+    "VERSION.json": "28954ac185d8d99e5a699b0961ee594562c18ebf483e19be4390e93ac8248d72",
+    "install.sh": "71833da669c112156534c33feefc8f981e0bdd583cf9c0a3c55ee838bd1a45cf"
+  },
+  "portable": {
+    "source_tests": 36,
+    "packaged_tests_outside_checkout": 36,
+    "skipped": 0
+  },
+  "build": {
+    "python_grammar": "3.11",
+    "shell_entries": 3,
+    "deterministic": true,
+    "product_boundary": true,
+    "paired_tester": true,
+    "checksums": true
+  },
+  "native": {
+    "checks": 23,
+    "receipt": "V0_1_2_NATIVE.json",
+    "software": {
+      "ollama": "0.35.1",
+      "llamacpp": "b11429",
+      "codex": "0.160.1"
+    },
+    "program_sha256": "00feeecd2ce235ea792661c31c76b21d7a44a7b10d7455e3c304bd58571fc8ea"
+  },
+  "boot": {
+    "status": "passed",
+    "uid": 1001,
+    "checks": [
+      "pause then container restart autostarts accepted target",
+      "context 32768",
+      "enabled owned maa.service",
+      "official Ollama daemon inactive"
+    ],
+    "model": "maa-09dadb68b4448ec5239f2adb:latest",
+    "program_sha256": "00feeecd2ce235ea792661c31c76b21d7a44a7b10d7455e3c304bd58571fc8ea"
+  },
+  "maa_menu": {
+    "status": "passed",
+    "llama_label_correct": true,
+    "cancellation_preserves_target": true,
+    "terminal_restored": true
+  },
+  "codex_tool_fixture": {
+    "status": "passed",
+    "kind": "real Codex / deterministic upstream fixture",
+    "tool_output_replayed": true,
+    "file_created_by_codex_tool": true,
+    "stdout": "Done.\n",
+    "diagnostic": "Reading additional input from stdin...\nOpenAI Codex v0.160.1\n--------\nworkdir: /home/sandbox/.maa-real-codex-tool-dd1u33nm\nmodel: maa_tool_fixture\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a110cf-71dd-7951-82ae-74ccb37f633b\n--------\nuser\nUse a shell tool to print MAA_REAL_CODEX_TOOL_OK, then answer done.\nexec\n/bin/bash -lc 'printf MAA_REAL_CODEX_TOOL_OK > codex-proof.txt; cat codex-proof.txt' in /home/sandbox/.maa-real-codex-tool-dd1u33nm\n succeeded in 0ms:\nMAA_REAL_CODEX_TOOL_OK\ncodex\nDone.\n"
+  },
+  "initial_driver_attempt": {
+    "status": "failed",
+    "kind": "test-driver handling",
+    "detail": "Codex buffered slash-command Enter as a paste burst; driver sends a separate Enter. Corrected native rerun passed 23 checks."
+  },
+  "limitations": [
+    "Native forced llama.cpp sleep/wake not separately accepted",
+    "Small-model timings do not establish large-model performance",
+    "Native MTP and large models await user acceptance"
+  ]
+}

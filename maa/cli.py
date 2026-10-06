@@ -8,6 +8,7 @@ from . import __version__, codex
 from .manager import Manager
 from .settings import DEFAULTS
 from .store import Error
+from .output import operation
 
 
 def change_pairs(pairs):
@@ -106,11 +107,12 @@ def run(argv=None):
         elif args.action == 'start':
             result = manager.start()
         elif args.action == 'yolo':
-            codex.yolo(args.state == 'on')
+            with operation('更新 Codex 全局 YOLO 设置'):
+                codex.yolo(args.state == 'on')
             result = codex.yolo_state()
         elif args.action == 'install':
             from .install import component
-            with manager.store.lock(), manager.maintenance():
+            with operation('安装底座 / Codex CLI'), manager.store.lock(), manager.maintenance():
                 component(args.component)
         if result is not None:
             print(json.dumps(result, ensure_ascii=False, indent=2))
