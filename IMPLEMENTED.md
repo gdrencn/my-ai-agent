@@ -48,7 +48,11 @@ Whole-GPU data was read on an NVIDIA RTX 5090 Laptop GPU through the container's
 
 ## Publication stage
 
-Verified source and frozen 0.1.3 test assets are ready for an immutable GitHub prerelease. Public installation and asset verification are recorded separately after publication. Stable awaits user acceptance; 0.1.1 and 0.1.2 releases remain unchanged.
+[v0.1.3 test](https://github.com/gdrencn/my-ai-agent/releases/tag/v0.1.3) is published as a GitHub prerelease from source commit 2ae8d01b11d69cb693e71ca27f69279844de0bc0. Main and tag CI passed. All nine initial assets were downloaded again and matched frozen bytes and GitHub SHA-256 metadata; both manifests passed.
+
+Anonymous public install and test entries resolved 0.1.3. Standalone upgrade preserved selection, model registry, per-model configs and the user-data canary. The paired public test passed 50 portable/PTY and 25 native checks with the frozen installed program hash. All three official installers had already run in this owned container; public validation used --components none to reuse them. Public evidence and its checksum are appended as new release assets without replacing the original nine. Record: [validation/V0_1_3_PUBLIC.json](validation/V0_1_3_PUBLIC.json).
+
+The owned maa-validation-013 container was stopped and deleted after reports were preserved. Prior release/asset identities remain unchanged. Stable awaits user acceptance.
 
 ## Historical evidence
 

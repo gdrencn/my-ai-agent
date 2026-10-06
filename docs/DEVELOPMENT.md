@@ -42,7 +42,7 @@ Progress belongs on stderr. Real PTY checks cover immediate feedback, one-line p
 
 ## Artifacts and release
 
-Build produces maa.pyz, maa-test.pyz, VERSION.json, bootstrap.py, install.sh and SHA256SUMS. Numeric version lives only in maa/__init__.py. VERSION.json pairs the test channel/version; SHA256SUMS covers the other five payloads. Test publication can add frozen validation JSON and its checksum.
+Build produces maa.pyz, maa-test.pyz, VERSION.json, bootstrap.py, install.sh and SHA256SUMS. Numeric version lives only in maa/__init__.py. VERSION.json pairs the test channel/version; SHA256SUMS covers the other five payloads. Test publication can add frozen validation JSON and its checksum. The repository validation manifest covers all checked-in receipts; the release validation manifest covers that version's initial local/native receipts. Public evidence is appended with a separate PUBLIC_SHA256SUMS; never overwrite a released manifest.
 
 Commit verified source/docs to main, tag v0.1.3, publish GitHub prerelease. Never replace an existing tag/release/asset. Download every asset again and verify local byte equality, manifest and the public installer. Changes after freeze require a new version unless they only record validation/documentation and do not alter frozen payloads. Stable promotion needs user acceptance.
 
