@@ -128,6 +128,7 @@ class Responses:
                       'created_at': int(time.time()), 'model': model, 'status': 'in_progress',
                       'output': [], 'error': None, 'usage': None}
         self.calls, self.message, self.reasoning = {}, None, None
+        self.native_usage = None
         self.event('response.created', response=self.value.copy())
         self.event('response.in_progress', response=self.value.copy())
 
@@ -142,11 +143,19 @@ class Responses:
         return index, item
 
     def delta(self, value):
-        if value.get('usage'):
-            usage = value['usage']
-            self.value['usage'] = {'input_tokens': usage.get('prompt_tokens', 0),
-                                   'output_tokens': usage.get('completion_tokens', 0),
-                                   'total_tokens': usage.get('total_tokens', 0)}
+        if 'usage' in value and value['usage'] is not None:
+            usage = value['usage'] if isinstance(value['usage'], dict) else {}
+            def count(key):
+                number = usage.get(key)
+                return number if type(number) is int and number >= 0 else None
+            inputs, outputs = count('prompt_tokens'), count('completion_tokens')
+            self.native_usage = {'input_tokens': inputs, 'output_tokens': outputs}
+            # Codex expects complete integer usage or null. Missing native
+            # fields are unknown, never invented zero counts in the status.
+            total = count('total_tokens')
+            self.value['usage'] = ({'input_tokens': inputs, 'output_tokens': outputs,
+                                    'total_tokens': total if total is not None else inputs + outputs}
+                                   if inputs is not None and outputs is not None else None)
         for choice in value.get('choices', []):
             delta = choice.get('delta') or choice.get('message') or {}
             reason = delta.get('reasoning_content') or delta.get('reasoning')
@@ -233,7 +242,7 @@ class Responses:
         return self.value
 
 
-def server(runtime, port=18443):
+def server(runtime, port=18443, record_usage=None):
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *args):
             pass
@@ -249,7 +258,7 @@ def server(runtime, port=18443):
         def do_GET(self):
             if self.path in ('/health', '/v1/models'):
                 self.send_json(200, {'status': 'ok'} if self.path == '/health' else
-                               {'object': 'list', 'data': [{'id': runtime['model'], 'object': 'model'}]})
+                               {'object': 'list', 'data': [{'id': runtime.get('display_name', runtime['model']), 'object': 'model'}]})
             else:
                 self.send_json(404, {'error': {'message': 'Unknown local endpoint'}})
 
@@ -281,7 +290,7 @@ def server(runtime, port=18443):
                         self.wfile.write(wire.encode())
                         self.wfile.flush()
 
-                result = Responses(runtime['model'], custom, emit)
+                result = Responses(runtime.get('display_name', runtime['model']), custom, emit)
                 with upstream:
                     content_type = upstream.headers.get('Content-Type', '')
                     if 'text/event-stream' not in content_type:
@@ -304,6 +313,13 @@ def server(runtime, port=18443):
                         if not done:
                             raise Error('Native stream closed without a completion marker')
                 response = result.finish()
+                if record_usage:
+                    try:
+                        record_usage({**response, 'usage': result.native_usage})
+                    except (OSError, Error, ValueError) as exc:
+                        # Status counters must not turn successful inference into failure.
+                        import sys
+                        print(f'maa: token statistics could not be saved: {exc}', file=sys.stderr, flush=True)
                 if not streaming:
                     self.send_json(200, response)
             except (BrokenPipeError, ConnectionResetError):

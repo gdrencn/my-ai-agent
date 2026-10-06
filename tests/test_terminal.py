@@ -15,6 +15,8 @@ class Terminal(unittest.TestCase):
     def session(self, operation, keys, marker, size=(12, 32)):
         pid, fd = pty.fork()
         if pid == 0:
+            os.environ['TERM'] = 'xterm-256color'
+            os.environ.pop('NO_COLOR', None)
             root = str(Path(__file__).resolve().parent.parent)
             code = f'import sys;sys.path.insert(0,{root!r})\nfrom maa.menu import interactive, Cancelled\n' + operation
             os.execv(sys.executable, [sys.executable, '-c', code])
@@ -90,6 +92,57 @@ class Terminal(unittest.TestCase):
         self.assertIn('恢复原目标', output)
         self.assertIn('已等待', output)
         self.assertIn('RECOVERED', output)
+
+    def test_grouped_menu_returns_to_main_and_preserves_focus(self):
+        operation = ("from unittest.mock import patch\nfrom maa.ui import main\n"
+                     "class Manager:\n def model_status(self, **kwargs):\n"
+                     "  return {'model':'fixture.gguf','state':'running'}\n"
+                     "with patch('maa.ui.Manager', Manager):\n interactive(main)\nprint('MENU_EXIT')")
+        keys = b'\r\x1b[A\r\x1b[A\r'
+        value = self.session(operation, keys, '当前模型', (20, 100))
+        self.assertIn('本地模型管理', value)
+        self.assertIn('当前模型状态', value)
+        self.assertIn('Codex 全局设置', value)
+        self.assertNotIn('当前状态与配置', value)
+        self.assertIn('MENU_EXIT', value)
+        self.assertIn('\x1b[32m运行中\x1b[39m', value)
+
+    def test_configuration_colors_pending_values_and_cancel(self):
+        operation = ("from maa.ui import edit_settings\nfrom maa.settings import settings\n"
+                     "try:\n interactive(lambda ui: edit_settings(ui, {'mtp_supported':False}, settings()))\n"
+                     "except Cancelled:\n print('DRAFT_CANCELLED')")
+        value = self.session(operation, b'\r4096\r\x1b[A\r', '上下文大小', (24, 120))
+        self.assertIn('\x1b[36m262144\x1b[39m', value)
+        self.assertIn('\x1b[36m4096\x1b[39m', value)
+        self.assertIn('\x1b[90m不可用', value)
+        self.assertIn('未应用修改', value)
+        self.assertIn('DRAFT_CANCELLED', value)
+
+    def test_yolo_nested_switch_restores_original_in_private_home(self):
+        operation = ("import tempfile, os\nfrom pathlib import Path\nfrom maa import codex\n"
+                     "from maa.ui import global_settings\nwith tempfile.TemporaryDirectory() as folder:\n"
+                     " os.environ['CODEX_HOME']=folder\n"
+                     " Path(folder,'config.toml').write_text('approval_policy=\"on-request\"\\n')\n"
+                     " interactive(global_settings)\n"
+                     " assert codex.parse(Path(folder,'config.toml').read_text())['approval_policy']=='on-request'\n"
+                     " assert not Path(folder,'maa-yolo-recovery.json').exists()\nprint('YOLO_RESTORED')")
+        keys = b'\r\x1b[A\r\r\x1b[B\r\x1b[A\r'
+        value = self.session(operation, keys, 'YOLO 模式', (16, 100))
+        self.assertIn('关闭（恢复原设置）', value)
+        self.assertIn('\x1b[32m开启\x1b[39m', value)
+        self.assertIn('\x1b[90m关闭\x1b[39m', value)
+        self.assertIn('YOLO_RESTORED', value)
+
+    def test_no_color_retains_configuration_text(self):
+        operation = ("import os\nos.environ['NO_COLOR']='1'\nfrom maa.ui import edit_settings\n"
+                     "from maa.settings import settings\ntry:\n"
+                     " interactive(lambda ui: edit_settings(ui, {'mtp_supported':False}, settings()))\n"
+                     "except Cancelled:\n print('NO_COLOR_EXIT')")
+        value = self.session(operation, b'\x1b[A\r', '上下文大小', (24, 120))
+        self.assertIn('上下文大小：262144', value)
+        self.assertNotIn('\x1b[36m', value)
+        self.assertNotIn('\x1b[32m', value)
+        self.assertIn('NO_COLOR_EXIT', value)
 
 
 if __name__ == '__main__':

@@ -1,0 +1,514 @@
+{
+  "version": "0.1.3",
+  "at": "2026-10-06T21:56:22.515144+00:00",
+  "status": "passed",
+  "asset_sha256": {
+    "maa-test.pyz": "33737835fa726634e56b354d87c093025effd184e83f5df625029fdd66490f93",
+    "bootstrap.py": "29be87f1d96b102eead25f33edf77f37affda5bec710420c6eda11e2f4a7ed6b",
+    "maa.pyz": "d3b954b6086c28a48211f8334189da12ce34043cc48536eec3112f179c7f9dd6",
+    "SHA256SUMS": "1588d48fc2644692117f119e71e8537cdf2272a6ab97943ed68692d18d6ab615",
+    "VERSION.json": "a64cedaef6165e041c2ed95c56a91220d8a597f61b9ef58f4d93c5cbd76e0fcc",
+    "install.sh": "71833da669c112156534c33feefc8f981e0bdd583cf9c0a3c55ee838bd1a45cf"
+  },
+  "portable": {
+    "source_tests": 50,
+    "packaged_tests_outside_checkout": 50,
+    "container_packaged_tests": 50,
+    "skipped": 0,
+    "host_python": "3.14.4"
+  },
+  "build": {
+    "passed": true,
+    "reproducible": true,
+    "python_3_11_grammar": 44,
+    "shell_syntax": true,
+    "package_boundaries": true
+  },
+  "native": {
+    "checks": 25,
+    "receipt": "V0_1_3_NATIVE.json",
+    "program_sha256": "d3b954b6086c28a48211f8334189da12ce34043cc48536eec3112f179c7f9dd6",
+    "software": {
+      "os": "Ubuntu 26.04.1 LTS",
+      "python": "3.14.4",
+      "uid": 1001,
+      "ollama": "0.40.0",
+      "ollama_llamacpp_pin": "b11351",
+      "llamacpp": "b11429 / d81235049",
+      "codex": "0.160.1"
+    }
+  },
+  "boot": {
+    "check": "paused-target-autostarts-on-container-restart",
+    "passed": true,
+    "program_sha256": "d3b954b6086c28a48211f8334189da12ce34043cc48536eec3112f179c7f9dd6",
+    "before": {
+      "model_key": "07591f8b732c1e7241bfe575",
+      "launch": {
+        "device": 2096,
+        "inode": 225956,
+        "offset": 801034,
+        "service_id": "64288886d0c84e5d89f6b8ba1cfe9698"
+      },
+      "program_sha256": "d3b954b6086c28a48211f8334189da12ce34043cc48536eec3112f179c7f9dd6"
+    },
+    "after": {
+      "selected": {
+        "model": {
+          "key": "07591f8b732c1e7241bfe575",
+          "backend": "llamacpp",
+          "name": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+          "path": "/home/sandbox/.local/state/my-ai-agent/models/66204dcd0d42165045cefdeb/Qwen3-0.6B-Q4_K_M.gguf",
+          "file_identity": [
+            2096,
+            226811,
+            396705472,
+            1791322543516811604
+          ],
+          "sha256": "ac2d97712095a558e31573f62f466a3f9d93990898b0ec79d7c974c1780d524a",
+          "metadata": {
+            "general.architecture": "qwen3",
+            "general.type": "model",
+            "general.name": "Qwen3-0.6B",
+            "general.basename": "Qwen3-0.6B",
+            "general.quantized_by": "Unsloth",
+            "general.size_label": "0.6B",
+            "general.repo_url": "https://huggingface.co/unsloth",
+            "qwen3.block_count": 28,
+            "qwen3.context_length": 40960,
+            "qwen3.embedding_length": 1024,
+            "qwen3.feed_forward_length": 3072,
+            "qwen3.attention.head_count": 16,
+            "qwen3.attention.head_count_kv": 8,
+            "qwen3.rope.freq_base": 1000000.0,
+            "qwen3.attention.layer_norm_rms_epsilon": 9.999999974752427e-07,
+            "qwen3.attention.key_length": 128,
+            "qwen3.attention.value_length": 128,
+            "tokenizer.ggml.model": "gpt2",
+            "tokenizer.ggml.pre": "qwen2",
+            "tokenizer.ggml.eos_token_id": 151645,
+            "tokenizer.ggml.padding_token_id": 151654,
+            "tokenizer.ggml.add_bos_token": false,
+            "tokenizer.chat_template": "{%- if tools %}\n    {{- '<|im_start|>system\\n' }}\n    {%- if messages[0].role == 'system' %}\n        {{- messages[0].content + '\\n\\n' }}\n    {%- endif %}\n    {{- \"# Tools\\n\\nYou may call one or more functions to assist with the user query.\\n\\nYou are provided with function signatures within <tools></tools> XML tags:\\n<tools>\" }}\n    {%- for tool in tools %}\n        {{- \"\\n\" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- \"\\n</tools>\\n\\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\\n<tool_call>\\n{\\\"name\\\": <function-name>, \\\"arguments\\\": <args-json-object>}\\n</tool_call><|im_end|>\\n\" }}\n{%- else %}\n    {%- if messages[0].role == 'system' %}\n        {{- '<|im_start|>system\\n' + messages[0].content + '<|im_end|>\\n' }}\n    {%- endif %}\n{%- endif %}\n{%- set ns = namespace(multi_step_tool=true, last_query_index=messages|length - 1) %}\n{%- for forward_message in messages %}\n    {%- set index = (messages|length - 1) - loop.index0 %}\n    {%- set message = messages[index] %}\n    {%- set current_content = message.content if message.content is defined and message.content is not none else '' %}\n    {%- set tool_start = '<tool_response>' %}\n    {%- set tool_start_length = tool_start|length %}\n    {%- set start_of_message = current_content[:tool_start_length] %}\n    {%- set tool_end = '</tool_response>' %}\n    {%- set tool_end_length = tool_end|length %}\n    {%- set start_pos = (current_content|length) - tool_end_length %}\n    {%- if start_pos < 0 %}\n        {%- set start_pos = 0 %}\n    {%- endif %}\n    {%- set end_of_message = current_content[start_pos:] %}\n    {%- if ns.multi_step_tool and message.role == \"user\" and not(start_of_message == tool_start and end_of_message == tool_end) %}\n        {%- set ns.multi_step_tool = false %}\n        {%- set ns.last_query_index = index %}\n    {%- endif %}\n{%- endfor %}\n{%- for message in messages %}\n    {%- if (message.role == \"user\") or (message.role == \"system\" and not loop.first) %}\n        {{- '<|im_start|>' + message.role + '\\n' + message.content + '<|im_end|>' + '\\n' }}\n    {%- elif message.role == \"assistant\" %}\n        {%- set m_content = message.content if message.content is defined and message.content is not none else '' %}\n        {%- set content = m_content %}\n        {%- set reasoning_content = '' %}\n        {%- if message.reasoning_content is defined and message.reasoning_content is not none %}\n            {%- set reasoning_content = message.reasoning_content %}\n        {%- else %}\n            {%- if '</think>' in m_content %}\n                {%- set content = (m_content.split('</think>')|last).lstrip('\\n') %}\n                {%- set reasoning_content = (m_content.split('</think>')|first).rstrip('\\n') %}\n                {%- set reasoning_content = (reasoning_content.split('<think>')|last).lstrip('\\n') %}\n            {%- endif %}\n        {%- endif %}\n        {%- if loop.index0 > ns.last_query_index %}\n            {%- if loop.last or (not loop.last and (not reasoning_content.strip() == '')) %}\n                {{- '<|im_start|>' + message.role + '\\n<think>\\n' + reasoning_content.strip('\\n') + '\\n</think>\\n\\n' + content.lstrip('\\n') }}\n            {%- else %}\n                {{- '<|im_start|>' + message.role + '\\n' + content }}\n            {%- endif %}\n        {%- else %}\n            {{- '<|im_start|>' + message.role + '\\n' + content }}\n        {%- endif %}\n        {%- if message.tool_calls %}\n            {%- for tool_call in message.tool_calls %}\n                {%- if (loop.first and content) or (not loop.first) %}\n                    {{- '\\n' }}\n                {%- endif %}\n                {%- if tool_call.function %}\n                    {%- set tool_call = tool_call.function %}\n                {%- endif %}\n                {{- '<tool_call>\\n{\"name\": \"' }}\n                {{- tool_call.name }}\n                {{- '\", \"arguments\": ' }}\n                {%- if tool_call.arguments is string %}\n                    {{- tool_call.arguments }}\n                {%- else %}\n                    {{- tool_call.arguments | tojson }}\n                {%- endif %}\n                {{- '}\\n</tool_call>' }}\n            {%- endfor %}\n        {%- endif %}\n        {{- '<|im_end|>\\n' }}\n    {%- elif message.role == \"tool\" %}\n        {%- if loop.first or (messages[loop.index0 - 1].role != \"tool\") %}\n            {{- '<|im_start|>user' }}\n        {%- endif %}\n        {{- '\\n<tool_response>\\n' }}\n        {{- message.content }}\n        {{- '\\n</tool_response>' }}\n        {%- if loop.last or (messages[loop.index0 + 1].role != \"tool\") %}\n            {{- '<|im_end|>\\n' }}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '<|im_start|>assistant\\n' }}\n    {%- if enable_thinking is defined and enable_thinking is false %}\n        {{- '<think>\\n\\n</think>\\n\\n' }}\n    {%- endif %}\n{%- endif %}",
+            "general.quantization_version": 2,
+            "general.file_type": 15,
+            "quantize.imatrix.file": "Qwen3-0.6B-GGUF/imatrix_unsloth.dat",
+            "quantize.imatrix.dataset": "unsloth_calibration_Qwen3-0.6B.txt",
+            "quantize.imatrix.entries_count": 196,
+            "quantize.imatrix.chunks_count": 688,
+            "maa.mtp_supported": false
+          },
+          "mtp_supported": false,
+          "source": "hf",
+          "repo": "unsloth/Qwen3-0.6B-GGUF",
+          "filename": "Qwen3-0.6B-Q4_K_M.gguf",
+          "revision": "50968a4468ef4233ed78cd7c3de230dd1d61a56b"
+        },
+        "settings": {
+          "context": 32768,
+          "kv": "q8_0",
+          "flash_attention": true,
+          "fit": true,
+          "reserve_mib": 0,
+          "keep_alive": "5m",
+          "mtp": false,
+          "mtp_kv": "follow",
+          "reasoning": "default"
+        }
+      },
+      "running": true,
+      "runtime": {
+        "model": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+        "context": 32768,
+        "upstream": "http://127.0.0.1:8080",
+        "resources": {
+          "sleeping": false,
+          "total_slots": 1,
+          "model_path": "/home/sandbox/.local/state/my-ai-agent/models/66204dcd0d42165045cefdeb/Qwen3-0.6B-Q4_K_M.gguf",
+          "gpu_layers": [
+            29,
+            29
+          ]
+        },
+        "backend": "llamacpp",
+        "key": "07591f8b732c1e7241bfe575",
+        "fingerprint": "803caf21af1be576d9717f6b801790a373d27e4ac3c0bf99cbf80eb99f78fba4",
+        "display_name": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+        "launch": {
+          "device": 2096,
+          "inode": 225956,
+          "offset": 819953,
+          "service_id": "9dd2fba9bc174583b3595bcec09fc2c4"
+        },
+        "base_url": "http://127.0.0.1:18443/v1",
+        "pid": 311,
+        "capabilities": {
+          "hosted_web_search": false,
+          "stateless_responses": true
+        }
+      },
+      "yolo": {
+        "enabled": true,
+        "managed": true
+      },
+      "model_status": {
+        "backend": "llamacpp",
+        "model": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+        "state": "running",
+        "context": 32768,
+        "allocations": {
+          "load_id": "831964",
+          "gpu_layers": [
+            29,
+            29
+          ],
+          "buffers": [
+            {
+              "phase": "main",
+              "component": "load_tensors",
+              "backend": "CPU_Mapped",
+              "kind": "model",
+              "mib": 121.71,
+              "location": "host"
+            },
+            {
+              "phase": "main",
+              "component": "load_tensors",
+              "backend": "CUDA0",
+              "kind": "model",
+              "mib": 372.65,
+              "location": "gpu"
+            },
+            {
+              "phase": "main",
+              "component": "llama_context",
+              "backend": "CUDA_Host",
+              "kind": "output",
+              "mib": 0.58,
+              "location": "host"
+            },
+            {
+              "phase": "main",
+              "component": "llama_kv_cache",
+              "backend": "CUDA0",
+              "kind": "KV",
+              "mib": 1904.0,
+              "location": "gpu"
+            },
+            {
+              "phase": "main",
+              "component": "sched_reserve",
+              "backend": "CUDA0",
+              "kind": "compute",
+              "mib": 176.09,
+              "location": "gpu"
+            },
+            {
+              "phase": "main",
+              "component": "sched_reserve",
+              "backend": "CUDA_Host",
+              "kind": "compute",
+              "mib": 40.1,
+              "location": "host"
+            }
+          ],
+          "mtp_shared_kv": false,
+          "rs_sequences": 0,
+          "gpu_identified_mib": 2452.74,
+          "truncated": false,
+          "error": null
+        },
+        "usage": null,
+        "error": null,
+        "mtp": "unavailable",
+        "gpu_memory": {
+          "devices": [
+            {
+              "index": "0",
+              "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+              "total_mib": 24463.0,
+              "used_mib": 2742.0,
+              "free_mib": 21396.0,
+              "reserved_mib": 326.0
+            }
+          ],
+          "error": null
+        },
+        "resources": {
+          "sleeping": false,
+          "total_slots": 1
+        }
+      }
+    }
+  },
+  "maa_menu": {
+    "check": "installed-maa-grouped-menu",
+    "passed": true,
+    "sizes": [
+      [
+        20,
+        120
+      ],
+      [
+        12,
+        50
+      ]
+    ],
+    "status_refresh_readonly": true,
+    "terminal_restored": true,
+    "colors": [
+      "green",
+      "cyan",
+      "gray"
+    ],
+    "output": "\r\nmy-ai-agent\r\n\r\n当前模型：unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf\r\n运行状态：运行中\r\n\r\n\r❯ 本地模型管理\r\n\r  Codex 配置\r\n\r  Codex 全局设置\r\n\r  安装底座 / Codex CLI\r\n\r  关于 my-ai-agent\r\n\r  退出\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 退出\r\n\r\r\r❯ 本地模型管理\r\n\r  Codex 配置\r\n\r  Codex 全局设置\r\n\r  安装底座 / Codex CLI\r\n\r  关于 my-ai-agent\r\n\r  退出\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 退出\r\n\r\n本地模型管理\r\n\r\n本地模型管理\r\n\r❯ 设置本地模型（立即切换）\r\n\r  安装 / 登记新模型\r\n\r  模型配置\r\n\r  当前模型状态\r\n\r  暂停当前模型，释放资源\r\n\r  启动当前模型\r\n\r  返回\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回\r\n\r\r\r  设置本地模型（立即切换）\r\n\r❯ 安装 / 登记新模型\r\n\r  模型配置\r\n\r  当前模型状态\r\n\r  暂停当前模型，释放资源\r\n\r  启动当前模型\r\n\r  返回\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回\r\n\r\r\r  设置本地模型（立即切换）\r\n\r  安装 / 登记新模型\r\n\r❯ 模型配置\r\n\r  当前模型状态\r\n\r  暂停当前模型，释放资源\r\n\r  启动当前模型\r\n\r  返回\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回\r\n\r\r\r  设置本地模型（立即切换）\r\n\r  安装 / 登记新模型\r\n\r  模型配置\r\n\r❯ 当前模型状态\r\n\r  暂停当前模型，释放资源\r\n\r  启动当前模型\r\n\r  返回\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回\r\n\r\r\r  设置本地模型（立即切换）\r\n\r  安装 / 登记新模型\r\n\r  模型配置\r\n\r❯ 当前模型状态\r\n\r  暂停当前模型，释放资源\r\n\r  启动当前模型\r\n\r  返回\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回\r\n\r\n当前模型状态\r\n\r\n\r[进行中] 当前模型状态 — 已等待 0.0 秒\r[成功] 当前模型状态 — 耗时 0.0 秒\r\n\r\n当前模型状态\r\n\r\n底座：llama.cpp\r\n当前模型：unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf\r\n运行状态：运行中\r\n模型层 GPU 装载：29/29 层（100.0%）\r\n模型权重：系统内存映射 121.71 MiB；GPU CUDA0 372.65 MiB\r\n主模型 KV：GPU CUDA0 1904.00 MiB\r\n循环状态缓冲区 RS：不适用\r\n计算缓冲区：GPU CUDA0 176.09 MiB；系统内存 CUDA_Host 40.10 MiB\r\n输出缓冲区：系统内存 CUDA_Host 0.58 MiB\r\nMTP KV：不可用\r\nMTP 计算缓冲区：不可用\r\n已识别显存分配合计：2452.74 MiB\r\n缓冲区数值为当前加载的原生分配记录；CPU_Mapped 为映射量，不是实际 RSS。\r\n整卡显存 0 / NVIDIA GeForce RTX 5090 Laptop GPU：总量 24463 MiB；已用 2742 MiB；可用 21396 MiB；驱动预留 326 MiB\r\n整卡显存包含其他程序及驱动占用，与已识别分配合计分别统计。\r\n有效上下文：32768 tokens\r\n上下文占用（最近一次输入）：未取得\r\n最近一次生成：未取得\r\n统计时间：未取得\r\n\r\n\r  刷新\r\n\r❯ 返回\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回\r\n\r\r\r❯ 刷新\r\n\r  返回\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回\r\n\r\r\r❯ 刷新\r\n\r  返回\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回\r\n\r\n\r[进行中] 当前模型状态 — 已等待 0.0 秒\r[成功] 当前模型状态 — 耗时 0.0 秒\r\n\r\n当前模型状态\r\n\r\n底座：llama.cpp\r\n当前模型：unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf\r\n运行状态：运行中\r\n模型层 GPU 装载：29/29 层（100.0%）\r\n模型权重：系统内存映射 121.71 MiB；GPU CUDA0 372.65 MiB\r\n主模型 KV：GPU CUDA0 1904.00 MiB\r\n循环状态缓冲区 RS：不适用\r\n计算缓冲区：GPU CUDA0 176.09 MiB；系统内存 CUDA_Host 40.10 MiB\r\n输出缓冲区：系统内存 CUDA_Host 0.58 MiB\r\nMTP KV：不可用\r\nMTP 计算缓冲区：不可用\r\n已识别显存分配合计：2452.74 MiB\r\n缓冲区数值为当前加载的原生分配记录；CPU_Mapped 为映射量，不是实际 RSS。\r\n整卡显存 0 / NVIDIA GeForce RTX 5090 Laptop GPU：总量 24463 MiB；已用 2742 MiB；可用 21396 MiB；驱动预留 326 MiB\r\n整卡显存包含其他程序及驱动占用，与已识别分配合计分别统计。\r\n有效上下文：32768 tokens\r\n上下文占用（最近一次输入）：未取得\r\n最近一次生成：未取得\r\n统计时间：未取得\r\n\r\n\r  刷新\r\n\r❯ 返回\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回\r\n\r\r\r  刷新\r\n\r❯ 返回\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回\r\n\r\n本地模型管理\r\n\r  设置本地模型（立即切换）\r\n\r  安装 / 登记新模型\r\n\r  模型配置\r\n\r❯ 当前模型状态\r\n\r  暂停当前模型，释放资源\r\n\r  启动当前模型\r\n\r  返回\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回\r\n\r\r\r  设置本地模型（立即切换）\r\n\r  安装 / 登记新模型\r\n\r  模型配置\r\n\r❯ 当前模型状态\r\n\r  暂停当前模型，释放资源\r\n\r  启动当前模型\r\n\r  返回\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回\r\n\r\nmy-ai-agent\r\n\r\n当前模型：unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf\r\n运行状态：运行中\r\n\r\n\r❯ 本地模型管理\r\n\r  Codex 配置\r\n\r  Codex 全局设置\r\n\r  安装底座 / Codex CLI\r\n\r  关于 my-ai-agent\r\n\r  退出\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 退出\r\n\r\r\r❯ 本地模型管理\r\n\r  Codex 配置\r\n\r  Codex 全局设置\r\n\r  安装底座 / Codex CLI\r\n\r  关于 my-ai-agent\r\n\r  退出\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 退出\r\n\r\r\r  本地模型管理\r\n\r❯ Codex 配置\r\n\r  Codex 全局设置\r\n\r  安装底座 / Codex CLI\r\n\r  关于 my-ai-agent\r\n\r  退出\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 退出\r\n\r\r\r  本地模型管理\r\n\r❯ Codex 配置\r\n\r  Codex 全局设置\r\n\r  安装底座 / Codex CLI\r\n\r  关于 my-ai-agent\r\n\r  退出\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 退出\r\n\r\nCodex 配置\r\n\r\nCodex 配置\r\n\r\n修改后选择“应用修改”生效；返回取消本次编辑。\r\n\r\n\r❯ Codex 推理强度：默认（不显式覆盖）\r\n\r  上下文大小（跟随模型，只读）：32768 tokens\r\n\r  自动压缩阈值（90%，只读）：29491 tokens\r\n\r  应用修改（立即重新加载）\r\n\r  返回\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回\r\n\r\r\r❯ Codex 推理强度：默认（不显式覆盖）\r\n\r  上下文大小（跟随模型，只读）：32768 tokens\r\n\r  自动压缩阈值（90%，只读）：29491 tokens\r\n\r  应用修改（立即重新加载）\r\n\r  返回\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回\r\n\r\nmy-ai-agent\r\n\r\n当前模型：unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K\r\n_M.gguf\r\n运行状态：运行中\r\n\r\n\r  本地模型管理\r\n\r❯ Codex 配置\r\n\r  Codex 全局设置\r\n\r  安装底座 / Codex CLI\r\n\r  关于 my-ai-agent\r\n\r  退出\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 退出\r\n\r\r\r  本地模型管理\r\n\r  Codex 配置\r\n\r❯ Codex 全局设置\r\n\r  安装底座 / Codex CLI\r\n\r  关于 my-ai-agent\r\n\r  退出\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 退出\r\n\r\r\r  本地模型管理\r\n\r  Codex 配置\r\n\r❯ Codex 全局设置\r\n\r  安装底座 / Codex CLI\r\n\r  关于 my-ai-agent\r\n\r  退出\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 退出\r\n\r\nCodex 全局设置\r\n\r\nCodex 全局设置\r\n\r❯ YOLO 模式：开启\r\n\r  返回\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回\r\n\r\r\r❯ YOLO 模式：开启\r\n\r  返回\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回\r\n\r\nYOLO 模式\r\n\r❯ 开启\r\n\r  关闭（恢复原设置）\r\n\r  返回\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回\r\n\r\r\r❯ 开启\r\n\r  关闭（恢复原设置）\r\n\r  返回\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回\r\n\r\nCodex 全局设置\r\n\r❯ YOLO 模式：开启\r\n\r  返回\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回\r\n\r\r\r❯ YOLO 模式：开启\r\n\r  返回\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回\r\n\r\nmy-ai-agent\r\n\r\n当前模型：unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K\r\n_M.gguf\r\n运行状态：运行中\r\n\r\n\r  本地模型管理\r\n\r  Codex 配置\r\n\r❯ Codex 全局设置\r\n\r  安装底座 / Codex CLI\r\n\r  关于 my-ai-agent\r\n\r  退出\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 退出\r\n\r\r\r  本地模型管理\r\n\r  Codex 配置\r\n\r  Codex 全局设置\r\n\r❯ 安装底座 / Codex CLI\r\n\r  关于 my-ai-agent\r\n\r  退出\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 退出\r\n\r\r\r  本地模型管理\r\n\r  Codex 配置\r\n\r  Codex 全局设置\r\n\r  安装底座 / Codex CLI\r\n\r❯ 关于 my-ai-agent\r\n\r  退出\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 退出\r\n\r\r\r  本地模型管理\r\n\r  Codex 配置\r\n\r  Codex 全局设置\r\n\r  安装底座 / Codex CLI\r\n\r❯ 关于 my-ai-agent\r\n\r  退出\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 退出\r\n\r\n关于 my-ai-agent\r\n\r\nmy-ai-agent / maa 0.1.3\r\n\r\n结果\r\n\r❯ 返回\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回\r\n\r\r\r❯ 返回\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回\r\n\r\nmy-ai-agent\r\n\r\n当前模型：unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K\r\n_M.gguf\r\n运行状态：运行中\r\n\r\n\r  本地模型管理\r\n\r  Codex 配置\r\n\r  Codex 全局设置\r\n\r  安装底座 / Codex CLI\r\n\r❯ 关于 my-ai-agent\r\n\r  退出\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 退出\r\n\r\r\r  本地模型管理\r\n\r  Codex 配置\r\n\r  Codex 全局设置\r\n\r  安装底座 / Codex CLI\r\n\r  关于 my-ai-agent\r\n\r❯ 退出\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 退出\r\n\r\r\r  本地模型管理\r\n\r  Codex 配置\r\n\r  Codex 全局设置\r\n\r  安装底座 / Codex CLI\r\n\r  关于 my-ai-agent\r\n\r❯ 退出\r\n\r↑/↓ 选择 · Enter/→ 确定 · Esc/← 退出\r\n\r\n"
+  },
+  "llamacpp_native_sleep": {
+    "check": "llamacpp-native-sleep-status-wake",
+    "passed": true,
+    "idle_seconds": 305.17,
+    "before": {
+      "backend": "llamacpp",
+      "model": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+      "state": "running",
+      "context": 32768,
+      "allocations": {
+        "load_id": "625583",
+        "gpu_layers": [
+          29,
+          29
+        ],
+        "buffers": [
+          {
+            "phase": "main",
+            "component": "load_tensors",
+            "backend": "CPU_Mapped",
+            "kind": "model",
+            "mib": 121.71,
+            "location": "host"
+          },
+          {
+            "phase": "main",
+            "component": "load_tensors",
+            "backend": "CUDA0",
+            "kind": "model",
+            "mib": 372.65,
+            "location": "gpu"
+          },
+          {
+            "phase": "main",
+            "component": "llama_context",
+            "backend": "CUDA_Host",
+            "kind": "output",
+            "mib": 0.58,
+            "location": "host"
+          },
+          {
+            "phase": "main",
+            "component": "llama_kv_cache",
+            "backend": "CUDA0",
+            "kind": "KV",
+            "mib": 1904.0,
+            "location": "gpu"
+          },
+          {
+            "phase": "main",
+            "component": "sched_reserve",
+            "backend": "CUDA0",
+            "kind": "compute",
+            "mib": 176.09,
+            "location": "gpu"
+          },
+          {
+            "phase": "main",
+            "component": "sched_reserve",
+            "backend": "CUDA_Host",
+            "kind": "compute",
+            "mib": 40.1,
+            "location": "host"
+          }
+        ],
+        "mtp_shared_kv": false,
+        "rs_sequences": 0,
+        "gpu_identified_mib": 2452.74,
+        "truncated": false,
+        "error": null
+      },
+      "usage": null,
+      "error": null,
+      "mtp": "unavailable",
+      "gpu_memory": {
+        "devices": [
+          {
+            "index": "0",
+            "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+            "total_mib": 24463.0,
+            "used_mib": 2742.0,
+            "free_mib": 21396.0,
+            "reserved_mib": 326.0
+          }
+        ],
+        "error": null
+      },
+      "resources": {
+        "sleeping": false,
+        "total_slots": 1
+      }
+    },
+    "idle": {
+      "backend": "llamacpp",
+      "model": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+      "state": "idle",
+      "context": 32768,
+      "allocations": null,
+      "usage": null,
+      "error": null,
+      "mtp": "unavailable",
+      "gpu_memory": {
+        "devices": [
+          {
+            "index": "0",
+            "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+            "total_mib": 24463.0,
+            "used_mib": 284.0,
+            "free_mib": 23854.0,
+            "reserved_mib": 326.0
+          }
+        ],
+        "error": null
+      },
+      "resources": {
+        "sleeping": true,
+        "total_slots": 1
+      }
+    },
+    "awake": {
+      "backend": "llamacpp",
+      "model": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+      "state": "running",
+      "context": 32768,
+      "allocations": {
+        "load_id": "643303",
+        "gpu_layers": [
+          29,
+          29
+        ],
+        "buffers": [
+          {
+            "phase": "main",
+            "component": "load_tensors",
+            "backend": "CPU_Mapped",
+            "kind": "model",
+            "mib": 121.71,
+            "location": "host"
+          },
+          {
+            "phase": "main",
+            "component": "load_tensors",
+            "backend": "CUDA0",
+            "kind": "model",
+            "mib": 372.65,
+            "location": "gpu"
+          },
+          {
+            "phase": "main",
+            "component": "llama_context",
+            "backend": "CUDA_Host",
+            "kind": "output",
+            "mib": 0.58,
+            "location": "host"
+          },
+          {
+            "phase": "main",
+            "component": "llama_kv_cache",
+            "backend": "CUDA0",
+            "kind": "KV",
+            "mib": 1904.0,
+            "location": "gpu"
+          },
+          {
+            "phase": "main",
+            "component": "sched_reserve",
+            "backend": "CUDA0",
+            "kind": "compute",
+            "mib": 176.09,
+            "location": "gpu"
+          },
+          {
+            "phase": "main",
+            "component": "sched_reserve",
+            "backend": "CUDA_Host",
+            "kind": "compute",
+            "mib": 40.1,
+            "location": "host"
+          }
+        ],
+        "mtp_shared_kv": false,
+        "rs_sequences": 0,
+        "gpu_identified_mib": 2452.74,
+        "truncated": false,
+        "error": null
+      },
+      "usage": {
+        "service_id": "f253e4ec8220430db748c78b0a6aa784",
+        "fingerprint": "803caf21af1be576d9717f6b801790a373d27e4ac3c0bf99cbf80eb99f78fba4",
+        "key": "07591f8b732c1e7241bfe575",
+        "load_id": "643303",
+        "input_tokens": 5384,
+        "output_tokens": 79,
+        "recorded_at": 1791323654.7942667
+      },
+      "error": null,
+      "mtp": "unavailable",
+      "gpu_memory": {
+        "devices": [
+          {
+            "index": "0",
+            "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+            "total_mib": 24463.0,
+            "used_mib": 2750.0,
+            "free_mib": 21388.0,
+            "reserved_mib": 326.0
+          }
+        ],
+        "error": null
+      },
+      "resources": {
+        "sleeping": false,
+        "total_slots": 1
+      }
+    },
+    "wake_diagnostic": "[进行中] 启动 codex-local — 已等待 0.0 秒\n[成功] 启动 codex-local：同步 Codex 本地配置和模型目录 — 耗时 0.7 秒\nReading additional input from stdin...\nOpenAI Codex v0.160.1\n--------\nworkdir: /home/sandbox\nmodel: unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a11335-c803-79d3-8b00-039c97ab504f\n--------\nuser\nReply with MAA_WAKE_OK. Do not use tools.\nOkay, the user wants me to reply with MAA_WAKE_OK. Let me check the environment context provided. The current context includes a filesystem with workspace roots at /home/sandbox. Since there's no mention of any tool calls or function execution needed, I don't need to use the provided tools. Just need to confirm the wake-up message.\n\ncodex\nMAA_WAKE_OK\ntokens used\n5,463\n",
+    "program_sha256": "e6c2f14170ebaf2917acebb9b8738c9898f322e5323c0d8059da7c8bab4bfd00",
+    "phase": "development artifact before partial-usage and malformed-API hardening",
+    "final_changes": "Only missing/invalid API and usage validation changed after this sleep run; final frozen native status/counters, installed menu and boot were reverified."
+  },
+  "codex_tool_fixture": {
+    "status": "passed",
+    "kind": "real Codex / deterministic upstream fixture",
+    "tool_output_replayed": true,
+    "file_created_by_codex_tool": true,
+    "stdout": "Done.\n",
+    "diagnostic": "Reading additional input from stdin...\nOpenAI Codex v0.160.1\n--------\nworkdir: /home/sandbox/.maa-real-codex-tool-3dpps2lv\nmodel: maa_tool_fixture\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a11336-98b3-7ac2-8317-186c65732b5f\n--------\nuser\nUse a shell tool to print MAA_REAL_CODEX_TOOL_OK, then answer done.\nexec\n/bin/bash -lc 'printf MAA_REAL_CODEX_TOOL_OK > codex-proof.txt; cat codex-proof.txt' in /home/sandbox/.maa-real-codex-tool-3dpps2lv\n succeeded in 0ms:\nMAA_REAL_CODEX_TOOL_OK\ncodex\nDone.\n"
+  },
+  "initial_driver_attempts": [
+    {
+      "kind": "source PTY inherited TERM=dumb",
+      "resolution": "Explicit color-capable PTY; independent NO_COLOR case passes"
+    },
+    {
+      "kind": "extra menu driver sent navigation before the refreshed prompt drew",
+      "resolution": "Wait for the complete prompt before sending the next action; installed menu passes"
+    },
+    {
+      "kind": "extra boot driver supplied an unsupported Controller.wait timeout keyword",
+      "resolution": "Use the actual Controller API; boot passes without product changes"
+    }
+  ],
+  "limitations": [
+    "Native MTP and recurrent-model RS inference not tested; source/native-log fixtures only",
+    "Large-model and partial-offload stability/performance unaccepted",
+    "Identified buffer allocations are initialization records, not complete process VRAM",
+    "Whole-card observations cover NVIDIA driver access only"
+  ]
+}

@@ -100,7 +100,9 @@ def llama_arguments(model, values):
                              '--flash-attn', '--sleep-idle-seconds', '--spec-type'])
     if values['mtp']:
         check_options(help_text, ['draft-mtp', '--spec-draft-type-k', '--spec-draft-type-v'])
-    args = command + ['--model', model['path'], '--alias', model['key'],
+    check_options(help_text, ['--log-verbosity'])
+    args = command + ['--model', model['path'], '--alias', model['name'],
+                      '--log-verbosity', '4',
                       '--parallel', '1',  # One local-agent slot; context is per conversation.
                       '--ctx-size', str(values['context']),
                       '--cache-type-k', values['kv'], '--cache-type-v', values['kv'],
@@ -204,6 +206,38 @@ def llama_observe(key, endpoint=None):
     return {'model': key, 'context': context, 'upstream': endpoint,
             'resources': {'sleeping': props.get('is_sleeping', False),
                           'total_slots': props.get('total_slots'), 'model_path': props.get('model_path')}}
+
+
+def ollama_status(runtime):
+    """Ollama residency/context only. Never create, load or keep a runner alive."""
+    payload = request(runtime['upstream'] + '/api/ps', timeout=2)
+    rows = payload.get('models') if isinstance(payload, dict) else None
+    if not isinstance(rows, list) or any(not isinstance(item, dict) for item in rows):
+        raise Error('Ollama /api/ps returned an invalid model list')
+    row = next((item for item in rows if item.get('name') == runtime['model']
+                or item.get('model') == runtime['model']), None)
+    if row is None:
+        return {'state': 'idle', 'context': None, 'resources': {}}
+    if runtime.get('native_digest') and row.get('digest') != runtime['native_digest']:
+        raise Error('Ollama loaded model no longer matches the accepted configuration')
+    context = row.get('context_length')
+    if type(context) is not int or context < 1:
+        raise Error('Ollama /api/ps did not report a valid context_length')
+    return {'state': 'running', 'context': context,
+            'resources': {key: row.get(key) for key in ('size', 'size_vram', 'expires_at')}}
+
+
+def llama_status(runtime):
+    """llama.cpp status uses sleep-exempt /props; /slots would wake the model."""
+    props = request(runtime['upstream'] + '/props', timeout=2)
+    if not isinstance(props, dict):
+        raise Error('llama.cpp /props returned invalid metadata')
+    generation = props.get('default_generation_settings')
+    context = generation.get('n_ctx') if isinstance(generation, dict) else None
+    if type(context) is not int or context < 1:
+        raise Error('llama.cpp /props did not report a valid per-slot context')
+    return {'state': 'idle' if props.get('is_sleeping') else 'running', 'context': context,
+            'resources': {'sleeping': bool(props.get('is_sleeping')), 'total_slots': props.get('total_slots')}}
 
 
 def stop_process(process):

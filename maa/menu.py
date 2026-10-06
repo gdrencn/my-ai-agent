@@ -17,6 +17,21 @@ class Cancelled(Exception):
 
 def wrapped(text, width):
     """Keep input instructions readable without terminal-controlled wrapping."""
+    if isinstance(text, Rich):
+        lines, current, used = [], [], 0
+        for cell in text.values:
+            for char in clipped(cell.text, 100000):
+                if used + cells(char) > max(2, width):
+                    lines.append(Rich(tuple(current)))
+                    current, used = [], 0
+                if current and current[-1].tone == cell.tone:
+                    current[-1] = Cell(current[-1].text + char, cell.tone)
+                else:
+                    current.append(Cell(char, cell.tone))
+                used += cells(char)
+        return lines + ([Rich(tuple(current))] if current else []) or ['']
+    if '\n' in str(text):
+        return [line for part in str(text).split('\n') for line in wrapped(part, width)]
     remaining = clipped(text, 100000)
     lines = []
     while remaining:
@@ -30,6 +45,12 @@ def wrapped(text, width):
 class Cell:
     text: str
     tone: str = ''
+
+
+@dataclass(frozen=True)
+class Rich:
+    values: tuple
+    prefix: str = ''
 
 
 def status_cell(text, status):
@@ -60,6 +81,13 @@ def rendered(label, width, color=True):
         return clipped(label, width)
     prefix = clipped(label.prefix, width)
     available = max(0, width - cells(prefix))
+    if isinstance(label, Rich):
+        result = prefix
+        for cell in label.values:
+            value = clipped(cell.text, available)
+            result += colored(value, cell.tone, enabled=color, foreground_only=True)
+            available -= cells(value)
+        return result
     widths = list(label.widths)
     gap = 2
     while sum(widths) + gap * max(0, len(widths)-1) > available and max(widths, default=0) > 1:
@@ -103,6 +131,7 @@ class Screen:
         self.dimensions = None
         self.needs_gap = False
         self.permanent_instructions = False
+        self.color = 'NO_COLOR' not in os.environ and os.environ.get('TERM') != 'dumb'
 
     def write(self, text):
         self.terminal.write(text.encode('utf-8'))
@@ -197,7 +226,7 @@ class Screen:
         output = ''
         for label, focused in lines:
             output += ('\r\x1b[2K' + ('\x1b[7m' if focused else '') +
-                       rendered(label, width - 1) + '\x1b[0m\n')
+                       rendered(label, width - 1, color=self.color) + '\x1b[0m\n')
         if park and lines:
             output += f'\x1b[{len(lines)}A\r'
         self.write(output)
@@ -228,7 +257,7 @@ class Screen:
             # terminals and is not repeated by selection movement or redraws.
             for text in (title, *(['', *description] if description else [])):
                 for line in wrapped(text, self.size()[0] - 1):
-                    self.write(line + '\n')
+                    self.write(rendered(line, self.size()[0] - 1, color=self.color) + '\n')
             if description:
                 self.write('\n')
             while True:
@@ -316,4 +345,3 @@ def confirm(message):
     if not sys.stdin.isatty() or not sys.stdout.isatty():
         return False
     return interactive(lambda ui: ui.confirm(message))
-

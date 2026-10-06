@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 import subprocess
 from . import codex
-from .backends import ollama_current, llama_observe
+from .backends import ollama_current, llama_observe, ollama_status, llama_status
 from .http import request
 from .models import ollama_session, ollama_inventory, ollama_install, local_model, hf_download, verify_file
 from .service import Controller, fingerprint
@@ -104,7 +104,48 @@ class Manager:
         running = self.controller.running()
         runtime = read(self.store.path('runtime.json')) if running else None
         return {'selected': selected, 'running': running, 'runtime': runtime,
-                'yolo': codex.yolo_state()}
+                'yolo': codex.yolo_state(), 'model_status': self.model_status()}
+
+    def model_status(self, include_gpu=True):
+        from .telemetry import native_allocations, nvidia_memory, last_usage
+        selected = self.store.selected()
+        result = {'backend': selected['model']['backend'] if selected else None,
+                  'model': selected['model']['name'] if selected else None,
+                  'state': 'unselected' if not selected else 'paused', 'context': None,
+                  'allocations': None, 'usage': None, 'error': None,
+                  'mtp': 'unavailable' if not selected or not selected['model']['mtp_supported'] else
+                  'on' if selected['settings']['mtp'] else 'off'}
+        if include_gpu:
+            result['gpu_memory'] = nvidia_memory()
+        if not selected:
+            return result
+        try:
+            state = self.controller.state() if hasattr(self.controller, 'state') else 'active' if self.controller.running() else 'inactive'
+        except (Error, OSError, subprocess.SubprocessError) as exc:
+            return {**result, 'state': 'error', 'error': str(exc)}
+        if state == 'failed':
+            return {**result, 'state': 'error', 'error': 'maa.service failed; inspect maa logs'}
+        if state in ('activating', 'reloading', 'deactivating'):
+            return {**result, 'state': 'stopping' if state == 'deactivating' else 'loading'}
+        if state != 'active':
+            return result
+        runtime = read(self.store.path('runtime.json'))
+        if not runtime or runtime.get('fingerprint') != fingerprint(selected):
+            return {**result, 'state': 'loading'}
+        if runtime.get('error'):
+            return {**result, 'state': 'error', 'error': runtime['error']}
+        try:
+            observed = ollama_status(runtime) if result['backend'] == 'ollama' else llama_status(runtime)
+            result.update(observed)
+            if observed['state'] == 'running':
+                result['allocations'] = native_allocations(self.store, runtime)
+                result['usage'] = last_usage(self.store, runtime, result['allocations']['load_id'])
+            current = read(self.store.path('runtime.json'))
+            if not current or current.get('fingerprint') != runtime.get('fingerprint') or current.get('launch') != runtime.get('launch'):
+                return {**result, 'state': 'loading', 'allocations': None, 'usage': None, 'context': None}
+        except (Error, OSError, ValueError, TypeError, KeyError) as exc:
+            result.update(state='error', error=str(exc))
+        return result
 
     @contextmanager
     def maintenance(self):
@@ -175,13 +216,13 @@ class Manager:
                 observed = ollama_current(target, runtime)
             else:
                 stage('检查当前 llama.cpp 模型')
-                observed = llama_observe(target['model']['key'], runtime['upstream'])
+                observed = llama_observe(runtime['model'], runtime['upstream'])
                 if observed['resources'].get('sleeping'):
                     stage('唤醒 llama.cpp 模型')
                     request(runtime['upstream'] + '/v1/chat/completions',
                             {'model': runtime['model'], 'messages': [{'role': 'user', 'content': 'Hi'}],
                              'max_tokens': 1, 'stream': False}, timeout=600)
-                    observed = llama_observe(target['model']['key'], runtime['upstream'])
+                    observed = llama_observe(runtime['model'], runtime['upstream'])
             runtime.update(observed)
             request(runtime['base_url'].removesuffix('/v1') + '/health', timeout=2)
             runtime['display_name'] = target['model']['name']

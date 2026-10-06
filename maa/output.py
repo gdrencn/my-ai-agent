@@ -18,7 +18,7 @@ def terminal_size(stream):
 
 
 def colored(text, tone, *, enabled=True, foreground_only=False):
-    codes = {'green': 32, 'yellow': 33, 'red': 31}
+    codes = {'green': 32, 'yellow': 33, 'red': 31, 'cyan': 36, 'gray': 90}
     return f'\033[{codes[tone]}m{text}\033[{39 if foreground_only else 0}m' if enabled and tone in codes else text
 
 

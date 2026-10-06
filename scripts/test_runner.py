@@ -19,7 +19,7 @@ def run():
         result = subprocess.check_output([sys.executable, args.product, '--version'], text=True).strip()
         if result != __version__:
             raise ValueError('Tester/product version mismatch')
-    modules = [importlib.import_module('tests.' + name) for name in ('test_core', 'test_bridge', 'test_terminal')]
+    modules = [importlib.import_module('tests.' + name) for name in ('test_core', 'test_bridge', 'test_status', 'test_terminal')]
     suite = unittest.TestSuite(unittest.defaultTestLoader.loadTestsFromModule(module) for module in modules)
     result = unittest.TextTestRunner(verbosity=2).run(suite)
     if not result.wasSuccessful() or result.skipped:

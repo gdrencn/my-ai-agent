@@ -11,6 +11,8 @@ from maa.store import Error
 class Bridge(unittest.TestCase):
     def setUp(self):
         self.received = []
+        self.recorded = []
+        self.fail_native = False
         parent = self
         class Native(BaseHTTPRequestHandler):
             def log_message(self, *args):
@@ -21,6 +23,9 @@ class Bridge(unittest.TestCase):
                 self.send_response(200)
                 self.send_header('Content-Type', 'text/event-stream')
                 self.end_headers()
+                if parent.fail_native:
+                    self.wfile.write(b'data: {"error":"injected native failure"}\n\n')
+                    return
                 chunks = [
                     {'choices': [{'delta': {'reasoning_content': 'planning'}}]},
                     {'choices': [{'delta': {'content': 'Hello '}}]},
@@ -36,7 +41,9 @@ class Bridge(unittest.TestCase):
                     self.wfile.write(('data: ' + json.dumps(chunk) + '\n\n').encode())
                 self.wfile.write(b'data: [DONE]\n\n')
         self.native = ThreadingHTTPServer(('127.0.0.1', 0), Native)
-        self.adapter = server({'model': 'actual', 'upstream': f'http://127.0.0.1:{self.native.server_port}'}, port=0)
+        self.adapter = server({'model': 'private-route', 'display_name': 'real-model',
+                               'upstream': f'http://127.0.0.1:{self.native.server_port}'}, port=0,
+                              record_usage=self.recorded.append)
         for instance in (self.native, self.adapter):
             threading.Thread(target=instance.serve_forever, daemon=True).start()
     def tearDown(self):
@@ -67,6 +74,18 @@ class Bridge(unittest.TestCase):
         result = json.loads(self.request(False))
         self.assertEqual(result['status'], 'completed')
         self.assertEqual(result['output'][2]['input'], 'patch\ntext')
+
+    def test_public_name_private_route_and_completed_usage(self):
+        result = json.loads(self.request(False))
+        self.assertEqual(result['model'], 'real-model')
+        self.assertEqual(self.received[0]['model'], 'private-route')
+        self.assertEqual(self.recorded[0]['usage'], {'input_tokens': 10, 'output_tokens': 5})
+        with urllib.request.urlopen(f'http://127.0.0.1:{self.adapter.server_port}/v1/models') as response:
+            self.assertEqual(json.load(response)['data'][0]['id'], 'real-model')
+        self.fail_native = True
+        with self.assertRaises(urllib.error.HTTPError):
+            self.request(False)
+        self.assertEqual(len(self.recorded), 1)  # Failure never overwrites completed counters.
 
     def test_tool_output_replay_preserves_call_identity_and_payload(self):
         body = {'input': [{'type': 'custom_tool_call', 'call_id': 'c1', 'name': 'apply_patch', 'input': 'patch'},

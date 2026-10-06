@@ -190,7 +190,7 @@ class Core(unittest.TestCase):
         self.assertTrue(ctrl.active)
         profile = codex.parse(old.decode())
         catalog = read(profile['model_catalog_json'])
-        self.assertEqual(catalog['models'][0]['slug'], first['key'])
+        self.assertEqual(catalog['models'][0]['slug'], first['name'])
         self.assertEqual(catalog['models'][0]['display_name'], first['name'])
         with patch.object(manager, 'save_config', side_effect=Error('Commit failed after catalog publication')):
             with self.assertRaisesRegex(Error, 'Previous service restored'):
@@ -254,7 +254,7 @@ class Core(unittest.TestCase):
         first = codex.parse(codex.profile_path().read_text())
         metadata = read(first['model_catalog_json'])['models']
         self.assertEqual(len(metadata), 1)
-        self.assertEqual(metadata[0]['slug'], runtime['model'])
+        self.assertEqual(metadata[0]['slug'], runtime['display_name'])
         self.assertEqual(metadata[0]['display_name'], 'qwen:latest')
         self.assertEqual(metadata[0]['context_window'], 4096)
         self.assertEqual(metadata[0]['input_modalities'], ['text'])

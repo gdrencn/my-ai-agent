@@ -9,12 +9,14 @@ import subprocess
 import sys
 import threading
 import time
+import uuid
 from . import bridge
 from .backends import (llama_arguments, llama_observe, ollama_capabilities, check_options,
                        binary, ollama_environment, ollama_endpoint, ollama_load, stop_process, wait_api, llama_endpoint)
 from .models import verify_file
 from .store import Error, Store, atomic, write
 from .output import stage
+from .telemetry import launch_reference, native_allocations, UsageRecorder
 
 UNIT = 'maa.service'
 
@@ -82,7 +84,17 @@ WantedBy=multi-user.target
         privileged(['systemctl', 'enable', UNIT], stdout=subprocess.DEVNULL)
 
     def running(self):
-        return subprocess.run(['systemctl', 'is-active', '--quiet', UNIT]).returncode == 0
+        return self.state() == 'active'
+
+    def state(self):
+        result = subprocess.run(['systemctl', 'show', '--property=ActiveState', '--value', UNIT],
+                                capture_output=True, text=True, timeout=3)
+        if result.returncode:
+            raise Error((result.stderr or result.stdout).strip() or 'Cannot read maa service state')
+        state = result.stdout.strip()
+        if state not in ('active', 'inactive', 'failed', 'activating', 'deactivating', 'reloading'):
+            raise Error('Unknown maa service state: ' + state)
+        return state
 
     def stop(self):
         privileged(['systemctl', 'stop', UNIT])
@@ -156,6 +168,7 @@ def serve(store=None):
         with store.path('native.log').open('ab', buffering=0) as log:
             launch_offset = log.tell()
             log.write(('\n=== my-ai-agent launch ' + model['name'] + ' ===\n').encode())
+            launch = launch_reference(store.path('native.log'), launch_offset, uuid.uuid4().hex)
             try:
                 from .http import request
                 request(health, timeout=1)
@@ -169,22 +182,15 @@ def serve(store=None):
                 # The official launcher can expose metadata before its model is
                 # resident. Complete a tiny request before accepting the target.
                 request(llama_endpoint() + '/v1/chat/completions',
-                        {'model': model['key'], 'messages': [{'role': 'user', 'content': 'Hi'}],
+                        {'model': model['name'], 'messages': [{'role': 'user', 'content': 'Hi'}],
                          'max_tokens': 1, 'stream': False}, timeout=600)
-            runtime = ollama_load(target) if model['backend'] == 'ollama' else llama_observe(model['key'])
-            if model['backend'] == 'llamacpp':
-                import re
-                with store.path('native.log').open('rb') as current_log:
-                    current_log.seek(0, 2)
-                    current_log.seek(max(launch_offset, current_log.tell() - 65536))
-                    text = current_log.read().decode(errors='replace')
-                offloads = re.findall(r'offloaded\s+(\d+)/(\d+)\s+layers to GPU', text)
-                runtime['resources']['gpu_layers'] = list(map(int, offloads[-1])) if offloads else None
+            runtime = ollama_load(target) if model['backend'] == 'ollama' else llama_observe(model['name'])
             runtime.update(backend=model['backend'], key=model['key'], fingerprint=stamp,
-                           display_name=model['name'],
+                           display_name=model['name'], launch=launch,
                            base_url='http://127.0.0.1:18443/v1', pid=os.getpid(),
                            capabilities={'hosted_web_search': False, 'stateless_responses': True})
-            adapter = bridge.server(runtime)
+            runtime['resources']['gpu_layers'] = native_allocations(store, runtime)['gpu_layers']
+            adapter = bridge.server(runtime, record_usage=UsageRecorder(store, runtime))
             thread = threading.Thread(target=adapter.serve_forever, daemon=True)
             thread.start()
             from .codex import profile

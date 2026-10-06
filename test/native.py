@@ -54,6 +54,7 @@ def inference():
     result = json.loads(api({'input': 'Reply with the word hello.', 'max_output_tokens': 64,
                              'reasoning': {'effort': 'none'}}))
     assert result['status'] == 'completed' and result['output'], result
+    assert result['model'] == command('status')['selected']['model']['name'], result
     wire = api({'input': 'Reply with the word hello.', 'stream': True, 'max_output_tokens': 64,
                 'reasoning': {'effort': 'none'}}).decode()
     assert 'response.output_text.delta' in wire and 'response.completed' in wire, wire
@@ -155,10 +156,31 @@ def catalog_metadata():
     state = command('status')
     config = parse(profile_path().read_text())
     models = read(config['model_catalog_json'])['models']
-    assert len(models) == 1 and models[0]['slug'] == state['runtime']['model'], models
+    assert len(models) == 1 and models[0]['slug'] == state['selected']['model']['name'], models
     assert models[0]['display_name'] == state['selected']['model']['name'], models
     assert models[0]['context_window'] == state['runtime']['context'], models
+    assert config['model'] == state['selected']['model']['name'], config
     return {'model': models[0]['slug'], 'display_name': models[0]['display_name'], 'context': models[0]['context_window']}
+
+
+def model_status_native():
+    state = command('status')
+    snapshot = state['model_status']
+    assert snapshot['state'] == 'running' and snapshot['model'] == state['selected']['model']['name'], snapshot
+    assert snapshot['context'] == state['runtime']['context'], snapshot
+    allocation = snapshot['allocations']
+    assert allocation['load_id'] is not None and allocation['gpu_layers'], allocation
+    assert any(row['kind'] == 'model' and row['location'] == 'gpu' for row in allocation['buffers']), allocation
+    assert any(row['kind'] == 'KV' and row['location'] == 'gpu' for row in allocation['buffers']), allocation
+    assert any(row['kind'] == 'compute' and row['location'] == 'gpu' for row in allocation['buffers']), allocation
+    assert snapshot['gpu_memory']['devices'] and snapshot['gpu_memory']['devices'][0]['free_mib'] is not None, snapshot
+    assert snapshot['usage'] and snapshot['usage']['input_tokens'] > 0, snapshot
+    before = Store().path('usage.json').read_bytes()
+    again = command('status')['model_status']
+    assert Store().path('usage.json').read_bytes() == before, 'Read-only status generated new inference usage'
+    assert again['allocations']['load_id'] == allocation['load_id'], (snapshot, again)
+    assert again['allocations']['gpu_identified_mib'] == allocation['gpu_identified_mib'], (snapshot, again)
+    return snapshot
 
 
 def ollama_entry_reuse(wake=False):
@@ -174,6 +196,9 @@ def ollama_entry_reuse(wake=False):
     if wake:
         native_api('/api/generate', {'model': runtime['model'], 'keep_alive': 0})
         assert not any(row['name'] == runtime['model'] for row in native_api('/api/ps')['models'])
+        idle = command('status')['model_status']
+        assert idle['state'] == 'idle' and idle['allocations'] is None and idle['usage'] is None, idle
+        assert not any(row['name'] == runtime['model'] for row in native_api('/api/ps')['models']), 'Status woke an idle model'
     started = time.monotonic()
     diagnostic = codex_exec()
     after = next(row for row in native_api('/api/tags')['models'] if row['name'] == runtime['model'])
@@ -199,6 +224,7 @@ def main():
         check(model['backend'] + '-responses', inference)
         check(model['backend'] + '-native-function-call', native_tool_call)
         check(model['backend'] + '-codex-cli', codex_exec)
+        check(model['backend'] + '-model-status', model_status_native)
         try:
             from maa_testing.codex_ui import picker
         except ImportError:
@@ -210,6 +236,7 @@ def main():
         command('pause', structured=False)
         state = command('status')
         assert not state['running'] and state['selected']['model']['key'] == ollama['key']
+        assert state['model_status']['state'] == 'paused' and state['model_status']['allocations'] is None, state
         state = command('start')
         assert state['running'] and state['selected']['model']['key'] == ollama['key']
         return state

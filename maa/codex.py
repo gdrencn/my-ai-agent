@@ -87,7 +87,7 @@ def catalog(runtime):
     from .settings import EFFORT
     context = runtime['context']
     model = {
-        'slug': runtime['model'], 'display_name': runtime.get('display_name', runtime['model']),
+        'slug': runtime.get('display_name', runtime['model']), 'display_name': runtime.get('display_name', runtime['model']),
         'description': 'Local model selected by my-ai-agent; native reasoning support varies.',
         'default_reasoning_level': None,
         'supported_reasoning_levels': [{'effort': value, 'description': 'Passed unchanged to the local backend.'}
@@ -96,7 +96,11 @@ def catalog(runtime):
         'base_instructions': ('You are Codex, a coding agent running with a local model. '
                               'Follow the user request and applicable project instructions. '
                               'Use the provided tools and their schemas to inspect, edit and verify work. '
-                              'Report actual tool results accurately; do not claim unperformed checks.'),
+                              'Report actual tool results accurately; do not claim unperformed checks. '
+                              'The local model serving this session is ' +
+                              json.dumps(runtime.get('display_name', runtime['model']), ensure_ascii=False) +
+                              '. Use this model name when identifying the local model; '
+                              'internal routing aliases are not model names.'),
         'include_skills_usage_instructions': True, 'include_plugin_usage_instructions': True,
         'include_apps_usage_instructions': True, 'supports_reasoning_summary_parameter': False,
         'default_reasoning_summary': 'none', 'support_verbosity': False, 'default_verbosity': None,
@@ -118,7 +122,7 @@ def profile(runtime, settings):
         raise Error('Native backend did not report a valid effective context')
     doc = tomlkit.document()
     doc.add(tomlkit.comment('Managed by my-ai-agent. Global permissions and web_search are inherited.'))
-    doc['model'] = runtime['model']
+    doc['model'] = runtime.get('display_name', runtime['model'])
     doc['model_provider'] = 'maa_local'
     doc['model_context_window'] = context
     doc['model_auto_compact_token_limit'] = context * 90 // 100

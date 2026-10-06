@@ -1,6 +1,21 @@
-# my-ai-agent Requirements — 0.1.2 test
+# my-ai-agent Requirements — 0.1.3 test
 
 用户于 2026-10-06 确认最终方案并授权开发及发布 0.1.1 test。自动压缩比例首版固定 90%，不添加未确认的比例修改入口。实现及验证见 IMPLEMENTED.md。
+
+## 0.1.3 menu and model status
+
+用户确认菜单、配置项呈现、模型名称及状态采集方案，并授权执行。另发 0.1.3 test，保留已发布资产。
+
+1. 主菜单顶部显示“当前模型”和“运行状态”，实际运行、空闲卸载、暂停、读取失败明确区分。主菜单按本地模型管理、Codex 配置、Codex 全局设置、安装底座 / Codex CLI、关于、退出组织。各子菜单保留返回及选中位置。
+2. 本地模型管理包括设置本地模型（立即切换）、安装 / 登记新模型、模型配置、当前模型状态、暂停当前模型、启动当前模型、返回。Codex 配置单独显示推理强度、跟随实际有效上下文的只读上下文大小、固定 90% 的只读自动压缩阈值及应用修改。Codex 全局设置只有“YOLO 模式：状态”和返回；进入 YOLO 后才选择开启或关闭（恢复原设置）。主菜单不提供原始“当前状态与配置”；完整结构化配置保留 maa status，原生日志保留 maa logs。
+3. 配置项使用“标题：当前值 / 状态”，标题正常颜色，数值、枚举、跟随、默认为青色，开启及运行中绿色，关闭、暂停、不可用灰色；错误明确显示。进入选项后才修改，保留当前默认选择、取消、待应用修改提示。顶部状态和只读字段使用相同规则，窄终端、无颜色模式与重定向保留文字。通用 CLI/TUI 规范不包含项目名称或业务需求。
+4. Codex profile、模型目录 slug、Responses 返回 model、公开 /v1/models 使用原模型名称；内部登记 key 和 Ollama 配置别名仅用于管理和上游路由。基础身份说明使用原模型名称，不向模型提供无意义的管理 ID，不修改原模型模板或采样预设。原配置、驻留复用和失败恢复保持有效。
+5. “当前模型状态”使用项目自己的格式，顺序为底座、当前模型、运行状态、GPU 装载与分项、上下文统计、刷新 / 返回。Ollama 独立使用 /api/ps 与自己的当前加载日志，llama.cpp 独立使用 /props 与自己的当前加载日志；各自采集后归一化呈现。查询不生成 token、不读取会唤醒的 /slots、不启停底座、不改变模型选择。
+6. 可展示模型层 GPU 装载、权重、主 KV、RS、计算与输出缓冲区，按实际 GPU / 系统内存位置分类。MTP 额外 KV 与计算按初始化阶段分别统计，共享部分不得重复求和；不支持显示不可用，未开启显示未启用。删除独立 MTP 权重及实时 KV token 占用字段。合计仅称“已识别显存分配合计”，不等同完整进程显存。CPU_Mapped 是映射量，不冒充实际 RSS；CUDA_Host 不属于显存。
+7. 原生分配日志只统计当前服务启动和当前实际加载；排除 fit 试算、重试及旧模型、旧配置、旧启动日志，重复缓冲区记录更新而非累加。休眠、卸载、暂停、加载中不展示旧分配值；无法确认的值显示未取得，绝不把缺失填成 0。采集应有超时和读取上限，原生诊断仍通过 maa logs 可见。
+8. 整卡总量、已用、可用及驱动预留按实际 NVIDIA 驱动读取，多个 GPU 分别列出；接口不可用时给出原因，不用总量减已用伪造可用量，不从整卡占用推导当前模型完整占用。
+9. 上下文统计包含实际有效容量、最近一次完成的 maa Responses 请求输入 token 数及容量比例、最近一次生成 token 数、统计时间。只保存身份、计数及时间，不保存对话。缺失 usage、失败及中断不伪造统计，切换 / 重新加载后旧统计不冒充当前模型统计；不累加重放历史，不称为实时 KV 使用量。
+10. 验收包括两个底座的独立只读查询、当前启动与重载隔离、fit / MTP / RS / Host 分配分类、未知与异常数据、成功 / 失败请求统计、颜色与真实 PTY 的菜单导航和返回、两种原生底座的状态与 Codex 名称、暂停 / 卸载时查询无唤醒、打包一致性。原生 MTP 若未实测，应在实现文档明确说明，不能把源码或日志夹具核验写成实际推理验收。
 
 ## 0.1.2 corrections
 
@@ -67,7 +82,7 @@ llama.cpp 配置 context、main K/V、flash attention、fit、reserve、sleep id
 
 | Key | Behavior |
 | --- | --- |
-| model | actual active model ID |
+| model | original active model name; adapter uses the exact native routing ID |
 | model_provider | dedicated local provider |
 | base_url | actual local endpoint |
 | wire_api | responses, compatibility verified |
@@ -88,7 +103,7 @@ llama.cpp 配置 context、main K/V、flash attention、fit、reserve、sleep id
 5. 核验 YOLO 两键恢复、重复开启、无关 TOML 保留、跨进程备份。
 6. 核验本地 Responses 对话、流式、工具调用及 context/90% 同步。
 7. PTY 验证导航、输入编辑、窄终端、取消和终端恢复；结构化输出无控制码。
-8. 可重现构建、校验和、包边界、安装版本；不可变 v0.1.2 GitHub prerelease，回下载比较字节。stable 等待用户验收。
+8. 可重现构建、校验和、包边界、安装版本；不可变 v0.1.3 GitHub prerelease，回下载比较字节。stable 等待用户验收。
 9. IMPLEMENTED.md 区分 portable/native/fault-injected/user-reported 证据，不宣称未实测的大模型/GPU/MTP 结果。
 
 ## Official references
