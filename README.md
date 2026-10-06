@@ -22,6 +22,8 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/insta
 
 已有底座和模型时，也可用上述 `--components none` 命令升级 maa，保留已下载模型和配置。
 
+升级不会自动重新加载正在运行的底座。已有选定模型时，升级后执行 `maa start`，或在菜单选择“启动当前模型”，重新加载保存目标，让新服务代码生效；尚未选定模型时先选择模型。
+
 安装完成后运行：
 
 ```bash
