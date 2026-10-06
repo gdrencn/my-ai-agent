@@ -1,0 +1,243 @@
+{
+  "version": "0.1.2",
+  "at": "2026-10-06T10:48:13.876520+00:00",
+  "status": "passed",
+  "release": "https://github.com/gdrencn/my-ai-agent/releases/tag/v0.1.2",
+  "source_commit": "4fbe029a29a7df5c4a6276c023f693d4e3a1a53d",
+  "ci": [
+    "https://github.com/gdrencn/my-ai-agent/actions/runs/37451866479",
+    "https://github.com/gdrencn/my-ai-agent/actions/runs/37451932025"
+  ],
+  "asset_downloads": [
+    {
+      "name": "bootstrap.py",
+      "sha256": "29be87f1d96b102eead25f33edf77f37affda5bec710420c6eda11e2f4a7ed6b",
+      "local_bytes_equal": true,
+      "github_digest_equal": true
+    },
+    {
+      "name": "install.sh",
+      "sha256": "71833da669c112156534c33feefc8f981e0bdd583cf9c0a3c55ee838bd1a45cf",
+      "local_bytes_equal": true,
+      "github_digest_equal": true
+    },
+    {
+      "name": "maa-test.pyz",
+      "sha256": "2d5134077f8903a891b0325f9e5d0ed5afdbc3ce29188347d0a8e074e9e5d97f",
+      "local_bytes_equal": true,
+      "github_digest_equal": true
+    },
+    {
+      "name": "maa.pyz",
+      "sha256": "00feeecd2ce235ea792661c31c76b21d7a44a7b10d7455e3c304bd58571fc8ea",
+      "local_bytes_equal": true,
+      "github_digest_equal": true
+    },
+    {
+      "name": "SHA256SUMS",
+      "sha256": "b072d6751ae668c49e171c3732de1f5b019b2b3042f6e7fa24948a5a2c445911",
+      "local_bytes_equal": true,
+      "github_digest_equal": true
+    },
+    {
+      "name": "V0_1_2_LOCAL.json",
+      "sha256": "76c205bc7d73f7fd95af94a2083057814e9bcbe6e63c64c207550433ca6aa392",
+      "local_bytes_equal": true,
+      "github_digest_equal": true
+    },
+    {
+      "name": "V0_1_2_NATIVE.json",
+      "sha256": "9f46ecb3135a4ba0b6a6e071e26c1ceb23e445f8cea634465f85292ff25052d2",
+      "local_bytes_equal": true,
+      "github_digest_equal": true
+    },
+    {
+      "name": "VALIDATION_SHA256SUMS",
+      "sha256": "7feddc5845cd1de085ff4b4161ab51b8e6d9d1a6aeccce6eca0a17b24a4c5255",
+      "local_bytes_equal": true,
+      "github_digest_equal": true
+    },
+    {
+      "name": "VERSION.json",
+      "sha256": "28954ac185d8d99e5a699b0961ee594562c18ebf483e19be4390e93ac8248d72",
+      "local_bytes_equal": true,
+      "github_digest_equal": true
+    }
+  ],
+  "manifests": {
+    "SHA256SUMS": "passed",
+    "VALIDATION_SHA256SUMS": "passed"
+  },
+  "previous_0_1_1_asset_digests_unchanged": true,
+  "public_test": {
+    "command": "curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/test.sh | bash -s -- --components none",
+    "exit_code": 0,
+    "portable_tests": 36,
+    "native_checks": [
+      {
+        "name": "installed-version",
+        "status": "passed"
+      },
+      {
+        "name": "hf-exact-download",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-native-pull",
+        "status": "passed"
+      },
+      {
+        "name": "hf-invalid-file-rejected",
+        "status": "passed"
+      },
+      {
+        "name": "llamacpp-select",
+        "status": "passed"
+      },
+      {
+        "name": "llamacpp-catalog",
+        "status": "passed",
+        "detail": {
+          "model": "07591f8b732c1e7241bfe575",
+          "display_name": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+          "context": 32768
+        }
+      },
+      {
+        "name": "llamacpp-responses",
+        "status": "passed"
+      },
+      {
+        "name": "llamacpp-native-function-call",
+        "status": "passed"
+      },
+      {
+        "name": "llamacpp-codex-cli",
+        "status": "passed"
+      },
+      {
+        "name": "llamacpp-codex-model-picker",
+        "status": "passed",
+        "detail": {
+          "local_only": true,
+          "warnings_absent": true,
+          "elapsed_seconds": 1.782
+        }
+      },
+      {
+        "name": "ollama-select",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-catalog",
+        "status": "passed",
+        "detail": {
+          "model": "maa-09dadb68b4448ec5239f2adb:latest",
+          "display_name": "qwen3:0.6b",
+          "context": 32768
+        }
+      },
+      {
+        "name": "ollama-responses",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-native-function-call",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-codex-cli",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-codex-model-picker",
+        "status": "passed",
+        "detail": {
+          "local_only": true,
+          "warnings_absent": true,
+          "elapsed_seconds": 1.778
+        }
+      },
+      {
+        "name": "ollama-resident-entry-reuses-alias",
+        "status": "passed",
+        "detail": {
+          "alias_unchanged": true,
+          "woke": false,
+          "elapsed_seconds": 0.923
+        }
+      },
+      {
+        "name": "ollama-expired-entry-wakes-existing-alias",
+        "status": "passed",
+        "detail": {
+          "alias_unchanged": true,
+          "woke": true,
+          "elapsed_seconds": 2.831
+        }
+      },
+      {
+        "name": "pause-start-retains-target",
+        "status": "passed"
+      },
+      {
+        "name": "native-load-failure-rollback",
+        "status": "passed"
+      },
+      {
+        "name": "invalid-fixture-cleaned",
+        "status": "passed",
+        "detail": {
+          "cleaned": true
+        }
+      },
+      {
+        "name": "yolo-off",
+        "status": "passed"
+      },
+      {
+        "name": "yolo-on",
+        "status": "passed"
+      }
+    ],
+    "started": "2026-10-06T10:46:18.536695+00:00",
+    "finished": "2026-10-06T10:47:02.245804+00:00",
+    "fixture_cleanup": [
+      {
+        "fixture": "bad-native.gguf",
+        "key": "0df18315c7ce6c2590e28208",
+        "registry_removed": true,
+        "temporary_directory": true
+      },
+      {
+        "selected_target_paused": true
+      }
+    ],
+    "official_tools": "Installed earlier in this disposable mas container with official installers; public rerun reused them"
+  },
+  "public_install": {
+    "command": "curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/install.sh | bash -s -- --components none",
+    "status": "passed",
+    "installed_version": "0.1.2",
+    "program_sha256": "00feeecd2ce235ea792661c31c76b21d7a44a7b10d7455e3c304bd58571fc8ea",
+    "selected_config_unchanged": true,
+    "model_registry_unchanged": true,
+    "model_files_preserved": true,
+    "user_canary_preserved": true,
+    "output": "正在安装 my-ai-agent v0.1.2 test\nmy-ai-agent 已安装：/home/sandbox/.local/share/my-ai-agent/maa.pyz\n运行 /home/sandbox/.local/bin/maa 打开菜单。\n",
+    "diagnostic": ""
+  },
+  "cleanup": {
+    "status": "passed",
+    "removed_owned_containers": [
+      "maa-validation-012"
+    ],
+    "reports_preserved": true,
+    "at": "2026-10-06T10:48:29.025858+00:00"
+  },
+  "limitations": [
+    "Small model acceptance is not large model performance evidence",
+    "Native MTP and forced llama.cpp idle wake await separate acceptance",
+    "Stable requires user acceptance"
+  ]
+}
