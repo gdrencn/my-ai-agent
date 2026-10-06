@@ -38,4 +38,8 @@ Both tested Qwen3 0.6B models lack MTP weights. MTP detection, follow/override l
 
 ## Publication stage
 
-Frozen v0.1.1 product/test assets are ready for GitHub prerelease publication. Public asset download and public installer/test entry verification are recorded separately after publication; they are not claimed by the local receipts above. Stable is not published.
+[v0.1.1 test](https://github.com/gdrencn/my-ai-agent/releases/tag/v0.1.1) is published as a GitHub prerelease. Release source commit: 45ee900c3a9c2e719323ad87b2cdfeedfa1a6657. GitHub CI passed on the frozen source. Product/test assets and tag are unchanged after publication.
+
+All eight initial assets were downloaded again and matched the local frozen files and GitHub SHA-256 metadata. The anonymous public install entry installed the paired product as sandbox user; the default full test entry ran all three official installers and portable tests. Its first native run failed a small-model tool assertion while using the q4_0 settings saved by the separate tuning check. After explicitly restoring q8_0/32768/5m, the public test entry with --components none passed 25 portable and all 16 native checks. The first failure is retained; these runs do not establish a definitive cause or guarantee small-model tool reliability. Use a fresh dedicated container for the public test.
+
+Publication evidence, exact commands and cleanup: [validation/V0_1_1_PUBLIC.json](validation/V0_1_1_PUBLIC.json). Both owned validation containers were removed after reports were preserved. No stable release is published.

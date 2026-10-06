@@ -113,7 +113,7 @@ codex-local exec --skip-git-repo-check 'Explain this directory.'
 
 ## Test
 
-完整安装及小模型验证会修改当前选择，请在**专用临时 mas 容器**运行：
+完整安装及小模型验证会修改当前选择，请在**新建的专用临时 mas 容器**运行：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/test.sh | bash
