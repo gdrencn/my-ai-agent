@@ -1,0 +1,540 @@
+{
+  "version": "0.1.1",
+  "at": "2026-10-06T09:14:00.868750+00:00",
+  "status": "passed",
+  "asset_sha256": {
+    "maa-test.pyz": "ea433d75d71b4f4340f2bfdd86395ba458cfab0c87f29da75568d34acc542db8",
+    "bootstrap.py": "29be87f1d96b102eead25f33edf77f37affda5bec710420c6eda11e2f4a7ed6b",
+    "maa.pyz": "86f3827e7908b4a44d7519229bebd5e126adb90eabb02c7d50188f7e4ebe9df1",
+    "SHA256SUMS": "295e489cb15fa4df01eb3997bcead61135a87c2f8ef95720ec5898795cce1100",
+    "VERSION.json": "1ef9185ff3ee58a62b6a73854199ceb29aa189b35df95592d1435fb8cd6e0f8e",
+    "install.sh": "71833da669c112156534c33feefc8f981e0bdd583cf9c0a3c55ee838bd1a45cf"
+  },
+  "portable": {
+    "source_tests": 25,
+    "packaged_tests_outside_checkout": 25,
+    "skipped": 0
+  },
+  "product_pty": {
+    "status": "passed",
+    "artifact": "dist/maa.pyz",
+    "terminal_size": [
+      12,
+      40
+    ],
+    "checks": [
+      "first selection opens config",
+      "context editing",
+      "cancel leaves no target",
+      "about version",
+      "main escape exits",
+      "terminal restored",
+      "inline history retained"
+    ]
+  },
+  "build": {
+    "python_grammar": "3.11",
+    "shell_entries": 3,
+    "deterministic": true,
+    "product_boundary": true,
+    "checksums": true
+  },
+  "autostart": [
+    {
+      "status": "passed",
+      "at": "2026-10-06T09:12:05.505769+00:00",
+      "uid": 0,
+      "program_sha256": "86f3827e7908b4a44d7519229bebd5e126adb90eabb02c7d50188f7e4ebe9df1",
+      "checks": [
+        "installed frozen bytes",
+        "pause then container restart autostarts target",
+        "one managed native backend",
+        "official Ollama unit inactive",
+        "unit owned by invoking user",
+        "profile effective context and 90% synchronized",
+        "adapter healthy"
+      ],
+      "software": {
+        "ollama": "ollama version is 0.35.1",
+        "llamacpp": "version: 0.6.0-dev (build 11429, commit d81235049)\nbuilt with Clang 22.1.8 for Linux x86_64",
+        "codex": "codex-cli 0.160.1"
+      },
+      "runtime": {
+        "selected": {
+          "model": {
+            "key": "09dadb68b4448ec5239f2adb",
+            "backend": "ollama",
+            "name": "qwen3:0.6b",
+            "digest": "7df6b6e09427a769808717c0a93cadc4ae99ed4eb8bf5ca557c90846becea435",
+            "metadata": {
+              "general.architecture": "qwen3",
+              "general.basename": "Qwen3",
+              "general.file_type": 15,
+              "general.license": "apache-2.0",
+              "general.parameter_count": 751632384,
+              "general.quantization_version": 2,
+              "general.size_label": "0.6B",
+              "general.type": "model",
+              "qwen3.attention.head_count": 16,
+              "qwen3.attention.head_count_kv": 8,
+              "qwen3.attention.key_length": 128,
+              "qwen3.attention.layer_norm_rms_epsilon": 1e-06,
+              "qwen3.attention.value_length": 128,
+              "qwen3.block_count": 28,
+              "qwen3.context_length": 40960,
+              "qwen3.embedding_length": 1024,
+              "qwen3.feed_forward_length": 3072,
+              "qwen3.rope.freq_base": 1000000,
+              "tokenizer.ggml.add_bos_token": false,
+              "tokenizer.ggml.bos_token_id": 151643,
+              "tokenizer.ggml.eos_token_id": 151645,
+              "tokenizer.ggml.merges": [],
+              "tokenizer.ggml.model": "gpt2",
+              "tokenizer.ggml.padding_token_id": 151643,
+              "tokenizer.ggml.pre": "qwen2",
+              "tokenizer.ggml.token_type": [],
+              "tokenizer.ggml.tokens": []
+            },
+            "mtp_supported": false,
+            "source": "ollama",
+            "capabilities": [
+              "completion",
+              "tools",
+              "thinking"
+            ]
+          },
+          "settings": {
+            "context": 32768,
+            "kv": "q8_0",
+            "flash_attention": true,
+            "fit": true,
+            "reserve_mib": 0,
+            "keep_alive": "5m",
+            "mtp": false,
+            "mtp_kv": "follow",
+            "reasoning": "default"
+          }
+        },
+        "running": true,
+        "runtime": {
+          "model": "maa-09dadb68b4448ec5239f2adb:latest",
+          "context": 32768,
+          "upstream": "http://127.0.0.1:11434",
+          "resources": {
+            "size": 2652257648,
+            "size_vram": 2652257648,
+            "expires_at": "2026-10-06T09:15:53.439563808Z"
+          },
+          "preset_parameters": "top_p                          0.95\nrepeat_penalty                 1\nstop                           \"<|im_start|>\"\nstop                           \"<|im_end|>\"\ntemperature                    0.6\ntop_k                          20",
+          "backend": "ollama",
+          "key": "09dadb68b4448ec5239f2adb",
+          "fingerprint": "cf5db80f9e6a03437ff7c1e5c091447faf12bfeb40732889894a245439300d9d",
+          "base_url": "http://127.0.0.1:18443/v1",
+          "pid": 322,
+          "capabilities": {
+            "hosted_web_search": false,
+            "stateless_responses": true
+          }
+        },
+        "yolo": {
+          "enabled": true,
+          "managed": true
+        }
+      },
+      "native_process": [
+        "ollama          /usr/local/bin/ollama serve"
+      ]
+    },
+    {
+      "status": "passed",
+      "at": "2026-10-06T09:12:05.874815+00:00",
+      "uid": 1001,
+      "program_sha256": "86f3827e7908b4a44d7519229bebd5e126adb90eabb02c7d50188f7e4ebe9df1",
+      "checks": [
+        "installed frozen bytes",
+        "pause then container restart autostarts target",
+        "one managed native backend",
+        "official Ollama unit inactive",
+        "unit owned by invoking user",
+        "profile effective context and 90% synchronized",
+        "adapter healthy"
+      ],
+      "software": {
+        "ollama": "Warning: could not connect to a running Ollama instance\nWarning: client version is 0.35.1",
+        "llamacpp": "version: 0.6.0-dev (build 11429, commit d81235049)\nbuilt with Clang 19.1.7 for Linux x86_64",
+        "codex": "codex-cli 0.160.1"
+      },
+      "runtime": {
+        "selected": {
+          "model": {
+            "key": "07591f8b732c1e7241bfe575",
+            "backend": "llamacpp",
+            "name": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+            "path": "/home/sandbox/.local/state/my-ai-agent/models/66204dcd0d42165045cefdeb/Qwen3-0.6B-Q4_K_M.gguf",
+            "file_identity": [
+              2096,
+              340610,
+              396705472,
+              1791277543332572144
+            ],
+            "sha256": "ac2d97712095a558e31573f62f466a3f9d93990898b0ec79d7c974c1780d524a",
+            "metadata": {
+              "general.architecture": "qwen3",
+              "general.type": "model",
+              "general.name": "Qwen3-0.6B",
+              "general.basename": "Qwen3-0.6B",
+              "general.quantized_by": "Unsloth",
+              "general.size_label": "0.6B",
+              "general.repo_url": "https://huggingface.co/unsloth",
+              "qwen3.block_count": 28,
+              "qwen3.context_length": 40960,
+              "qwen3.embedding_length": 1024,
+              "qwen3.feed_forward_length": 3072,
+              "qwen3.attention.head_count": 16,
+              "qwen3.attention.head_count_kv": 8,
+              "qwen3.rope.freq_base": 1000000.0,
+              "qwen3.attention.layer_norm_rms_epsilon": 9.999999974752427e-07,
+              "qwen3.attention.key_length": 128,
+              "qwen3.attention.value_length": 128,
+              "tokenizer.ggml.model": "gpt2",
+              "tokenizer.ggml.pre": "qwen2",
+              "tokenizer.ggml.eos_token_id": 151645,
+              "tokenizer.ggml.padding_token_id": 151654,
+              "tokenizer.ggml.add_bos_token": false,
+              "tokenizer.chat_template": "{%- if tools %}\n    {{- '<|im_start|>system\\n' }}\n    {%- if messages[0].role == 'system' %}\n        {{- messages[0].content + '\\n\\n' }}\n    {%- endif %}\n    {{- \"# Tools\\n\\nYou may call one or more functions to assist with the user query.\\n\\nYou are provided with function signatures within <tools></tools> XML tags:\\n<tools>\" }}\n    {%- for tool in tools %}\n        {{- \"\\n\" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- \"\\n</tools>\\n\\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\\n<tool_call>\\n{\\\"name\\\": <function-name>, \\\"arguments\\\": <args-json-object>}\\n</tool_call><|im_end|>\\n\" }}\n{%- else %}\n    {%- if messages[0].role == 'system' %}\n        {{- '<|im_start|>system\\n' + messages[0].content + '<|im_end|>\\n' }}\n    {%- endif %}\n{%- endif %}\n{%- set ns = namespace(multi_step_tool=true, last_query_index=messages|length - 1) %}\n{%- for forward_message in messages %}\n    {%- set index = (messages|length - 1) - loop.index0 %}\n    {%- set message = messages[index] %}\n    {%- set current_content = message.content if message.content is defined and message.content is not none else '' %}\n    {%- set tool_start = '<tool_response>' %}\n    {%- set tool_start_length = tool_start|length %}\n    {%- set start_of_message = current_content[:tool_start_length] %}\n    {%- set tool_end = '</tool_response>' %}\n    {%- set tool_end_length = tool_end|length %}\n    {%- set start_pos = (current_content|length) - tool_end_length %}\n    {%- if start_pos < 0 %}\n        {%- set start_pos = 0 %}\n    {%- endif %}\n    {%- set end_of_message = current_content[start_pos:] %}\n    {%- if ns.multi_step_tool and message.role == \"user\" and not(start_of_message == tool_start and end_of_message == tool_end) %}\n        {%- set ns.multi_step_tool = false %}\n        {%- set ns.last_query_index = index %}\n    {%- endif %}\n{%- endfor %}\n{%- for message in messages %}\n    {%- if (message.role == \"user\") or (message.role == \"system\" and not loop.first) %}\n        {{- '<|im_start|>' + message.role + '\\n' + message.content + '<|im_end|>' + '\\n' }}\n    {%- elif message.role == \"assistant\" %}\n        {%- set m_content = message.content if message.content is defined and message.content is not none else '' %}\n        {%- set content = m_content %}\n        {%- set reasoning_content = '' %}\n        {%- if message.reasoning_content is defined and message.reasoning_content is not none %}\n            {%- set reasoning_content = message.reasoning_content %}\n        {%- else %}\n            {%- if '</think>' in m_content %}\n                {%- set content = (m_content.split('</think>')|last).lstrip('\\n') %}\n                {%- set reasoning_content = (m_content.split('</think>')|first).rstrip('\\n') %}\n                {%- set reasoning_content = (reasoning_content.split('<think>')|last).lstrip('\\n') %}\n            {%- endif %}\n        {%- endif %}\n        {%- if loop.index0 > ns.last_query_index %}\n            {%- if loop.last or (not loop.last and (not reasoning_content.strip() == '')) %}\n                {{- '<|im_start|>' + message.role + '\\n<think>\\n' + reasoning_content.strip('\\n') + '\\n</think>\\n\\n' + content.lstrip('\\n') }}\n            {%- else %}\n                {{- '<|im_start|>' + message.role + '\\n' + content }}\n            {%- endif %}\n        {%- else %}\n            {{- '<|im_start|>' + message.role + '\\n' + content }}\n        {%- endif %}\n        {%- if message.tool_calls %}\n            {%- for tool_call in message.tool_calls %}\n                {%- if (loop.first and content) or (not loop.first) %}\n                    {{- '\\n' }}\n                {%- endif %}\n                {%- if tool_call.function %}\n                    {%- set tool_call = tool_call.function %}\n                {%- endif %}\n                {{- '<tool_call>\\n{\"name\": \"' }}\n                {{- tool_call.name }}\n                {{- '\", \"arguments\": ' }}\n                {%- if tool_call.arguments is string %}\n                    {{- tool_call.arguments }}\n                {%- else %}\n                    {{- tool_call.arguments | tojson }}\n                {%- endif %}\n                {{- '}\\n</tool_call>' }}\n            {%- endfor %}\n        {%- endif %}\n        {{- '<|im_end|>\\n' }}\n    {%- elif message.role == \"tool\" %}\n        {%- if loop.first or (messages[loop.index0 - 1].role != \"tool\") %}\n            {{- '<|im_start|>user' }}\n        {%- endif %}\n        {{- '\\n<tool_response>\\n' }}\n        {{- message.content }}\n        {{- '\\n</tool_response>' }}\n        {%- if loop.last or (messages[loop.index0 + 1].role != \"tool\") %}\n            {{- '<|im_end|>\\n' }}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '<|im_start|>assistant\\n' }}\n    {%- if enable_thinking is defined and enable_thinking is false %}\n        {{- '<think>\\n\\n</think>\\n\\n' }}\n    {%- endif %}\n{%- endif %}",
+              "general.quantization_version": 2,
+              "general.file_type": 15,
+              "quantize.imatrix.file": "Qwen3-0.6B-GGUF/imatrix_unsloth.dat",
+              "quantize.imatrix.dataset": "unsloth_calibration_Qwen3-0.6B.txt",
+              "quantize.imatrix.entries_count": 196,
+              "quantize.imatrix.chunks_count": 688,
+              "maa.mtp_supported": false
+            },
+            "mtp_supported": false,
+            "source": "hf",
+            "repo": "unsloth/Qwen3-0.6B-GGUF",
+            "filename": "Qwen3-0.6B-Q4_K_M.gguf",
+            "revision": "50968a4468ef4233ed78cd7c3de230dd1d61a56b"
+          },
+          "settings": {
+            "context": 8192,
+            "kv": "q4_0",
+            "flash_attention": true,
+            "fit": true,
+            "reserve_mib": 0,
+            "keep_alive": "10m",
+            "mtp": false,
+            "mtp_kv": "follow",
+            "reasoning": "default"
+          }
+        },
+        "running": true,
+        "runtime": {
+          "model": "07591f8b732c1e7241bfe575",
+          "context": 8192,
+          "upstream": "http://127.0.0.1:8080",
+          "resources": {
+            "sleeping": false,
+            "total_slots": 1,
+            "model_path": "/home/sandbox/.local/state/my-ai-agent/models/66204dcd0d42165045cefdeb/Qwen3-0.6B-Q4_K_M.gguf",
+            "gpu_layers": null
+          },
+          "backend": "llamacpp",
+          "key": "07591f8b732c1e7241bfe575",
+          "fingerprint": "44a6affeb5b618ebb27ea876ff98f4baad65d52512d40deb9464186bb8ccb4a8",
+          "base_url": "http://127.0.0.1:18443/v1",
+          "pid": 322,
+          "capabilities": {
+            "hosted_web_search": false,
+            "stateless_responses": true
+          }
+        },
+        "yolo": {
+          "enabled": true,
+          "managed": true
+        }
+      },
+      "native_process": [
+        "llama           /home/sandbox/.local/bin/llama serve --model /home/sandbox/.local/state/my-ai-agent/models/66204dcd0d42165045cefdeb/Qwen3-0.6B-Q4_K_M.gguf --alias 07591f8b732c1e7241bfe575 --parallel 1 --ctx-size 8192 --cache-type-k q4_0 --cache-type-v q4_0 --flash-attn on --fit on --fit-target 0 --sleep-idle-seconds 600 --spec-type none"
+      ]
+    }
+  ],
+  "q4_native": {
+    "llamacpp": {
+      "selected": {
+        "model": {
+          "key": "07591f8b732c1e7241bfe575",
+          "backend": "llamacpp",
+          "name": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+          "path": "/home/sandbox/.local/state/my-ai-agent/models/66204dcd0d42165045cefdeb/Qwen3-0.6B-Q4_K_M.gguf",
+          "file_identity": [
+            2096,
+            340610,
+            396705472,
+            1791277543332572144
+          ],
+          "sha256": "ac2d97712095a558e31573f62f466a3f9d93990898b0ec79d7c974c1780d524a",
+          "metadata": {
+            "general.architecture": "qwen3",
+            "general.type": "model",
+            "general.name": "Qwen3-0.6B",
+            "general.basename": "Qwen3-0.6B",
+            "general.quantized_by": "Unsloth",
+            "general.size_label": "0.6B",
+            "general.repo_url": "https://huggingface.co/unsloth",
+            "qwen3.block_count": 28,
+            "qwen3.context_length": 40960,
+            "qwen3.embedding_length": 1024,
+            "qwen3.feed_forward_length": 3072,
+            "qwen3.attention.head_count": 16,
+            "qwen3.attention.head_count_kv": 8,
+            "qwen3.rope.freq_base": 1000000.0,
+            "qwen3.attention.layer_norm_rms_epsilon": 9.999999974752427e-07,
+            "qwen3.attention.key_length": 128,
+            "qwen3.attention.value_length": 128,
+            "tokenizer.ggml.model": "gpt2",
+            "tokenizer.ggml.pre": "qwen2",
+            "tokenizer.ggml.eos_token_id": 151645,
+            "tokenizer.ggml.padding_token_id": 151654,
+            "tokenizer.ggml.add_bos_token": false,
+            "tokenizer.chat_template": "{%- if tools %}\n    {{- '<|im_start|>system\\n' }}\n    {%- if messages[0].role == 'system' %}\n        {{- messages[0].content + '\\n\\n' }}\n    {%- endif %}\n    {{- \"# Tools\\n\\nYou may call one or more functions to assist with the user query.\\n\\nYou are provided with function signatures within <tools></tools> XML tags:\\n<tools>\" }}\n    {%- for tool in tools %}\n        {{- \"\\n\" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- \"\\n</tools>\\n\\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\\n<tool_call>\\n{\\\"name\\\": <function-name>, \\\"arguments\\\": <args-json-object>}\\n</tool_call><|im_end|>\\n\" }}\n{%- else %}\n    {%- if messages[0].role == 'system' %}\n        {{- '<|im_start|>system\\n' + messages[0].content + '<|im_end|>\\n' }}\n    {%- endif %}\n{%- endif %}\n{%- set ns = namespace(multi_step_tool=true, last_query_index=messages|length - 1) %}\n{%- for forward_message in messages %}\n    {%- set index = (messages|length - 1) - loop.index0 %}\n    {%- set message = messages[index] %}\n    {%- set current_content = message.content if message.content is defined and message.content is not none else '' %}\n    {%- set tool_start = '<tool_response>' %}\n    {%- set tool_start_length = tool_start|length %}\n    {%- set start_of_message = current_content[:tool_start_length] %}\n    {%- set tool_end = '</tool_response>' %}\n    {%- set tool_end_length = tool_end|length %}\n    {%- set start_pos = (current_content|length) - tool_end_length %}\n    {%- if start_pos < 0 %}\n        {%- set start_pos = 0 %}\n    {%- endif %}\n    {%- set end_of_message = current_content[start_pos:] %}\n    {%- if ns.multi_step_tool and message.role == \"user\" and not(start_of_message == tool_start and end_of_message == tool_end) %}\n        {%- set ns.multi_step_tool = false %}\n        {%- set ns.last_query_index = index %}\n    {%- endif %}\n{%- endfor %}\n{%- for message in messages %}\n    {%- if (message.role == \"user\") or (message.role == \"system\" and not loop.first) %}\n        {{- '<|im_start|>' + message.role + '\\n' + message.content + '<|im_end|>' + '\\n' }}\n    {%- elif message.role == \"assistant\" %}\n        {%- set m_content = message.content if message.content is defined and message.content is not none else '' %}\n        {%- set content = m_content %}\n        {%- set reasoning_content = '' %}\n        {%- if message.reasoning_content is defined and message.reasoning_content is not none %}\n            {%- set reasoning_content = message.reasoning_content %}\n        {%- else %}\n            {%- if '</think>' in m_content %}\n                {%- set content = (m_content.split('</think>')|last).lstrip('\\n') %}\n                {%- set reasoning_content = (m_content.split('</think>')|first).rstrip('\\n') %}\n                {%- set reasoning_content = (reasoning_content.split('<think>')|last).lstrip('\\n') %}\n            {%- endif %}\n        {%- endif %}\n        {%- if loop.index0 > ns.last_query_index %}\n            {%- if loop.last or (not loop.last and (not reasoning_content.strip() == '')) %}\n                {{- '<|im_start|>' + message.role + '\\n<think>\\n' + reasoning_content.strip('\\n') + '\\n</think>\\n\\n' + content.lstrip('\\n') }}\n            {%- else %}\n                {{- '<|im_start|>' + message.role + '\\n' + content }}\n            {%- endif %}\n        {%- else %}\n            {{- '<|im_start|>' + message.role + '\\n' + content }}\n        {%- endif %}\n        {%- if message.tool_calls %}\n            {%- for tool_call in message.tool_calls %}\n                {%- if (loop.first and content) or (not loop.first) %}\n                    {{- '\\n' }}\n                {%- endif %}\n                {%- if tool_call.function %}\n                    {%- set tool_call = tool_call.function %}\n                {%- endif %}\n                {{- '<tool_call>\\n{\"name\": \"' }}\n                {{- tool_call.name }}\n                {{- '\", \"arguments\": ' }}\n                {%- if tool_call.arguments is string %}\n                    {{- tool_call.arguments }}\n                {%- else %}\n                    {{- tool_call.arguments | tojson }}\n                {%- endif %}\n                {{- '}\\n</tool_call>' }}\n            {%- endfor %}\n        {%- endif %}\n        {{- '<|im_end|>\\n' }}\n    {%- elif message.role == \"tool\" %}\n        {%- if loop.first or (messages[loop.index0 - 1].role != \"tool\") %}\n            {{- '<|im_start|>user' }}\n        {%- endif %}\n        {{- '\\n<tool_response>\\n' }}\n        {{- message.content }}\n        {{- '\\n</tool_response>' }}\n        {%- if loop.last or (messages[loop.index0 + 1].role != \"tool\") %}\n            {{- '<|im_end|>\\n' }}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '<|im_start|>assistant\\n' }}\n    {%- if enable_thinking is defined and enable_thinking is false %}\n        {{- '<think>\\n\\n</think>\\n\\n' }}\n    {%- endif %}\n{%- endif %}",
+            "general.quantization_version": 2,
+            "general.file_type": 15,
+            "quantize.imatrix.file": "Qwen3-0.6B-GGUF/imatrix_unsloth.dat",
+            "quantize.imatrix.dataset": "unsloth_calibration_Qwen3-0.6B.txt",
+            "quantize.imatrix.entries_count": 196,
+            "quantize.imatrix.chunks_count": 688,
+            "maa.mtp_supported": false
+          },
+          "mtp_supported": false,
+          "source": "hf",
+          "repo": "unsloth/Qwen3-0.6B-GGUF",
+          "filename": "Qwen3-0.6B-Q4_K_M.gguf",
+          "revision": "50968a4468ef4233ed78cd7c3de230dd1d61a56b"
+        },
+        "settings": {
+          "context": 8192,
+          "kv": "q4_0",
+          "flash_attention": true,
+          "fit": true,
+          "reserve_mib": 0,
+          "keep_alive": "10m",
+          "mtp": false,
+          "mtp_kv": "follow",
+          "reasoning": "default"
+        }
+      },
+      "running": true,
+      "runtime": {
+        "model": "07591f8b732c1e7241bfe575",
+        "context": 8192,
+        "upstream": "http://127.0.0.1:8080",
+        "resources": {
+          "sleeping": false,
+          "total_slots": 1,
+          "model_path": "/home/sandbox/.local/state/my-ai-agent/models/66204dcd0d42165045cefdeb/Qwen3-0.6B-Q4_K_M.gguf",
+          "gpu_layers": null
+        },
+        "backend": "llamacpp",
+        "key": "07591f8b732c1e7241bfe575",
+        "fingerprint": "44a6affeb5b618ebb27ea876ff98f4baad65d52512d40deb9464186bb8ccb4a8",
+        "base_url": "http://127.0.0.1:18443/v1",
+        "pid": 2685,
+        "capabilities": {
+          "hosted_web_search": false,
+          "stateless_responses": true
+        }
+      },
+      "yolo": {
+        "enabled": true,
+        "managed": true
+      }
+    },
+    "ollama": {
+      "selected": {
+        "model": {
+          "key": "09dadb68b4448ec5239f2adb",
+          "backend": "ollama",
+          "name": "qwen3:0.6b",
+          "digest": "7df6b6e09427a769808717c0a93cadc4ae99ed4eb8bf5ca557c90846becea435",
+          "metadata": {
+            "general.architecture": "qwen3",
+            "general.basename": "Qwen3",
+            "general.file_type": 15,
+            "general.license": "apache-2.0",
+            "general.parameter_count": 751632384,
+            "general.quantization_version": 2,
+            "general.size_label": "0.6B",
+            "general.type": "model",
+            "qwen3.attention.head_count": 16,
+            "qwen3.attention.head_count_kv": 8,
+            "qwen3.attention.key_length": 128,
+            "qwen3.attention.layer_norm_rms_epsilon": 1e-06,
+            "qwen3.attention.value_length": 128,
+            "qwen3.block_count": 28,
+            "qwen3.context_length": 40960,
+            "qwen3.embedding_length": 1024,
+            "qwen3.feed_forward_length": 3072,
+            "qwen3.rope.freq_base": 1000000,
+            "tokenizer.ggml.add_bos_token": false,
+            "tokenizer.ggml.bos_token_id": 151643,
+            "tokenizer.ggml.eos_token_id": 151645,
+            "tokenizer.ggml.merges": [],
+            "tokenizer.ggml.model": "gpt2",
+            "tokenizer.ggml.padding_token_id": 151643,
+            "tokenizer.ggml.pre": "qwen2",
+            "tokenizer.ggml.token_type": [],
+            "tokenizer.ggml.tokens": []
+          },
+          "mtp_supported": false,
+          "source": "ollama",
+          "capabilities": [
+            "completion",
+            "tools",
+            "thinking"
+          ]
+        },
+        "settings": {
+          "context": 8192,
+          "kv": "q4_0",
+          "flash_attention": true,
+          "fit": true,
+          "reserve_mib": 0,
+          "keep_alive": "10m",
+          "mtp": false,
+          "mtp_kv": "follow",
+          "reasoning": "default"
+        }
+      },
+      "running": true,
+      "runtime": {
+        "model": "maa-09dadb68b4448ec5239f2adb:latest",
+        "context": 8192,
+        "upstream": "http://127.0.0.1:11434",
+        "resources": {
+          "size": 769015152,
+          "size_vram": 769015152,
+          "expires_at": "2026-10-06T09:20:51.865888301Z"
+        },
+        "preset_parameters": "temperature                    0.6\ntop_k                          20\ntop_p                          0.95\nrepeat_penalty                 1\nstop                           \"<|im_start|>\"\nstop                           \"<|im_end|>\"",
+        "backend": "ollama",
+        "key": "09dadb68b4448ec5239f2adb",
+        "fingerprint": "e25c9ec84321c1ef18bd54fc7bf4f323ac05fb6a028e94c5a315ac9b0affe0bc",
+        "base_url": "http://127.0.0.1:18443/v1",
+        "pid": 2851,
+        "capabilities": {
+          "hosted_web_search": false,
+          "stateless_responses": true
+        }
+      },
+      "yolo": {
+        "enabled": true,
+        "managed": true
+      }
+    },
+    "switch_back": {
+      "selected": {
+        "model": {
+          "key": "07591f8b732c1e7241bfe575",
+          "backend": "llamacpp",
+          "name": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+          "path": "/home/sandbox/.local/state/my-ai-agent/models/66204dcd0d42165045cefdeb/Qwen3-0.6B-Q4_K_M.gguf",
+          "file_identity": [
+            2096,
+            340610,
+            396705472,
+            1791277543332572144
+          ],
+          "sha256": "ac2d97712095a558e31573f62f466a3f9d93990898b0ec79d7c974c1780d524a",
+          "metadata": {
+            "general.architecture": "qwen3",
+            "general.type": "model",
+            "general.name": "Qwen3-0.6B",
+            "general.basename": "Qwen3-0.6B",
+            "general.quantized_by": "Unsloth",
+            "general.size_label": "0.6B",
+            "general.repo_url": "https://huggingface.co/unsloth",
+            "qwen3.block_count": 28,
+            "qwen3.context_length": 40960,
+            "qwen3.embedding_length": 1024,
+            "qwen3.feed_forward_length": 3072,
+            "qwen3.attention.head_count": 16,
+            "qwen3.attention.head_count_kv": 8,
+            "qwen3.rope.freq_base": 1000000.0,
+            "qwen3.attention.layer_norm_rms_epsilon": 9.999999974752427e-07,
+            "qwen3.attention.key_length": 128,
+            "qwen3.attention.value_length": 128,
+            "tokenizer.ggml.model": "gpt2",
+            "tokenizer.ggml.pre": "qwen2",
+            "tokenizer.ggml.eos_token_id": 151645,
+            "tokenizer.ggml.padding_token_id": 151654,
+            "tokenizer.ggml.add_bos_token": false,
+            "tokenizer.chat_template": "{%- if tools %}\n    {{- '<|im_start|>system\\n' }}\n    {%- if messages[0].role == 'system' %}\n        {{- messages[0].content + '\\n\\n' }}\n    {%- endif %}\n    {{- \"# Tools\\n\\nYou may call one or more functions to assist with the user query.\\n\\nYou are provided with function signatures within <tools></tools> XML tags:\\n<tools>\" }}\n    {%- for tool in tools %}\n        {{- \"\\n\" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- \"\\n</tools>\\n\\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\\n<tool_call>\\n{\\\"name\\\": <function-name>, \\\"arguments\\\": <args-json-object>}\\n</tool_call><|im_end|>\\n\" }}\n{%- else %}\n    {%- if messages[0].role == 'system' %}\n        {{- '<|im_start|>system\\n' + messages[0].content + '<|im_end|>\\n' }}\n    {%- endif %}\n{%- endif %}\n{%- set ns = namespace(multi_step_tool=true, last_query_index=messages|length - 1) %}\n{%- for forward_message in messages %}\n    {%- set index = (messages|length - 1) - loop.index0 %}\n    {%- set message = messages[index] %}\n    {%- set current_content = message.content if message.content is defined and message.content is not none else '' %}\n    {%- set tool_start = '<tool_response>' %}\n    {%- set tool_start_length = tool_start|length %}\n    {%- set start_of_message = current_content[:tool_start_length] %}\n    {%- set tool_end = '</tool_response>' %}\n    {%- set tool_end_length = tool_end|length %}\n    {%- set start_pos = (current_content|length) - tool_end_length %}\n    {%- if start_pos < 0 %}\n        {%- set start_pos = 0 %}\n    {%- endif %}\n    {%- set end_of_message = current_content[start_pos:] %}\n    {%- if ns.multi_step_tool and message.role == \"user\" and not(start_of_message == tool_start and end_of_message == tool_end) %}\n        {%- set ns.multi_step_tool = false %}\n        {%- set ns.last_query_index = index %}\n    {%- endif %}\n{%- endfor %}\n{%- for message in messages %}\n    {%- if (message.role == \"user\") or (message.role == \"system\" and not loop.first) %}\n        {{- '<|im_start|>' + message.role + '\\n' + message.content + '<|im_end|>' + '\\n' }}\n    {%- elif message.role == \"assistant\" %}\n        {%- set m_content = message.content if message.content is defined and message.content is not none else '' %}\n        {%- set content = m_content %}\n        {%- set reasoning_content = '' %}\n        {%- if message.reasoning_content is defined and message.reasoning_content is not none %}\n            {%- set reasoning_content = message.reasoning_content %}\n        {%- else %}\n            {%- if '</think>' in m_content %}\n                {%- set content = (m_content.split('</think>')|last).lstrip('\\n') %}\n                {%- set reasoning_content = (m_content.split('</think>')|first).rstrip('\\n') %}\n                {%- set reasoning_content = (reasoning_content.split('<think>')|last).lstrip('\\n') %}\n            {%- endif %}\n        {%- endif %}\n        {%- if loop.index0 > ns.last_query_index %}\n            {%- if loop.last or (not loop.last and (not reasoning_content.strip() == '')) %}\n                {{- '<|im_start|>' + message.role + '\\n<think>\\n' + reasoning_content.strip('\\n') + '\\n</think>\\n\\n' + content.lstrip('\\n') }}\n            {%- else %}\n                {{- '<|im_start|>' + message.role + '\\n' + content }}\n            {%- endif %}\n        {%- else %}\n            {{- '<|im_start|>' + message.role + '\\n' + content }}\n        {%- endif %}\n        {%- if message.tool_calls %}\n            {%- for tool_call in message.tool_calls %}\n                {%- if (loop.first and content) or (not loop.first) %}\n                    {{- '\\n' }}\n                {%- endif %}\n                {%- if tool_call.function %}\n                    {%- set tool_call = tool_call.function %}\n                {%- endif %}\n                {{- '<tool_call>\\n{\"name\": \"' }}\n                {{- tool_call.name }}\n                {{- '\", \"arguments\": ' }}\n                {%- if tool_call.arguments is string %}\n                    {{- tool_call.arguments }}\n                {%- else %}\n                    {{- tool_call.arguments | tojson }}\n                {%- endif %}\n                {{- '}\\n</tool_call>' }}\n            {%- endfor %}\n        {%- endif %}\n        {{- '<|im_end|>\\n' }}\n    {%- elif message.role == \"tool\" %}\n        {%- if loop.first or (messages[loop.index0 - 1].role != \"tool\") %}\n            {{- '<|im_start|>user' }}\n        {%- endif %}\n        {{- '\\n<tool_response>\\n' }}\n        {{- message.content }}\n        {{- '\\n</tool_response>' }}\n        {%- if loop.last or (messages[loop.index0 + 1].role != \"tool\") %}\n            {{- '<|im_end|>\\n' }}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '<|im_start|>assistant\\n' }}\n    {%- if enable_thinking is defined and enable_thinking is false %}\n        {{- '<think>\\n\\n</think>\\n\\n' }}\n    {%- endif %}\n{%- endif %}",
+            "general.quantization_version": 2,
+            "general.file_type": 15,
+            "quantize.imatrix.file": "Qwen3-0.6B-GGUF/imatrix_unsloth.dat",
+            "quantize.imatrix.dataset": "unsloth_calibration_Qwen3-0.6B.txt",
+            "quantize.imatrix.entries_count": 196,
+            "quantize.imatrix.chunks_count": 688,
+            "maa.mtp_supported": false
+          },
+          "mtp_supported": false,
+          "source": "hf",
+          "repo": "unsloth/Qwen3-0.6B-GGUF",
+          "filename": "Qwen3-0.6B-Q4_K_M.gguf",
+          "revision": "50968a4468ef4233ed78cd7c3de230dd1d61a56b"
+        },
+        "settings": {
+          "context": 8192,
+          "kv": "q4_0",
+          "flash_attention": true,
+          "fit": true,
+          "reserve_mib": 0,
+          "keep_alive": "10m",
+          "mtp": false,
+          "mtp_kv": "follow",
+          "reasoning": "default"
+        }
+      },
+      "running": true,
+      "runtime": {
+        "model": "07591f8b732c1e7241bfe575",
+        "context": 8192,
+        "upstream": "http://127.0.0.1:8080",
+        "resources": {
+          "sleeping": false,
+          "total_slots": 1,
+          "model_path": "/home/sandbox/.local/state/my-ai-agent/models/66204dcd0d42165045cefdeb/Qwen3-0.6B-Q4_K_M.gguf",
+          "gpu_layers": null
+        },
+        "backend": "llamacpp",
+        "key": "07591f8b732c1e7241bfe575",
+        "fingerprint": "44a6affeb5b618ebb27ea876ff98f4baad65d52512d40deb9464186bb8ccb4a8",
+        "base_url": "http://127.0.0.1:18443/v1",
+        "pid": 3215,
+        "capabilities": {
+          "hosted_web_search": false,
+          "stateless_responses": true
+        }
+      },
+      "yolo": {
+        "enabled": true,
+        "managed": true
+      }
+    }
+  },
+  "real_codex_tool_fixture": {
+    "status": "passed",
+    "kind": "real Codex / deterministic upstream fixture",
+    "tool_output_replayed": true,
+    "file_created_by_codex_tool": true,
+    "stdout": "Done.\n",
+    "diagnostic": "WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"/tmp/maa-real-codex-tool-p28qrew_/codex\"))\nReading additional input from stdin...\nOpenAI Codex v0.160.1\n--------\nworkdir: /tmp/maa-real-codex-tool-p28qrew_\nmodel: maa_tool_fixture\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a1107d-0800-7300-9f7f-42f7cc4ddf5d\n--------\nuser\nUse a shell tool to print MAA_REAL_CODEX_TOOL_OK, then answer done.\nwarning: Model metadata for `maa_tool_fixture` not found. Defaulting to fallback metadata; this can degrade performance and cause issues.\nexec\n/bin/bash -lc 'printf MAA_REAL_CODEX_TOOL_OK > codex-proof.txt; cat codex-proof.txt' in /tmp/maa-real-codex-tool-p28qrew_\n succeeded in 0ms:\nMAA_REAL_CODEX_TOOL_OK\ncodex\nDone.\n"
+  },
+  "limitations": [
+    "Native MTP inference unverified",
+    "Large-model/GPU capacity/performance unverified",
+    "Authenticated HF and split GGUF native paths unverified",
+    "Public entry verification follows publication"
+  ]
+}

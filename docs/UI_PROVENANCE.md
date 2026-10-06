@@ -1,0 +1,1 @@
+Screen / Selection / text helpers are derived from gdrencn/my-ai-sandbox stable 0.2.25. Business-specific container/shell helpers are excluded. Rendering, keys and input editing remain shared within maa.
