@@ -35,7 +35,7 @@ maa is a one-shot installation/configuration tool. There is no maa daemon or Res
 - Inherited from the byte-identical 0.1.4 runtime (only the product version constant changed): actual root official installation and active 0.1.3 llama.cpp migration; ordinary-user paused 0.1.3 Ollama migration. YOLO recovery backup hashes remain unchanged.
 - The same inherited architecture checks verify that both backends autostart from pause after container restart and serve real Codex while maa.pyz is absent. These additional root/ordinary-user checks are separate from the paired native runner.
 - Software: Ubuntu 26.04.1, Python 3.14.4, Ollama 0.40.0, llama app b11429, Codex 0.160.1. Native suite uses Qwen3-0.6B-Q4_K_M.gguf and qwen2.5:3b; extra reasoning probes use qwen3:0.6b and the Qwen3 GGUF.
-- Frozen hashes and receipts are in validation/V0_1_5_LOCAL.json and V0_1_5_NATIVE.json. Public asset verification is recorded separately after publication.
+- Frozen hashes and receipts are in validation/V0_1_5_LOCAL.json and V0_1_5_NATIVE.json. validation/V0_1_5_PUBLIC.json records all nine public assets matching frozen bytes, both manifests, successful default-latest installation preserving the paused target, green GitHub CI and deletion of all three owned validation containers.
 
 ## Limits
 

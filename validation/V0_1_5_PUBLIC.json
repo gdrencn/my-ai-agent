@@ -1,0 +1,49 @@
+{
+  "version": "0.1.5",
+  "at": "2026-10-07T02:24:28.088622+00:00",
+  "status": "passed",
+  "release": "https://github.com/gdrencn/my-ai-agent/releases/tag/v0.1.5",
+  "tag_commit": "ebd65e34c2ddae2f314c6fb1ea79d9401e43620c",
+  "assets_match_local": true,
+  "product_and_validation_manifests_verified": true,
+  "asset_sha256": {
+    "SHA256SUMS": "6e24a731fb19381f2a632f76973a124a64c91395884a29d0c1bfd7f621f3ce5c",
+    "V0_1_5_LOCAL.json": "14a922545271e0c0c7ad201e1a6ca7d5d2ab1ae13b806b221939c068d544f2f8",
+    "V0_1_5_NATIVE.json": "9d404e2494a665b39af8d91976c43c2295edbc4c28fa56cf57ade1d2634e2e74",
+    "VALIDATION_SHA256SUMS": "2bbf15809099403f376516fef048c763fc2a522a3bbccba5257d830168deecc9",
+    "VERSION.json": "55ea891d8531bda44ccf145b02d0fcef481665c160b6080757e1e93a0475aa73",
+    "bootstrap.py": "29be87f1d96b102eead25f33edf77f37affda5bec710420c6eda11e2f4a7ed6b",
+    "install.sh": "71833da669c112156534c33feefc8f981e0bdd583cf9c0a3c55ee838bd1a45cf",
+    "maa-test.pyz": "a5c1cff7d565450dbf2569804cbef9c2921307941664bb66c2835bf4dfa9a763",
+    "maa.pyz": "35af3ca471bdd712af26a9dee12df44eb4145b394582a1750adb997ab6d83013"
+  },
+  "public_install_inside_mas": {
+    "passed": true,
+    "entrypoint": "https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/install.sh",
+    "version_selection": "default newest numeric test release, no explicit version override",
+    "components": "none",
+    "uid": 1001,
+    "installed_version": "0.1.5",
+    "selected_backend": "ollama",
+    "selected_model": "qwen2.5:3b",
+    "paused_state_and_configuration_preserved": true
+  },
+  "ci": {
+    "conclusion": "success",
+    "commit": "ebd65e34c2ddae2f314c6fb1ea79d9401e43620c",
+    "runs": [
+      "https://github.com/gdrencn/my-ai-agent/actions/runs/37561464908",
+      "https://github.com/gdrencn/my-ai-agent/actions/runs/37561505806"
+    ]
+  },
+  "cleanup": {
+    "all_owned_validation_containers_deleted": true,
+    "containers": [
+      "maa-direct-014",
+      "maa-root-014",
+      "maa-public-014"
+    ]
+  },
+  "immutable_previous_assets_retained": true,
+  "stable_promotion": "requires user acceptance"
+}
