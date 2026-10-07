@@ -33,7 +33,7 @@ class Service(unittest.TestCase):
         out = process.communicate(timeout=5)[0]
         self.assertEqual(process.returncode, 0)
         self.assertEqual(out.splitlines(), ['--no-daemon', '--profile', 'maa-local', 'exec', 'text with spaces', f'PID={process.pid}'])
-        self.assertEqual(list(self.root.iterdir()), [folder, self.store.root])
+        self.assertCountEqual(self.root.iterdir(), [folder, self.store.root])
 
     def test_native_units_execute_only_native_programs(self):
         paths = {b: self.root / (b + '.service') for b in ('ollama', 'llamacpp')}
