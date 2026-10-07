@@ -1,0 +1,226 @@
+{
+  "version": "0.1.8",
+  "status": "passed",
+  "at": "2026-10-07T09:24:51.298807+00:00",
+  "release": "https://github.com/gdrencn/my-ai-agent/releases/tag/v0.1.8",
+  "release_source_commit": "5b3bc1c0dfc17ce1beb5bfdd98b7ae4c660263b8",
+  "downloads": {
+    "version": "0.1.8",
+    "status": "passed",
+    "asset_count": 12,
+    "asset_sha256": {
+      "bootstrap.py": "29be87f1d96b102eead25f33edf77f37affda5bec710420c6eda11e2f4a7ed6b",
+      "install.sh": "71833da669c112156534c33feefc8f981e0bdd583cf9c0a3c55ee838bd1a45cf",
+      "maa-test.pyz": "d6b4701c862cae99fc469127606b061ed3857e3c0e5df2817353f32b8057b1b1",
+      "maa.pyz": "46ccec1b00606b6d7e8a11f6525903e8d9ab48ea9e15d2b5f8201107042050f4",
+      "SHA256SUMS": "5f6ae0d05477f275c09cf9b10996da328ecdc1f6fb59a31743659fde6d8405f5",
+      "V0_1_8_AUTOSTART.json": "f4de5206df613041b37caa17b124641cd37f0349fb5266f4a72642e6845ed292",
+      "V0_1_8_LOCAL.json": "98d4be2cbba398d19c4743175d0f4edbbf0ed1c7ffdacaca64fc3699517a9e40",
+      "V0_1_8_NATIVE.json": "1ccbbab4e9fc2544127636d03d9fd51a4132f4ebf1ab14d87d88ba7f5f496d32",
+      "V0_1_8_ROOT_NATIVE.json": "927e44b65d4b8924b6bae1cab4327ca450752dd455706b459013658b00d280df",
+      "V0_1_8_UPGRADE.json": "16095e8d6664384226e6f742199c80630308a365b666cb7fce6b93f16fa3c174",
+      "VALIDATION_SHA256SUMS": "71a0c5bc63403305031c0230fc9a7a824463cbb7797fce9928e50e3f30f1b13b",
+      "VERSION.json": "08419671efd36d649bb05efeaaaba4609f4c6fbc9ebd69aa0a999314729a57cf"
+    },
+    "all_local_bytes_equal": true,
+    "both_manifests_verified": true,
+    "release_prerelease": true
+  },
+  "public_installer": {
+    "version": "0.1.8",
+    "status": "passed",
+    "kind": "public default install entry with --components none",
+    "artifact_sha256": "46ccec1b00606b6d7e8a11f6525903e8d9ab48ea9e15d2b5f8201107042050f4",
+    "preserved_yolo_off": true,
+    "profile_and_selection_unchanged": true,
+    "native_instance_unchanged": true,
+    "before": {
+      "ActiveState": "active",
+      "SubState": "running",
+      "InvocationID": "6f340c669f5f464bbeab1f85355dca7c",
+      "MainPID": "6058",
+      "Result": "success"
+    },
+    "after": {
+      "ActiveState": "active",
+      "SubState": "running",
+      "InvocationID": "6f340c669f5f464bbeab1f85355dca7c",
+      "MainPID": "6058",
+      "Result": "success"
+    },
+    "diagnostic": "正在安装 my-ai-agent v0.1.8 test\nmy-ai-agent 已安装：/root/.local/share/my-ai-agent/maa.pyz\n运行 /root/.local/bin/maa 打开菜单。\n"
+  },
+  "public_test_entry": {
+    "components": "none",
+    "portable_checks": 81,
+    "native_checks": 35,
+    "native_initial_yolo": {
+      "enabled": false,
+      "managed": false
+    },
+    "report_sha256": "7947a40b57f9fd8eccfe725e9f70e7cc6b6f23cfd24dc8f0b91c4b0e20c590e2",
+    "checks": [
+      {
+        "name": "installed-version",
+        "status": "passed"
+      },
+      {
+        "name": "explicit-yolo-test-baseline",
+        "status": "passed"
+      },
+      {
+        "name": "hf-exact-download",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-native-pull",
+        "status": "passed"
+      },
+      {
+        "name": "hf-invalid-file-rejected",
+        "status": "passed"
+      },
+      {
+        "name": "llamacpp-select",
+        "status": "passed"
+      },
+      {
+        "name": "llamacpp-catalog",
+        "status": "passed"
+      },
+      {
+        "name": "llamacpp-responses",
+        "status": "passed"
+      },
+      {
+        "name": "llamacpp-native-function-call",
+        "status": "passed"
+      },
+      {
+        "name": "llamacpp-codex-cli",
+        "status": "passed"
+      },
+      {
+        "name": "llamacpp-manager-independent",
+        "status": "passed"
+      },
+      {
+        "name": "llamacpp-model-status",
+        "status": "passed"
+      },
+      {
+        "name": "llamacpp-configuration-without-reload",
+        "status": "passed"
+      },
+      {
+        "name": "llamacpp-codex-model-picker",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-select",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-catalog",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-responses",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-native-function-call",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-codex-cli",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-manager-independent",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-model-status",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-configuration-without-reload",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-codex-model-picker",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-resident-entry-reuses-alias",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-expired-entry-wakes-existing-alias",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-explicit-start-wakes-without-restart",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-unchanged-inventory-reuses-registry",
+        "status": "passed"
+      },
+      {
+        "name": "codex-direct-shell-and-result-replay",
+        "status": "passed"
+      },
+      {
+        "name": "pause-start-retains-target",
+        "status": "passed"
+      },
+      {
+        "name": "interrupted-candidate-restores-accepted-native-target",
+        "status": "passed"
+      },
+      {
+        "name": "native-load-failure-rollback",
+        "status": "passed"
+      },
+      {
+        "name": "invalid-fixture-cleaned",
+        "status": "passed"
+      },
+      {
+        "name": "yolo-off",
+        "status": "passed"
+      },
+      {
+        "name": "product-reinstall-retains-yolo-off-and-native-instance",
+        "status": "passed"
+      },
+      {
+        "name": "yolo-on",
+        "status": "passed"
+      }
+    ]
+  },
+  "release_ci": [
+    {
+      "conclusion": "success",
+      "databaseId": 37599686110,
+      "headBranch": "main",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 37599686421,
+      "headBranch": "v0.1.8",
+      "status": "completed"
+    }
+  ],
+  "cleanup": {
+    "owned_containers_removed": [
+      "maa-v018-root-check",
+      "maa-v018-user-check"
+    ],
+    "verified_absent": true
+  }
+}
