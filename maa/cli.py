@@ -55,20 +55,13 @@ def parser():
     installation.add_argument('component', choices=('ollama', 'llamacpp', 'codex', 'all'))
     product = actions.add_parser('_install')
     product.add_argument('--components', choices=('none', 'ollama', 'llamacpp', 'codex', 'all'), default='all')
-    actions.add_parser('_serve')
     return root
 
 
 def run(argv=None):
     argv = list(sys.argv[1:] if argv is None else argv)
     try:
-        if argv[:1] == ['_local']:
-            return Manager().local_command(argv[1:])
         args = parser().parse_args(argv)
-        if args.action == '_serve':
-            from .service import serve
-            serve()
-            return 0
         if args.action == '_install':
             from .install import product
             product(sys.argv[0], args.components)
@@ -84,7 +77,8 @@ def run(argv=None):
         if args.action == 'status':
             result = manager.status()
         elif args.action == 'logs':
-            path = manager.store.path('native.log')
+            selected = manager.store.selected()
+            path = manager.store.path('native') / ((selected['model']['backend'] if selected else 'ollama') + '.log')
             if path.exists():
                 with path.open('rb') as source:
                     source.seek(0, 2)

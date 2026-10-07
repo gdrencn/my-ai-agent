@@ -104,7 +104,7 @@ def catalog(runtime):
         'include_skills_usage_instructions': True, 'include_plugin_usage_instructions': True,
         'include_apps_usage_instructions': True, 'supports_reasoning_summary_parameter': False,
         'default_reasoning_summary': 'none', 'support_verbosity': False, 'default_verbosity': None,
-        'apply_patch_tool_type': 'freeform', 'web_search_tool_type': 'text',
+        'apply_patch_tool_type': None, 'web_search_tool_type': 'text',
         'truncation_policy': {'mode': 'tokens', 'limit': 10000},
         'supports_image_detail_original': False, 'context_window': context,
         'max_context_window': context, 'auto_compact_token_limit': context * 90 // 100,
@@ -142,6 +142,22 @@ def profile(runtime, settings):
         if not path.exists():
             atomic(path, catalog_json)
         atomic(profile_path(), tomlkit.dumps(doc))
+
+
+def launcher_path():
+    return Path.home() / '.local/bin/codex-local'
+
+
+def launcher():
+    # The generated entrypoint is independent of this module and maa.pyz.
+    return '#!/bin/sh\n# managed by my-ai-agent\nexec codex --no-daemon --profile maa-local "$@"\n'
+
+
+def install_launcher():
+    path = launcher_path()
+    if path.exists() and '# managed by my-ai-agent\n' not in path.read_text():
+        raise Error('codex-local is not owned by maa; refusing to overwrite it')
+    atomic(path, launcher(), 0o755)
 
 
 def executable():

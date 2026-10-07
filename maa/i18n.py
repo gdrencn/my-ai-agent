@@ -9,7 +9,7 @@ MESSAGES = {
     'add': '安装 / 登记新模型', 'select': '设置本地模型（立即切换）',
     'configure': '模型配置', 'pause': '暂停当前模型，释放资源',
     'start': '启动当前模型', 'yolo': 'YOLO 模式',
-    'models_menu': '本地模型管理', 'codex_config': 'Codex 配置', 'codex_global': 'Codex 全局设置',
+    'models_menu': '本地模型管理', 'codex_config': 'codex-local 配置', 'codex_global': 'Codex 配置',
     'model_status': '当前模型状态', 'refresh': '刷新', 'off_restore': '关闭（恢复原设置）',
     'current_model': '当前模型', 'run_state': '运行状态', 'base_label': '底座',
     'dirty': '存在未应用修改；选择“应用修改”后才生效。返回取消本次编辑。',

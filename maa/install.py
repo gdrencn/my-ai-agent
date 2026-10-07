@@ -38,7 +38,7 @@ def require_container():
         if status != 200 or value not in ('true', '1'):
             raise Error('Not a mas-managed container')
     except (OSError, http.client.HTTPException) as exc:
-        raise Error('Install/run the service inside a mas container, not on the host') from exc
+        raise Error('Install/configure inside a mas container, not on the host') from exc
 
 
 def component(name):
@@ -71,23 +71,37 @@ def _component(name):
 
 def product(archive, components='all'):
     require_container()
+    from .manager import Manager
+    store = Store()
+    controller = Controller(store)
+    controller.ensure()
+    legacy = controller.legacy_path()
+    if legacy is not None:
+        was_running = subprocess.run(['systemctl', 'is-active', '--quiet', 'maa.service']).returncode == 0
+    else:
+        was_running = controller.running()
+    controller.migrate()
     root = Path.home() / '.local/share/my-ai-agent'
     executable = root / 'maa.pyz'
     atomic(executable, Path(archive).read_bytes(), 0o755)
     bindir = Path.home() / '.local/bin'
     import shlex
-    for name, command in [('maa', ''), ('codex-local', ' _local')]:
+    for name, command in [('maa', '')]:
         path = bindir / name
         marker = '# managed by my-ai-agent\n'
         if path.exists() and marker not in path.read_text():
             raise Error(f'Existing command is not owned by maa: {path}')
         wrapper = '#!/bin/sh\n' + marker + 'exec ' + shlex.quote(sys.executable) + ' ' + shlex.quote(str(executable)) + command + ' "$@"\n'
         atomic(path, wrapper, 0o755)
-    Controller(Store()).ensure()
+    codex.install_launcher()
     codex.yolo(True)
     if components != 'none':
-        from .manager import Manager
         manager = Manager()
         with manager.store.lock(), manager.maintenance():
             component(components)
+    if store.selected():
+        manager = Manager(store, controller)
+        manager.start()
+        if not was_running:
+            manager.pause()
     print(f'my-ai-agent 已安装：{executable}\n运行 {bindir / "maa"} 打开菜单。', flush=True)

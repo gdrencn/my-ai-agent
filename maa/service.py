@@ -1,24 +1,20 @@
-"""One systemd service owns either native backend and its local API adapter."""
+"""One-shot native systemd configuration; no maa runtime service."""
 import hashlib
 import json
 import os
 from pathlib import Path
 import pwd
-import signal
 import subprocess
-import sys
-import threading
 import time
 import uuid
-from . import bridge
-from .backends import (llama_arguments, llama_observe, ollama_capabilities, check_options,
-                       binary, ollama_environment, ollama_endpoint, ollama_load, stop_process, wait_api, llama_endpoint)
-from .models import verify_file
-from .store import Error, Store, atomic, write
+from .backends import (binary, llama_arguments, llama_endpoint, llama_observe,
+                       ollama_capabilities, check_options, ollama_environment,
+                       ollama_endpoint, ollama_prepare, ollama_observe)
+from .http import request
 from .output import stage
-from .telemetry import launch_reference, native_allocations, UsageRecorder
+from .store import Error, atomic, read, write
 
-UNIT = 'maa.service'
+UNITS = {'ollama': 'ollama.service', 'llamacpp': 'llama-server.service'}
 
 
 def fingerprint(target):
@@ -30,189 +26,260 @@ def privileged(command, **kwargs):
 
 
 def escaped(value):
-    return '"' + str(value).replace('%', '%%').replace('\\', '\\\\').replace('"', '\\"') + '"'
+    return '"' + str(value).replace('\\', '\\\\').replace('"', '\\"').replace('%', '%%') + '"'
+
+
+def exec_arg(value):
+    return escaped(str(value).replace('$', '$$'))
 
 
 class Controller:
     def __init__(self, store):
         self.store = store
+        self.marker = f'# my-ai-agent native configuration owner uid={os.getuid()}'
+        self.model_backup = None
+
+    def unit_path(self, backend):
+        base = Path('/etc/systemd/system')
+        return base / 'ollama.service.d/50-local-model.conf' if backend == 'ollama' else base / UNITS[backend]
+
+    def config_paths(self):
+        return ([self.unit_path(b) for b in UNITS] + [self.store.path('native') / 'ollama-preload.json',
+                self.store.path('runtime.json'), self.store.path('ollama-originals.json')])
+
+    def owned(self, backend):
+        path = self.unit_path(backend)
+        return path.exists() and path.read_text().startswith(self.marker + '\n')
 
     def ensure(self):
         from .install import require_container
         require_container()
         if not Path('/run/systemd/system').exists():
-            raise Error('maa requires systemd inside the mas container')
-        user = pwd.getpwuid(os.getuid()).pw_name
-        app = Path.home() / '.local/share/my-ai-agent/maa.pyz'
-        if not app.is_file():
-            raise Error('Install the packaged maa first; system service cannot use a checkout entry')
-        unit = Path('/etc/systemd/system') / UNIT
-        marker = f'# my-ai-agent owner uid={os.getuid()}'
-        if unit.exists() and marker not in unit.read_text():
-            raise Error('maa.service belongs to another installation/user; refusing to overwrite it')
-        text = f'''{marker}
-[Unit]
-Description=my-ai-agent selected local model
-After=network-online.target
-Wants=network-online.target
-[Service]
-Type=simple
-User={user}
-Environment=HOME={escaped(Path.home())}
-Environment=MAA_HOME={escaped(self.store.root)}
-Environment=CODEX_HOME={escaped(os.environ.get('CODEX_HOME', str(Path.home() / '.codex')))}
-Environment=PATH={escaped(str(Path.home() / '.local/bin') + ':/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin')}
-Environment=PYTHONUNBUFFERED=1
-ExecStart={escaped(sys.executable)} {escaped(app)} _serve
-KillMode=control-group
-TimeoutStopSec=30
-Restart=on-failure
-RestartSec=10
-[Install]
-WantedBy=multi-user.target
-'''
-        from .backends import native_environment
-        forwarded = {k: v for k, v in native_environment().items()
-                     if k.startswith('LLAMA_ARG_') or k in ('OLLAMA_HOST', 'OLLAMA_MODELS')}
-        extra = ''.join('Environment=' + escaped(k + '=' + v) + '\n' for k, v in sorted(forwarded.items()))
-        text = text.replace('Environment=PYTHONUNBUFFERED=1\n', 'Environment=PYTHONUNBUFFERED=1\n' + extra)
-        if not unit.exists() or unit.read_text() != text:
-            temp = self.store.path('maa.service')
-            atomic(temp, text, 0o644)
-            privileged(['install', '-m', '644', str(temp), str(unit)])
-            privileged(['systemctl', 'daemon-reload'])
-        privileged(['systemctl', 'enable', UNIT], stdout=subprocess.DEVNULL)
+            raise Error('Native backend autostart requires systemd inside mas')
+        for backend in UNITS:
+            path = self.unit_path(backend)
+            if path.exists() and not self.owned(backend):
+                raise Error(f'Native configuration is not owned by this installation: {path}')
 
-    def running(self):
-        return self.state() == 'active'
+    def legacy_path(self):
+        path = Path('/etc/systemd/system/maa.service')
+        if not path.exists():
+            return None
+        text = path.read_text()
+        expected = str(Path.home() / '.local/share/my-ai-agent/maa.pyz')
+        import shlex
+        commands = [line.split('=', 1)[1] for line in text.splitlines() if line.startswith('ExecStart=')]
+        arguments = shlex.split(commands[0]) if len(commands) == 1 else []
+        if (not text.startswith(f'# my-ai-agent owner uid={os.getuid()}\n') or len(arguments) != 3
+                or arguments[1:] != [expected, '_serve']
+                or not Path(arguments[0]).name.startswith('python')
+                or any(line.startswith(('ExecStartPre=', 'ExecStartPost=', 'ExecStop=')) for line in text.splitlines())):
+            raise Error('Legacy maa.service was modified or belongs to another user; refusing to remove it')
+        return path
 
-    def state(self):
-        result = subprocess.run(['systemctl', 'show', '--property=ActiveState', '--value', UNIT],
-                                capture_output=True, text=True, timeout=3)
-        if result.returncode:
-            raise Error((result.stderr or result.stdout).strip() or 'Cannot read maa service state')
-        state = result.stdout.strip()
-        if state not in ('active', 'inactive', 'failed', 'activating', 'deactivating', 'reloading'):
-            raise Error('Unknown maa service state: ' + state)
-        return state
-
-    def stop(self):
-        privileged(['systemctl', 'stop', UNIT])
+    def migrate(self):
+        path = self.legacy_path()
+        if path is None:
+            return
+        stage('移除旧 maa 常驻服务')
+        privileged(['systemctl', 'disable', '--now', 'maa.service'])
+        privileged(['rm', '--', str(path)])
+        privileged(['systemctl', 'daemon-reload'])
         self.store.path('runtime.json').unlink(missing_ok=True)
 
-    def start(self):
+    def snapshot(self):
         self.ensure()
-        self.store.path('runtime.json').unlink(missing_ok=True)
-        stage('启动底座服务')
-        privileged(['systemctl', 'restart', UNIT])
+        return {'files': {str(p): p.read_bytes() if p.exists() else None for p in self.config_paths()},
+                'enabled': {b: self.enabled(b) for b in UNITS}}
 
-    def wait(self, target):
-        from .store import read
-        deadline = time.monotonic() + int(os.environ.get('MAA_START_TIMEOUT', '600'))
-        stamp = fingerprint(target)
-        stage('等待底座启动和模型加载；原生日志：maa logs')
-        while time.monotonic() < deadline:
-            runtime = read(self.store.path('runtime.json'))
-            if runtime and runtime.get('fingerprint') == stamp:
-                if runtime.get('error'):
-                    raise Error(runtime['error'])
-                return runtime
-            time.sleep(.2)
-        raise Error('Model startup timed out; run maa logs to inspect the native diagnostic')
+    def enabled(self, backend):
+        result = subprocess.run(['systemctl', 'is-enabled', UNITS[backend]], capture_output=True, text=True, timeout=5)
+        return result.stdout.strip() == 'enabled'
 
+    def write_unit(self, path, text):
+        temp = self.store.path('native-unit.tmp')
+        atomic(temp, text)
+        privileged(['install', '-D', '-m', '644', str(temp), str(path)])
+        temp.unlink(missing_ok=True)
 
-def boot_target(store):
-    # A candidate is allowed only while its initiating transaction is alive.
-    # After a crash/reboot, boot the last validated selection, never a candidate.
-    from .store import read
-    pending = read(store.path('pending.json'))
-    valid_pending = False
-    if pending and pending.get('boot_id') == Path('/proc/sys/kernel/random/boot_id').read_text().strip():
-        try:
-            current_start = Path(f'/proc/{pending["pid"]}/stat').read_text().rsplit(')', 1)[1].split()[19]
-            valid_pending = current_start == pending.get('process_start')
-        except (OSError, KeyError, IndexError):
-            pass
-    return store.target() if valid_pending else store.selected()
+    def restore(self, snapshot):
+        if self.model_backup:
+            from .models import ollama_session
+            name, backup = self.model_backup
+            with ollama_session(self.store.path('native') / 'maintenance.log'):
+                request(ollama_endpoint() + '/api/copy', {'source': backup, 'destination': name})
+                request(ollama_endpoint() + '/api/delete', {'model': backup}, method='DELETE')
+            self.model_backup = None
+        for name, data in snapshot['files'].items():
+            path = Path(name)
+            if name.startswith('/etc/systemd/system/'):
+                if data is None:
+                    if path.exists():
+                        privileged(['rm', '--', name])
+                else:
+                    self.write_unit(path, data.decode())
+            elif data is None:
+                path.unlink(missing_ok=True)
+            else:
+                atomic(path, data)
+        privileged(['systemctl', 'daemon-reload'])
+        for backend, enabled in snapshot['enabled'].items():
+            if self.unit_path(backend).exists() or backend == 'ollama':
+                privileged(['systemctl', 'enable' if enabled else 'disable', UNITS[backend]],
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
+    def begin(self):
+        # An interrupted validation must never boot an unaccepted candidate.
+        # Pause uses stop() only and therefore keeps the accepted boot target.
+        for backend in UNITS:
+            if self.owned(backend):
+                privileged(['systemctl', 'disable', UNITS[backend]], stdout=subprocess.DEVNULL)
 
-def serve(store=None):
-    store = store or Store()
-    target = boot_target(store)
-    store.path('runtime.json').unlink(missing_ok=True)
-    if not target:
-        return
-    process = adapter = None
-    stopped = threading.Event()
-    def terminate(*_):
-        stopped.set()
-        if process and process.poll() is None:
-            process.terminate()
-    signal.signal(signal.SIGTERM, terminate)
-    signal.signal(signal.SIGINT, terminate)
-    stamp = fingerprint(target)
-    try:
+    def commit(self, target):
+        privileged(['systemctl', 'enable', UNITS[target['model']['backend']]], stdout=subprocess.DEVNULL)
+
+    def finish(self):
+        if self.model_backup:
+            try:
+                request(ollama_endpoint() + '/api/delete', {'model': self.model_backup[1]}, method='DELETE')
+                self.model_backup = None
+            except Error:
+                # An unused manifest is harmless; the accepted runtime is valid.
+                import sys
+                print('Unused rollback manifest retained; native model configuration is committed.', file=sys.stderr)
+
+    def prepare(self, target):
+        """Only official backend executables and curl run at boot."""
+        self.ensure()
         model, values = target['model'], target['settings']
-        verify_file(model)
+        user = pwd.getpwuid(os.getuid()).pw_name
+        self.store.path('native').mkdir(exist_ok=True)
+        log = self.store.path('native') / (model['backend'] + '.log')
+        log.touch(mode=0o600, exist_ok=True)
+        import grp
+        group = grp.getgrgid(os.getgid()).gr_name
+        common = (f'User={user}\nGroup={group}\n'
+                  f'Environment=HOME={escaped(Path.home())}\n'
+                  f'Environment=PATH={escaped(str(Path.home() / ".local/bin") + ":/usr/local/bin:/usr/bin:/bin")}\n'
+                  f'StandardOutput=append:{log}\nStandardError=append:{log}\n'
+                  f'ExecStartPre=/usr/bin/truncate --size 0 {exec_arg(log)}\n'
+                  'TimeoutStartSec=660\nTimeoutStopSec=30\nKillMode=control-group\nRestart=on-failure\nRestartSec=10\n')
         if model['backend'] == 'ollama':
+            from .models import ollama_session
             help_text = ollama_capabilities()
             check_options(help_text, ['--fit', '--fit-target'])
             if values['mtp']:
                 check_options(help_text, ['draft-mtp', '--spec-draft-type-k', '--spec-draft-type-v'])
-            command, env = [binary('ollama'), 'serve'], ollama_environment(values)
-            health = ollama_endpoint() + '/api/version'
+            with ollama_session(log, values):
+                backup = 'maa-rollback-' + uuid.uuid4().hex + ':latest'
+                request(ollama_endpoint() + '/api/copy', {'source': model['name'], 'destination': backup})
+                self.model_backup = (model['name'], backup)
+                ollama_prepare(target, self.store)
+            names = {key: value for key, value in ollama_environment(values).items()
+                     if key.startswith(('OLLAMA_', 'LLAMA_ARG_'))}
+            environments = ''.join('Environment=' + escaped(key + '=' + value) + '\n' for key, value in sorted(names.items()))
+            preload = self.store.path('native') / 'ollama-preload.json'
+            write(preload, {'model': model['name'], 'prompt': '', 'stream': False, 'keep_alive': values['keep_alive']})
+            text = (self.marker + '\n[Service]\nExecStart=\nExecStartPre=\nExecStartPost=\n' + common + environments +
+                    'ExecStart=' + exec_arg(binary('ollama')) + ' serve\n' +
+                    'ExecStartPost=/usr/bin/curl --fail --silent --show-error --retry 120 --retry-delay 1 '
+                    '--retry-connrefused --max-time 600 --output /dev/null --header "Content-Type: application/json" '
+                    '--data-binary ' + exec_arg('@' + str(preload)) + ' ' + exec_arg(ollama_endpoint() + '/api/generate') + '\n')
         else:
-            from .backends import native_environment
-            command, env = llama_arguments(model, values), native_environment()
-            health = llama_endpoint() + '/health'
-        with store.path('native.log').open('ab', buffering=0) as log:
-            launch_offset = log.tell()
-            log.write(('\n=== my-ai-agent launch ' + model['name'] + ' ===\n').encode())
-            launch = launch_reference(store.path('native.log'), launch_offset, uuid.uuid4().hex)
+            import socket
+            from urllib.parse import urlparse
+            endpoint = urlparse(llama_endpoint())
             try:
-                from .http import request
-                request(health, timeout=1)
-            except Error:
+                with socket.create_connection((endpoint.hostname, endpoint.port), timeout=1):
+                    pass
+            except OSError:
                 pass
             else:
-                raise Error('An unmanaged native backend is already listening; stop it before maa start')
-            process = subprocess.Popen(command, env=env, stdout=log, stderr=log)
-            wait_api(health, process, timeout=600)
-            if model['backend'] == 'llamacpp':
-                # The official launcher can expose metadata before its model is
-                # resident. Complete a tiny request before accepting the target.
-                request(llama_endpoint() + '/v1/chat/completions',
-                        {'model': model['name'], 'messages': [{'role': 'user', 'content': 'Hi'}],
-                         'max_tokens': 1, 'stream': False}, timeout=600)
-            runtime = ollama_load(target) if model['backend'] == 'ollama' else llama_observe(model['name'])
-            runtime.update(backend=model['backend'], key=model['key'], fingerprint=stamp,
-                           display_name=model['name'], launch=launch,
-                           base_url='http://127.0.0.1:18443/v1', pid=os.getpid(),
-                           capabilities={'hosted_web_search': False, 'stateless_responses': True})
-            runtime['resources']['gpu_layers'] = native_allocations(store, runtime)['gpu_layers']
-            adapter = bridge.server(runtime, record_usage=UsageRecorder(store, runtime))
-            thread = threading.Thread(target=adapter.serve_forever, daemon=True)
-            thread.start()
-            from .codex import profile
-            profile(runtime, values)
-            write(store.path('runtime.json'), runtime)
-            while not stopped.wait(.5):
-                if process.poll() is not None:
-                    raise Error(f'Native backend exited with code {process.returncode}')
-    except Exception as exc:
-        tail = ''
-        try:
-            with store.path('native.log').open('rb') as log:
-                log.seek(0, 2)
-                log.seek(max(0, log.tell() - 8192))
-                tail = log.read().decode(errors='replace')
-        except OSError:
-            pass
-        write(store.path('runtime.json'), {'fingerprint': stamp, 'error': str(exc) + '\n' + tail})
-        raise
-    finally:
-        if adapter:
-            adapter.shutdown()
-            adapter.server_close()
-        if process:
-            stop_process(process)
+                raise Error('An unmanaged llama.cpp endpoint is already listening; stop it before maa model operations')
+            command = llama_arguments(model, values)
+            env = {key: value for key, value in os.environ.items() if key in ('LLAMA_ARG_HOST', 'LLAMA_ARG_PORT')}
+            text = (self.marker + '\n[Unit]\nDescription=llama.cpp local model\nAfter=network-online.target\n'
+                    'Wants=network-online.target\n[Service]\nType=simple\n' + common +
+                    ''.join('Environment=' + escaped(key + '=' + value) + '\n' for key, value in env.items()) +
+                    'ExecStart=' + ' '.join(exec_arg(arg) for arg in command) + '\n[Install]\nWantedBy=multi-user.target\n')
+        self.write_unit(self.unit_path(model['backend']), text)
+        privileged(['systemctl', 'daemon-reload'])
+
+    def stop(self):
+        for backend in UNITS:
+            if self.owned(backend):
+                privileged(['systemctl', 'stop', UNITS[backend]])
+
+    def start(self):
+        target = self.store.target() or self.store.selected()
+        if not target:
+            raise Error('Select a local model first')
+        backend = target['model']['backend']
+        for other in UNITS:
+            if other != backend and self.owned(other):
+                privileged(['systemctl', 'disable', '--now', UNITS[other]], stdout=subprocess.DEVNULL)
+        stage('启动原生底座')
+        privileged(['systemctl', 'restart', UNITS[backend]])
+
+    def unit_info(self, target=None):
+        target = target or self.store.selected()
+        if not target:
+            return {'ActiveState': 'inactive'}
+        if not self.owned(target['model']['backend']):
+            return {'ActiveState': 'inactive'}
+        result = subprocess.run(['systemctl', 'show', UNITS[target['model']['backend']],
+                                 '--property=ActiveState,SubState,Result,MainPID,InvocationID'], capture_output=True, text=True, timeout=5)
+        if result.returncode:
+            raise Error(result.stderr.strip() or 'Cannot read native unit state')
+        return dict(line.split('=', 1) for line in result.stdout.splitlines() if '=' in line)
+
+    def state(self):
+        return self.unit_info().get('ActiveState', 'inactive')
+
+    def running(self):
+        return self.state() == 'active'
+
+    def observe(self, target=None):
+        target = target or self.store.selected()
+        model = target['model']
+        runtime = ollama_observe(model['name'], missing_ok=True) if model['backend'] == 'ollama' else llama_observe(model['name'])
+        if runtime is None:
+            runtime = read(self.store.path('runtime.json'), {})
+            if runtime.get('fingerprint') != fingerprint(target):
+                runtime = {'model': model['name'], 'upstream': ollama_endpoint(), 'context': None, 'resources': {}}
+        info = self.unit_info(target)
+        log = self.store.path('native') / (model['backend'] + '.log')
+        launch = None
+        if log.exists():
+            from .telemetry import launch_reference
+            launch = launch_reference(log, 0, info.get('InvocationID'))
+        return {**runtime, 'model': model['name'], 'display_name': model['name'], 'backend': model['backend'],
+                'key': model['key'], 'fingerprint': fingerprint(target), 'launch': launch,
+                'log_path': str(log), 'pid': int(info.get('MainPID', 0)),
+                'base_url': (ollama_endpoint() if model['backend'] == 'ollama' else llama_endpoint()) + '/v1',
+                'capabilities': {'native_direct_connection': True}}
+
+    def wait(self, target):
+        stage('等待原生底座和模型加载；原生日志：maa logs')
+        end = time.monotonic() + int(os.environ.get('MAA_START_TIMEOUT', '600'))
+        last = ''
+        while time.monotonic() < end:
+            state = self.unit_info(target)
+            if state.get('ActiveState') == 'failed' or (state.get('SubState') == 'auto-restart' and state.get('Result') not in ('success', None)):
+                raise Error('Native service failed; inspect maa logs')
+            try:
+                if self.unit_info(target).get('ActiveState') == 'failed':
+                    raise Error('Native service failed; inspect maa logs')
+                observed = self.observe(target)
+                if observed.get('context') and not observed.get('resources', {}).get('sleeping'):
+                    if observed['backend'] == 'llamacpp':
+                        request(observed['base_url'] + '/responses', {'model': observed['model'], 'input': 'Hi',
+                                'max_output_tokens': 1, 'stream': False}, timeout=600)
+                    write(self.store.path('runtime.json'), observed)
+                    return observed
+            except Error as exc:
+                last = str(exc)
+                if self.unit_info(target).get('ActiveState') == 'failed':
+                    raise Error(last)
+            time.sleep(.2)
+        raise Error('Native backend readiness timed out: ' + last)

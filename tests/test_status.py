@@ -4,12 +4,12 @@ from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import patch
-from maa import backends, bridge, menu, ui
+from maa import backends, menu, ui
 from maa.manager import Manager
 from maa.service import fingerprint
 from maa.settings import settings
 from maa.store import Error, Store, read, write
-from maa.telemetry import allocations, native_allocations, launch_reference, UsageRecorder, last_usage, nvidia_memory
+from maa.telemetry import allocations, native_allocations, launch_reference, nvidia_memory
 
 MAIN = b'''print_info: no_alloc = 0
 load_tensors: loading model tensors
@@ -117,34 +117,7 @@ class Status(unittest.TestCase):
             self.assertEqual(manager.model_status(False)['state'], 'paused')
             call.assert_not_called()
 
-    def test_usage_counts_only_current_load_without_conversation_data(self):
-        recorder = UsageRecorder(self.store, self.runtime)
-        recorder({'usage': {'input_tokens': 123, 'output_tokens': 4}, 'output': ['must not persist']})
-        value = last_usage(self.store, self.runtime, native_allocations(self.store, self.runtime)['load_id'])
-        self.assertEqual(value['input_tokens'], 123)
-        self.assertNotIn('must not persist', self.store.path('usage.json').read_text())
-        with self.log.open('ab') as log:
-            log.write(MAIN)
-        self.assertIsNone(last_usage(self.store, self.runtime, native_allocations(self.store, self.runtime)['load_id']))
-        recorder({'usage': None})
-        self.assertIsNone(read(self.store.path('usage.json'))['input_tokens'])
-        self.runtime['launch']['service_id'] = 'retired'
-        recorder({'usage': {'input_tokens': 99}})
-        self.assertIsNone(read(self.store.path('usage.json'))['input_tokens'])
 
-    def test_partial_native_usage_keeps_missing_counts_unknown(self):
-        response = bridge.Responses('original-model', {}, lambda event: None)
-        response.delta({'usage': {'prompt_tokens': 17}, 'choices': []})
-        self.assertIsNone(response.finish()['usage'])
-        UsageRecorder(self.store, self.runtime)({'usage': response.native_usage})
-        counters = last_usage(self.store, self.runtime, native_allocations(self.store, self.runtime)['load_id'])
-        self.assertEqual(counters['input_tokens'], 17)
-        self.assertIsNone(counters['output_tokens'])
-        response.delta({'usage': {'prompt_tokens': True, 'completion_tokens': -1}, 'choices': []})
-        self.assertIsNone(response.value['usage'])
-        self.assertEqual(response.native_usage, {'input_tokens': None, 'output_tokens': None})
-        response.delta({'usage': 'malformed', 'choices': []})
-        self.assertIsNone(response.value['usage'])
 
     def test_driver_free_is_not_derived_and_unavailable_is_not_zero(self):
         result = type('Result', (), {'returncode': 0, 'stdout': '0, GPU, 24463, 0, 24137, 326\n', 'stderr': ''})()

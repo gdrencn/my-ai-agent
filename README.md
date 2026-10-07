@@ -2,7 +2,7 @@
 
 在 **my-ai-sandbox（mas）容器内**安装并管理 Ollama、llama.cpp 和 Codex CLI。
 
-当前版本：**0.1.3 test**。两种底座可共存，通过 `maa` 选择一个当前底座和模型，并同步 `codex-local`。
+当前版本：**0.1.4 test**。两种底座可共存，通过 `maa` 选择一个当前底座和模型，并同步 `codex-local`。
 
 ## Install
 
@@ -12,7 +12,7 @@
 curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/install.sh | bash
 ```
 
-默认安装 maa，并依次运行 Ollama、llama.cpp、Codex 的官方安装程序。需要容器内 sudo 权限、网络、Python 3.11+、curl 和 systemd。mas 默认 Ubuntu 24.04 环境符合 Python 要求。官方程序安装完成后，maa 接管底座的自动启动，避免 Ollama 官方服务与当前选定底座同时运行。
+默认安装 maa，并依次运行 Ollama、llama.cpp、Codex 的官方安装程序。需要容器内 sudo 权限、网络、Python 3.11+、curl 和 systemd。mas 默认 Ubuntu 24.04 环境符合 Python 要求。官方程序安装完成后，maa 写入两种底座各自的原生 systemd 配置，只启用当前底座。maa 本身没有常驻服务。
 
 只安装管理程序，之后在菜单选择软件：
 
@@ -22,7 +22,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/insta
 
 已有底座和模型时，也可用上述 `--components none` 命令升级 maa，保留已下载模型和配置。
 
-升级不会自动重新加载正在运行的底座。已有选定模型时，升级后执行 `maa start`，或在菜单选择“启动当前模型”，重新加载保存目标，让新服务代码生效；尚未选定模型时先选择模型。
+从旧版本升级时，会核验并移除项目自己的 `maa.service`，保留模型、每模型配置和 YOLO 恢复记录，然后生成原生配置并核验保存目标。原来运行的目标恢复运行，原来暂停的目标核验后恢复暂停。修改过或属于其他用户的服务会被拒绝处理；尚未选择模型时，在菜单选择模型。
 
 安装完成后运行：
 
@@ -60,8 +60,8 @@ HF 页面网址不是仓库标识。子目录必须包含在文件名里；分�
 | Main entry | Contents |
 | --- | --- |
 | 本地模型管理 | 设置本地模型、安装 / 登记新模型、模型配置、当前模型状态、暂停、启动、返回 |
-| Codex 配置 | 推理强度、跟随模型的只读上下文大小、固定 90% 的只读压缩阈值、应用修改、返回 |
-| Codex 全局设置 | YOLO 模式及当前状态、返回；进入 YOLO 后选择开启或关闭（恢复原设置） |
+| Codex 配置 | YOLO 模式及当前状态、返回；进入 YOLO 后选择开启或关闭（恢复原设置） |
+| codex-local 配置 | 推理强度、跟随模型的只读上下文大小、固定 90% 的只读压缩阈值、应用修改、返回 |
 | 安装底座 / Codex CLI | 全部安装或单独安装 Ollama、llama.cpp、Codex CLI |
 | 关于 my-ai-agent | 当前 maa 版本 |
 | 退出 | 结束菜单 |
@@ -72,7 +72,7 @@ HF 页面网址不是仓库标识。子目录必须包含在文件名里；分�
 
 Ollama 查询自己的 `/api/ps`，llama.cpp 查询自己的 `/props`；状态查询不推理、不唤醒模型、不启停服务。分项来自当前实际加载的原生初始化分配记录，GPU 与系统内存分别标注；`CPU_Mapped` 是映射量，不是实际 RSS，`CUDA_Host` 不算显存。整卡总量、已用、可用和驱动预留通过 NVIDIA 驱动读取，包含其他程序占用，不能当成当前模型完整占用。暂停或卸载后不展示旧分项；接口或当前日志不可用时显示“未取得”及原因。
 
-上下文占用是**最近一次完成的 maa Responses 请求输入 token 数 / 有效容量**，并显示生成 token 数和统计时间。它不代表实时 KV 占用，也不累加重放的历史；重新加载后旧统计失效，只保存计数和身份，不保存对话。独立 MTP 权重和实时 KV token 占用不提供。MTP 共享 KV 不重复计入合计；本轮原生验收使用无 MTP 权重的小模型，MTP 分项只有源码及日志夹具验证。
+直连模式下 maa 不读取或记录对话，底座没有提供可靠的最近请求 token 状态接口，因此输入、生成 token 和统计时间显示“未取得”。旧版本的请求统计不再使用。有效上下文仍由原生 API 读取。独立 MTP 权重和实时 KV token 占用不提供。MTP 共享 KV 不重复计入合计；原生验收使用无 MTP 权重的小模型，MTP 分项只有源码及日志夹具验证。
 
 完整结构化状态和配置仍通过 `maa status` 返回，原生日志通过 `maa logs` 查看。
 
@@ -96,7 +96,7 @@ Ollama 查询自己的 `/api/ps`，llama.cpp 查询自己的 `/props`；状态�
 
 GPU 层数、采样、对话模板、服务地址没有修改入口，保留模型/底座预设。llama.cpp 内部使用一个推理槽，防止上下文被默认多槽平分。GPU 全量加载是优先目标，状态显示实际资源观测；底座/模型不支持的设置保留原生错误。官方安装器可能选择 CPU 构建，实际硬件支持以它的安装输出及原生运行信息为准。
 
-首次选择模型会打开默认配置，允许在加载前修改上下文和 KV；已有配置的模型直接恢复其配置。选择或应用配置会**立即重新加载**，同时保存下次容器启动的目标。失败时恢复之前的选择并尝试恢复服务，报告恢复结果。启动中断或容器重启不会把未验证的候选目标当作已成功目标。
+首次选择模型会打开默认配置，允许在加载前修改上下文和 KV；已有配置的模型直接恢复其配置。选择或应用配置会**立即重新加载**，同时保存下次容器启动的目标。失败时恢复之前的选择并尝试恢复服务，报告恢复结果。检查通过之后才启用新目标的自启动。若管理进程被强制终止或容器在配置阶段掉电，自启动可能保持关闭；重新执行 `maa start` 核验保存目标。未验证的候选目标不会自启动。
 
 “暂停”释放资源，但保留选择和自启动目标；“启动”恢复。空闲卸载保留底座服务，下一次请求由底座重新加载。`codex-local` 不在暂停状态下暗中启动模型。
 
@@ -108,13 +108,19 @@ YOLO 只管理全局 `approval_policy = "never"` 和 `sandbox_mode = "danger-ful
 
 `codex-local` 使用专用 `maa-local.config.toml` profile，不覆盖普通 Codex 的模型设置，也不强制 YOLO 启动参数。模型与有效上下文同步，自动压缩阈值固定为有效上下文的 90%（262144 对应 235929）。推理档位按选定字符串传递，支持情况由客户端、底座和模型决定。
 
-专用 profile 配合 `--no-daemon` 使用 Codex embedded 模式。maa 生成仅包含当前本地模型的 `model_catalog_json`，`/model`、profile、公开模型清单和 Responses 返回值统一使用原模型名称；适配器内部仍将请求路由到准确的原生模型。Ollama 的 `maa-…` 配置别名仅在内部使用，普通 Codex 的模型目录保持独立。目录包含项目自行编写的基础编码指引和已实现的文本/工具元数据，不包含本机全局工作规范或云模型提示词。
+`codex-local` 是独立的 shell 脚本，内容为：
 
-入口先检查当前服务和模型。Ollama 模型已驻留时不重建配置别名、不重复加载；空闲卸载后唤醒原别名。llama.cpp 已加载时直接检查，休眠时唤醒后同步实际上下文。真正重新加载仍需要时间，启动阶段会显示累计耗时。
+```sh
+exec codex --no-daemon --profile maa-local "$@"
+```
 
-本地 Responses 接口适配普通/命名空间函数、custom 工具、工具结果回放、文本和 reasoning 流式事件。不能通过 codex-local 的模型/provider 参数绕开当前选择。
+它直接启动官方 Codex，不调用 maa、不检查管理状态、不改写配置、不自动启动暂停的底座。空闲模型由底座根据正常推理请求自行唤醒。删除 maa 程序后，已生成的 profile、模型目录和原生底座配置仍能使用。
 
-maa **不写入或覆盖 `web_search` 配置**。本地接口没有 OpenAI 托管搜索实现，因此不把 Codex 默认声明的托管搜索转交给模型；状态标明该能力不可用。已有 MCP 搜索函数仍可传递。Ollama 登录不会自动完成 Codex 搜索接入。本版不安装搜索 MCP。
+Ollama profile 直连其 `/v1/responses`；llama.cpp profile 直连自己的 `/v1/responses`。切换时 maa 写入对应底座的配置，随后退出。`/model`、profile 和模型目录使用原模型名称。Ollama 在原名称上应用上下文参数，并用只占清单、不复制权重的私有备份保留原模型预设；不再用不透明的运行别名。
+
+两条路径使用原生 Responses 普通函数调用及结果回放。当前官方接口不能完整支持 Codex 的 custom/freeform 工具，因此专用模型目录不声明 freeform `apply_patch`，文件编辑使用普通 shell 工具。模型对工具调用的能力由实际模型决定，小模型可能返回错误参数或没有选择工具。maa 不转换、过滤或修补请求。模型目录不包含本机全局工作规范或云模型提示词。
+
+maa **不写入或覆盖 `web_search` 配置**，不安装搜索 MCP。原生底座对托管搜索、命名空间工具、推理强度的支持以其官方接口为准；配置档位不保证模型支持这些能力。普通 Codex 和本地 profile 都保留正常的用户启动参数。
 
 ## CLI
 
@@ -152,4 +158,4 @@ codex-local exec --skip-git-repo-check 'Explain this directory.'
 curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/test.sh | bash
 ```
 
-入口下载同版本测试包，运行 portable/PTY 检查与两个小模型的原生接口、真实 Codex `/model`、驻留复用、空闲唤醒、暂停恢复及失败回滚检查，保存 JSON 报告，最后暂停模型。测试产生的坏 GGUF 与登记记录在失败时也会清理；旧测试遗留文件只在路径、内容、登记身份均符合旧测试签名且未被选中时清理，保留用户的同名真实模型。大模型、MTP 实际速度和全 GPU 装载仍需使用自己的模型验收。已核验范围见 [IMPLEMENTED.md](IMPLEMENTED.md)，开发说明见 [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)。
+入口下载同版本测试包，运行 portable/PTY 检查与Qwen3-0.6B GGUF 和 Ollama qwen2.5:3b 的原生接口、真实 Codex `/model`、驻留复用、空闲唤醒、暂停恢复及失败回滚检查，保存 JSON 报告，最后暂停模型。测试产生的坏 GGUF 与登记记录在失败时也会清理；旧测试遗留文件只在路径、内容、登记身份均符合旧测试签名且未被选中时清理，保留用户的同名真实模型。大模型、MTP 实际速度和全 GPU 装载仍需使用自己的模型验收。已核验范围见 [IMPLEMENTED.md](IMPLEMENTED.md)，开发说明见 [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)。

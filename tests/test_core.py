@@ -47,6 +47,18 @@ class FakeController:
         self.active, self.fail, self.stops, self.starts = False, 0, 0, 0
     def ensure(self):
         pass
+    def snapshot(self):
+        return {}
+    def restore(self, snapshot):
+        pass
+    def prepare(self, target):
+        pass
+    def begin(self):
+        pass
+    def commit(self, target):
+        pass
+    def finish(self):
+        pass
     def running(self):
         return self.active
     def stop(self):
@@ -70,8 +82,11 @@ class Core(unittest.TestCase):
         self.root = Path(self.temp.name)
         self.env = patch.dict(os.environ, {'MAA_HOME': str(self.root / 'state'), 'CODEX_HOME': str(self.root / 'codex')})
         self.env.start()
+        self.entry = patch("maa.codex.launcher_path", return_value=self.root / "bin/codex-local")
+        self.entry.start()
         self.store = Store()
     def tearDown(self):
+        self.entry.stop()
         self.env.stop()
         self.temp.cleanup()
     def model(self, name, mtp=False):
@@ -235,13 +250,6 @@ class Core(unittest.TestCase):
         with self.assertRaises(Error):
             change_pairs(['fit=maybe'])
 
-    def test_local_entry_rejects_compact_and_long_routing_overrides(self):
-        manager = Manager(self.store, FakeController())
-        for args in (['-mother'], ['-pother'], ['--model=other'], ['-cmodel="other"'],
-                     ['--config=model_provider="other"'], ['-c', 'profiles.other.model="other"'],
-                     ['--remote=unix:///other.sock']):
-            with self.subTest(args=args), self.assertRaisesRegex(Error, 'managed by maa|changed through maa'):
-                manager.local_command(args)
 
     def test_catalog_tracks_exact_alias_context_and_preserves_base_config(self):
         codex.home().mkdir()
@@ -266,66 +274,9 @@ class Core(unittest.TestCase):
         self.assertEqual(read(first['model_catalog_json'])['models'], metadata)
         self.assertEqual(base.read_text(), 'model = "ordinary-cloud-model"\n')
 
-    def test_ollama_resident_entry_never_creates_or_loads(self):
-        target = {'model': {'name': 'native:latest', 'digest': 'original'}, 'settings': settings()}
-        runtime = {'model': 'maa-alias:latest', 'native_digest': 'adapted'}
-        calls = []
-        def api(url, value=None, **kwargs):
-            calls.append((url, value))
-            if url.endswith('/api/tags'):
-                return {'models': [{'name': 'native:latest', 'digest': 'original'},
-                                   {'name': runtime['model'], 'digest': 'adapted'}]}
-            if url.endswith('/api/ps'):
-                return {'models': [{'name': runtime['model'], 'context_length': 4096, 'digest': 'adapted'}]}
-            raise AssertionError('Unexpected mutation: ' + url)
-        with patch('maa.backends.request', side_effect=api):
-            observed = backends.ollama_current(target, runtime)
-        self.assertEqual(observed['context'], 4096)
-        self.assertEqual(len(calls), 2)
 
-    def test_ollama_expired_entry_wakes_without_creating(self):
-        target = {'model': {'name': 'native:latest', 'digest': 'original'}, 'settings': settings()}
-        runtime = {'model': 'maa-alias:latest', 'native_digest': 'adapted'}
-        calls, resident = [], False
-        def api(url, value=None, **kwargs):
-            nonlocal resident
-            calls.append((url, value))
-            if url.endswith('/api/tags'):
-                return {'models': [{'name': 'native:latest', 'digest': 'original'},
-                                   {'name': runtime['model'], 'digest': 'adapted'}]}
-            if url.endswith('/api/ps'):
-                return {'models': [{'name': runtime['model'], 'context_length': 4096}] if resident else []}
-            if url.endswith('/api/generate'):
-                resident = True
-                return {}
-            raise AssertionError('Unexpected mutation: ' + url)
-        with patch('maa.backends.request', side_effect=api):
-            backends.ollama_current(target, runtime)
-        mutations = [(url, body) for url, body in calls if body is not None]
-        self.assertEqual(len(mutations), 1)
-        self.assertEqual(mutations[0][1]['keep_alive'], '5m')
 
-    def test_ollama_modified_alias_refused_before_wake(self):
-        target = {'model': {'name': 'native:latest', 'digest': 'original'}, 'settings': settings()}
-        with patch('maa.backends.request', return_value={'models': [
-                {'name': 'native:latest', 'digest': 'original'}, {'name': 'alias', 'digest': 'changed'}]}) as api:
-            with self.assertRaisesRegex(Error, 'configuration changed'):
-                backends.ollama_current(target, {'model': 'alias', 'native_digest': 'accepted'})
-            self.assertEqual(api.call_count, 1)
 
-    def test_local_launch_explicit_embedded_and_pause_refusal(self):
-        model = self.model('one')
-        manager = Manager(self.store, FakeController())
-        manager.select(model['key'])
-        observed = {'context': 4096, 'upstream': 'http://localhost:8080', 'resources': {'sleeping': False}}
-        with patch('maa.manager.llama_observe', return_value=observed), patch('maa.manager.request'), \
-             patch('maa.codex.executable', return_value='/test/codex'), patch('maa.manager.subprocess.call', return_value=0) as launch:
-            self.assertEqual(manager.local_command(['exec', 'hello']), 0)
-            self.assertEqual(launch.call_args.args[0], ['/test/codex', '--no-daemon', '--profile', 'maa-local', 'exec', 'hello'])
-            manager.pause()
-            with self.assertRaisesRegex(Error, 'stopped'):
-                manager.local_command([])
-            self.assertEqual(launch.call_count, 1)
 
     def test_redirected_progress_keeps_json_clean_without_duplicate_ticks(self):
         from maa.output import operation, stage
@@ -341,19 +292,6 @@ class Core(unittest.TestCase):
         self.assertEqual(len(err.getvalue().splitlines()), 2)
         self.assertNotIn('\x1b', err.getvalue())
 
-    def test_sleeping_llama_is_woken_once_and_context_is_synchronized(self):
-        model = self.model('sleeping')
-        manager = Manager(self.store, FakeController())
-        manager.select(model['key'])
-        sleeping = {'context': 8192, 'resources': {'sleeping': True}}
-        awake = {'context': 4096, 'resources': {'sleeping': False}}
-        with patch('maa.manager.llama_observe', side_effect=[sleeping, awake]), \
-             patch('maa.manager.request') as api, patch('maa.codex.executable', return_value='/test/codex'), \
-             patch('maa.manager.subprocess.call', return_value=0):
-            manager.local_command([])
-        self.assertEqual(api.call_count, 2)
-        self.assertEqual(api.call_args_list[0].args[1]['max_tokens'], 1)
-        self.assertEqual(codex.parse(codex.profile_path().read_text())['model_context_window'], 4096)
 
     def test_native_bad_fixture_is_removed_after_interrupted_check(self):
         native = native_runner()
@@ -409,19 +347,6 @@ class Core(unittest.TestCase):
             ui.select_model(None, manager, model['key'])
         self.assertEqual(self.store.selected()['settings']['kv'], 'q4_0')
 
-    def test_boot_ignores_crashed_uncommitted_target(self):
-        from maa.service import boot_target
-        old, candidate = {'name': 'accepted'}, {'name': 'unaccepted'}
-        write(self.store.path('selected.json'), old)
-        write(self.store.path('target.json'), candidate)
-        self.assertEqual(boot_target(self.store), old)
-        pending = {'pid': os.getpid(), 'boot_id': Path('/proc/sys/kernel/random/boot_id').read_text().strip(),
-                   'process_start': Path('/proc/self/stat').read_text().rsplit(')', 1)[1].split()[19]}
-        write(self.store.path('pending.json'), pending)
-        self.assertEqual(boot_target(self.store), candidate)
-        pending['process_start'] = 'wrong-recycled-pid'
-        write(self.store.path('pending.json'), pending)
-        self.assertEqual(boot_target(self.store), old)
 
 
 if __name__ == '__main__':

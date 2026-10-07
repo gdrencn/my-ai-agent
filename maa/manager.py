@@ -1,11 +1,11 @@
-"""Transactional composition shared by CLI, menu and codex-local."""
+"""One-shot configuration transactions shared by CLI and menu."""
 from contextlib import contextmanager
 import json
 import os
 from pathlib import Path
 import subprocess
 from . import codex
-from .backends import ollama_current, llama_observe, ollama_status, llama_status
+from .backends import ollama_status, llama_status
 from .http import request
 from .models import ollama_session, ollama_inventory, ollama_install, local_model, hf_download, verify_file
 from .service import Controller, fingerprint
@@ -40,29 +40,36 @@ class Manager:
         active = self.controller.running()
         path = codex.profile_path()
         old_profile = path.read_bytes() if path.exists() else None
+        launcher = codex.launcher_path()
+        if launcher.exists() and '# managed by my-ai-agent\n' not in launcher.read_text():
+            raise Error('codex-local is not owned by maa; refusing to overwrite it')
+        old_launcher = launcher.read_bytes() if launcher.exists() else None
+        native_snapshot = self.controller.snapshot()
         config_path = self.store.path('configs') / (target['model']['key'] + '.json')
         old_config = config_path.read_bytes() if config_path.exists() else None
         try:
             stage('准备底座服务')
             self.controller.ensure()
+            self.controller.begin()
             stage('停止原底座')
             self.controller.stop()
-            write(self.store.path('pending.json'), {'pid': os.getpid(),
-                  'boot_id': Path('/proc/sys/kernel/random/boot_id').read_text().strip(),
-                  'process_start': Path('/proc/self/stat').read_text().rsplit(')', 1)[1].split()[19]})
             write(self.store.path('target.json'), target)
+            self.controller.prepare(target)
             self.controller.start()
             runtime = self.controller.wait(target)
             runtime['display_name'] = target['model']['name']
             stage('同步 Codex 本地配置和模型目录')
             codex.profile(runtime, target['settings'])
+            codex.install_launcher()
             self.save_config(target['model'], target['settings'])
+            self.controller.commit(target)
             write(self.store.path('selected.json'), target)
         except BaseException as primary:
             recovery = ''
             try:
                 stage('切换失败，恢复原目标')
                 self.controller.stop()
+                self.controller.restore(native_snapshot)
                 if old_target:
                     write(self.store.path('target.json'), old_target)
                 else:
@@ -71,6 +78,10 @@ class Manager:
                     atomic(path, old_profile)
                 else:
                     path.unlink(missing_ok=True)
+                if old_launcher is None:
+                    launcher.unlink(missing_ok=True)
+                else:
+                    atomic(launcher, old_launcher, 0o755)
                 if old_config is not None:
                     atomic(config_path, old_config)
                 else:
@@ -84,8 +95,14 @@ class Manager:
             except BaseException as secondary:
                 recovery = f'Recovery failed: {secondary}; saved selection retained. Run maa start.'
             raise Error(f'Switch failed: {primary}\n{recovery}') from primary
+        else:
+            self.controller.finish()
         finally:
             self.store.path('pending.json').unlink(missing_ok=True)
+            if self.store.selected():
+                write(self.store.path('target.json'), self.store.selected())
+            else:
+                self.store.path('target.json').unlink(missing_ok=True)
 
     def pause(self):
         with operation('暂停当前模型'), self.store.lock():
@@ -107,7 +124,7 @@ class Manager:
                 'yolo': codex.yolo_state(), 'model_status': self.model_status()}
 
     def model_status(self, include_gpu=True):
-        from .telemetry import native_allocations, nvidia_memory, last_usage
+        from .telemetry import native_allocations, nvidia_memory, launch_reference
         selected = self.store.selected()
         result = {'backend': selected['model']['backend'] if selected else None,
                   'model': selected['model']['name'] if selected else None,
@@ -124,7 +141,7 @@ class Manager:
         except (Error, OSError, subprocess.SubprocessError) as exc:
             return {**result, 'state': 'error', 'error': str(exc)}
         if state == 'failed':
-            return {**result, 'state': 'error', 'error': 'maa.service failed; inspect maa logs'}
+            return {**result, 'state': 'error', 'error': 'Native backend service failed; inspect maa logs'}
         if state in ('activating', 'reloading', 'deactivating'):
             return {**result, 'state': 'stopping' if state == 'deactivating' else 'loading'}
         if state != 'active':
@@ -135,13 +152,18 @@ class Manager:
         if runtime.get('error'):
             return {**result, 'state': 'error', 'error': runtime['error']}
         try:
+            if hasattr(self.controller, 'unit_info'):
+                info = self.controller.unit_info()
+                log = self.store.path('native') / (result['backend'] + '.log')
+                runtime['launch'] = launch_reference(log, 0, info.get('InvocationID')) if log.exists() else None
+                runtime['log_path'] = str(log)
             observed = ollama_status(runtime) if result['backend'] == 'ollama' else llama_status(runtime)
             result.update(observed)
             if observed['state'] == 'running':
                 result['allocations'] = native_allocations(self.store, runtime)
-                result['usage'] = last_usage(self.store, runtime, result['allocations']['load_id'])
+            result['usage_note'] = 'Native direct connection: no maa conversation interceptor or token receipt.'
             current = read(self.store.path('runtime.json'))
-            if not current or current.get('fingerprint') != runtime.get('fingerprint') or current.get('launch') != runtime.get('launch'):
+            if not current or current.get('fingerprint') != runtime.get('fingerprint'):
                 return {**result, 'state': 'loading', 'allocations': None, 'usage': None, 'context': None}
         except (Error, OSError, ValueError, TypeError, KeyError) as exc:
             result.update(state='error', error=str(exc))
@@ -191,44 +213,3 @@ class Manager:
         if not selected:
             raise Error('Select a local model first')
         return self.select(selected['model']['key'], changes)
-
-    def local_command(self, arguments):
-        # This entry is dedicated to the selected local model. Native Codex task
-        # arguments are forwarded, but provider/model overrides cannot reroute it.
-        forbidden = ('--profile', '-p', '--model', '-m', '--oss', '--local-provider', '--remote')
-        for index, arg in enumerate(arguments):
-            if any(arg == flag or arg.startswith(flag + '=') for flag in forbidden) or (
-                    arg.startswith(('-m', '-p')) and not arg.startswith('--')):
-                raise Error('codex-local model/provider are managed by maa; change them in maa select')
-            override = (arguments[index + 1] if arg in ('-c', '--config') and index + 1 < len(arguments)
-                        else arg[2:] if arg.startswith('-c') and not arg.startswith('--')
-                        else arg.partition('=')[2] if arg.startswith('--config=') else '')
-            if override:
-                key = override.partition('=')[0].strip()
-                if key.startswith(('model', 'profiles')):
-                    raise Error('codex-local model configuration must be changed through maa')
-        with operation('启动 codex-local'), self.store.lock():
-            target = self.store.selected()
-            if not target or not self.controller.running():
-                raise Error('Current model is stopped or unselected; use maa start / maa select')
-            runtime = self.controller.wait(target)
-            if runtime['backend'] == 'ollama':
-                observed = ollama_current(target, runtime)
-            else:
-                stage('检查当前 llama.cpp 模型')
-                observed = llama_observe(runtime['model'], runtime['upstream'])
-                if observed['resources'].get('sleeping'):
-                    stage('唤醒 llama.cpp 模型')
-                    request(runtime['upstream'] + '/v1/chat/completions',
-                            {'model': runtime['model'], 'messages': [{'role': 'user', 'content': 'Hi'}],
-                             'max_tokens': 1, 'stream': False}, timeout=600)
-                    observed = llama_observe(runtime['model'], runtime['upstream'])
-            runtime.update(observed)
-            request(runtime['base_url'].removesuffix('/v1') + '/health', timeout=2)
-            runtime['display_name'] = target['model']['name']
-            stage('同步 Codex 本地配置和模型目录')
-            codex.profile(runtime, target['settings'])
-            write(self.store.path('runtime.json'), runtime)
-            command = [codex.executable(), '--no-daemon', '--profile', 'maa-local'] + list(arguments)
-        # Do not hold the mutation lock throughout an interactive coding session.
-        return subprocess.call(command)

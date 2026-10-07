@@ -1,0 +1,109 @@
+{
+  "version": "0.1.4",
+  "at": "2026-10-07T02:11:29.646887+00:00",
+  "status": "passed",
+  "asset_sha256": {
+    "maa-test.pyz": "bcb88b158c8f0b0b2cc7dfd4a335e38d08509939164fdda51a2c59604cec4fec",
+    "bootstrap.py": "29be87f1d96b102eead25f33edf77f37affda5bec710420c6eda11e2f4a7ed6b",
+    "maa.pyz": "2c68badb463a3b086b4093d4ba8f830b88da0f1cec2dfc787d0cad613bac0a9c",
+    "SHA256SUMS": "fe28959efa7360471c554828e57220249e03e8dbae37b4c4ac5e6104c80383d3",
+    "VERSION.json": "830dbb76e58e390b78d95dbdc5b64a4a366a2d2b2e2eba64f79126db3671fa6a",
+    "install.sh": "71833da669c112156534c33feefc8f981e0bdd583cf9c0a3c55ee838bd1a45cf"
+  },
+  "portable": {
+    "source_tests": 44,
+    "packaged_tests_outside_checkout": 44,
+    "container_packaged_tests": 44,
+    "skipped": 0
+  },
+  "build": {
+    "reproducible": true,
+    "python_3_11_grammar": 43,
+    "shell_syntax": true,
+    "package_boundaries": true
+  },
+  "native": {
+    "checks": 28,
+    "receipt": "V0_1_4_NATIVE.json",
+    "program_sha256": "2c68badb463a3b086b4093d4ba8f830b88da0f1cec2dfc787d0cad613bac0a9c"
+  },
+  "migration": {
+    "from": "immutable v0.1.3",
+    "root_active_llamacpp": {
+      "selection_preserved": true,
+      "running_restored": true,
+      "legacy_service_removed": true,
+      "yolo_backup_hash_unchanged": true
+    },
+    "ordinary_paused_ollama": {
+      "selection_preserved": true,
+      "paused_restored": true,
+      "legacy_service_removed": true,
+      "yolo_backup_hash_unchanged": true
+    },
+    "phase": "0.1.4 development artifact before final whitespace cleanup; final frozen native transactions and independent entrypoints separately verified"
+  },
+  "boot_without_manager": [
+    {
+      "backend": "llamacpp",
+      "uid": 0,
+      "archive_absent": true,
+      "paused_target_autostarted": true,
+      "new_native_invocation": true,
+      "legacy_service_absent": true,
+      "codex_direct_output": "Hello! What's your name?\n"
+    },
+    {
+      "backend": "ollama",
+      "uid": 1001,
+      "archive_absent": true,
+      "paused_target_autostarted": true,
+      "new_native_invocation": true,
+      "legacy_service_absent": true,
+      "codex_direct_output": "hello\n"
+    }
+  ],
+  "boot_phase": "0.1.4 development artifact; generated native boot commands and standalone launcher retained unchanged in final implementation",
+  "native_reasoning_streams": [
+    {
+      "backend": "llamacpp",
+      "model": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+      "native_reasoning_closed_before_text": false,
+      "stream_and_completed_text_identical": true,
+      "text": "Hello",
+      "events": 139,
+      "reasoning_event_types": [
+        "response.reasoning_text.delta"
+      ]
+    },
+    {
+      "backend": "ollama",
+      "model": "qwen3:0.6b",
+      "native_reasoning_closed_before_text": true,
+      "stream_and_completed_text_identical": true,
+      "text": "Hi!",
+      "events": 121
+    }
+  ],
+  "preliminary_failure": {
+    "model": "ollama qwen3:0.6b",
+    "check": "ollama-codex-cli",
+    "result": "exit 0 with thinking but no final body; recorded as failed",
+    "failed_receipt_started": "2026-10-07T01:59:32.777638+00:00",
+    "resolution": "No product output patch; native suite uses qwen2.5:3b. Other qwen3 runs and its direct reasoning stream produced body text."
+  },
+  "limitations": [
+    "No full custom/freeform apply_patch compatibility; catalog retains ordinary shell tools",
+    "No native MTP or recurrent-model inference acceptance",
+    "No qwen3.8 large-model reproduction or partial-offload performance claim",
+    "No conversation interceptor or recent token receipts",
+    "Forced termination during configuration may leave native autostart disabled; maa start revalidates saved target"
+  ],
+  "cleanup": {
+    "containers": [
+      "maa-direct-014",
+      "maa-root-014"
+    ],
+    "deleted": true
+  }
+}

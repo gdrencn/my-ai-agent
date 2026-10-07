@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Real Codex shell-tool execution over a deterministic native SSE fixture.
+"""Real Codex execution against a deterministic native Responses test fixture.
 
-This proves client/protocol execution semantics, independently of tiny model
-tool-selection quality. It is fault-injected evidence, not model performance.
+This test server is never installed or shipped in the product. It verifies the
+client contract without measuring a small model's tool-selection competence.
 """
 import json
 import os
@@ -13,59 +13,71 @@ import tempfile
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 sys.path.insert(0, str(Path.home() / '.local/share/my-ai-agent/maa.pyz'))
-from maa import bridge, codex
+from maa import codex
 
 
 def main():
-    seen = []
+    seen, declarations = [], []
+    previous_home = os.environ.get('CODEX_HOME')
     class Native(BaseHTTPRequestHandler):
         def log_message(self, *args):
             pass
         def do_POST(self):
+            assert self.path == '/v1/responses', self.path
             body = json.loads(self.rfile.read(int(self.headers['Content-Length'])))
-            outputs = [m for m in body['messages'] if m['role'] == 'tool']
+            outputs = [m for m in body.get('input', []) if m.get('type') == 'function_call_output']
             if outputs:
                 seen.extend(outputs)
-                chunk = {'choices': [{'delta': {'content': 'Done.'}, 'finish_reason': 'stop'}]}
+                item = {'id': 'msg_fixture', 'type': 'message', 'role': 'assistant', 'status': 'completed',
+                        'content': [{'type': 'output_text', 'text': 'Done.', 'annotations': []}]}
             else:
                 tools = body.get('tools', [])
-                fn = next(t['function'] for t in tools if t['function']['name'].endswith(('exec_command', 'shell_command')))
+                declarations.extend(tools)
+                fn = next(t for t in tools if t['type'] == 'function' and t['name'].endswith(('exec_command', 'shell_command')))
                 key = 'cmd' if fn['name'].endswith('exec_command') else 'command'
-                chunk = {'choices': [{'delta': {'tool_calls': [{'index': 0, 'id': 'call_real_exec',
-                     'function': {'name': fn['name'], 'arguments': json.dumps({
-                         key: 'printf MAA_REAL_CODEX_TOOL_OK > codex-proof.txt; cat codex-proof.txt'})}}]},
-                     'finish_reason': 'tool_calls'}]}
+                item = {'id': 'fc_fixture', 'type': 'function_call', 'call_id': 'call_real_exec', 'status': 'completed',
+                        'name': fn['name'], 'arguments': json.dumps({
+                            key: 'printf MAA_REAL_CODEX_TOOL_OK > codex-proof.txt; cat codex-proof.txt'})}
+            response = {'id': 'resp_fixture', 'object': 'response', 'status': 'completed',
+                        'model': body['model'], 'output': [item], 'usage': {'input_tokens': 32, 'output_tokens': 4, 'total_tokens': 36}}
             self.send_response(200)
             self.send_header('Content-Type', 'text/event-stream')
             self.end_headers()
-            self.wfile.write(('data: ' + json.dumps(chunk) + '\n\ndata: [DONE]\n\n').encode())
+            for event in [
+                {'type': 'response.created', 'response': {**response, 'status': 'in_progress', 'output': []}},
+                {'type': 'response.output_item.added', 'output_index': 0, 'item': {**item, 'status': 'in_progress'}},
+                {'type': 'response.output_item.done', 'output_index': 0, 'item': item},
+                {'type': 'response.completed', 'response': response}]:
+                self.wfile.write(('event: '+event['type']+'\ndata: '+json.dumps(event)+'\n\n').encode())
+                self.wfile.flush()
     native = ThreadingHTTPServer(('127.0.0.1', 0), Native)
-    runtime = {'model': 'maa_tool_fixture', 'upstream': f'http://127.0.0.1:{native.server_port}', 'context': 32768}
-    adapter = bridge.server(runtime, port=0)
-    runtime['base_url'] = f'http://127.0.0.1:{adapter.server_port}/v1'
-    for instance in (native, adapter):
-        threading.Thread(target=instance.serve_forever, daemon=True).start()
+    threading.Thread(target=native.serve_forever, daemon=True).start()
     try:
         with tempfile.TemporaryDirectory(prefix='.maa-real-codex-tool-', dir=Path.home()) as folder:
             folder = Path(folder)
             os.environ['CODEX_HOME'] = str(folder / 'codex')
             codex.home().mkdir()
             (codex.home() / 'config.toml').write_text('approval_policy="never"\nsandbox_mode="danger-full-access"\n')
+            runtime = {'model': 'native_fixture', 'context': 32768, 'base_url': f'http://127.0.0.1:{native.server_port}/v1'}
             codex.profile(runtime, {'reasoning': 'default'})
             result = subprocess.run([codex.executable(), '--no-daemon', '--profile', 'maa-local', 'exec', '--skip-git-repo-check',
                 '--ephemeral', '-C', str(folder), 'Use a shell tool to print MAA_REAL_CODEX_TOOL_OK, then answer done.'],
                 capture_output=True, text=True, stdin=subprocess.DEVNULL, timeout=120)
             assert result.returncode == 0, result.stdout + result.stderr
             assert (folder / 'codex-proof.txt').read_text() == 'MAA_REAL_CODEX_TOOL_OK'
-            assert seen and 'MAA_REAL_CODEX_TOOL_OK' in seen[0]['content'], seen
-            report = {'status': 'passed', 'kind': 'real Codex / deterministic upstream fixture',
-                      'tool_output_replayed': True, 'file_created_by_codex_tool': True,
-                      'stdout': result.stdout, 'diagnostic': result.stderr[-8192:]}
-            print(json.dumps(report, indent=2))
+            assert seen and 'MAA_REAL_CODEX_TOOL_OK' in str(seen[0]['output']), seen
+            assert not any(t['type'] == 'custom' for t in declarations), declarations
+            print(json.dumps({'status': 'passed', 'kind': 'real Codex / native Responses deterministic fixture',
+                  'tool_output_replayed': True, 'file_created_by_codex_tool': True,
+                  'declarations': [(t['type'], t.get('name')) for t in declarations],
+                  'stdout': result.stdout, 'diagnostic': result.stderr[-8192:]}, indent=2))
     finally:
-        for instance in (adapter, native):
-            instance.shutdown()
-            instance.server_close()
+        if previous_home is None:
+            os.environ.pop('CODEX_HOME', None)
+        else:
+            os.environ['CODEX_HOME'] = previous_home
+        native.shutdown()
+        native.server_close()
 
 
 if __name__ == '__main__':

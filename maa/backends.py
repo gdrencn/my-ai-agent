@@ -130,23 +130,36 @@ def wait_api(url, process, timeout=180):
     raise Error(f'Backend readiness timed out: {last}')
 
 
-def ollama_prepare(target):
+def ollama_prepare(target, store):
     endpoint, model, values = ollama_endpoint(), target['model'], target['settings']
     info = request(endpoint + '/api/show', {'model': model['name']}, timeout=60)
     inventory = request(endpoint + '/api/tags')['models']
     entry = next((row for row in inventory if row['name'] == model['name']), None)
-    if entry is None or entry.get('digest') != model.get('digest'):
+    from .store import read, write
+    originals = read(store.path('ollama-originals.json'), {})
+    origin = originals.get(model['name'])
+    expected = (model.get('digest'), origin.get('configured_digest') if origin and origin['digest'] == model.get('digest') else None)
+    if entry is None or entry.get('digest') not in expected:
         raise Error('Ollama model tag changed; refresh maa models and select the current model again')
+    backup = 'maa-source-' + model['key'] + ':latest'
+    previous = next((row for row in inventory if row['name'] == backup), None)
+    if previous is not None and previous.get('digest') != model['digest']:
+        raise Error('Ollama original-configuration backup changed; refusing to overwrite it')
+    if previous is None:
+        request(endpoint + '/api/copy', {'source': model['name'], 'destination': backup}, timeout=60)
+    info = request(endpoint + '/api/show', {'model': backup}, timeout=60)
     params = {'num_ctx': values['context']}
     if model['mtp_supported']:
         preset = re.search(r'^\s*draft_num_predict\s+(\d+)', info.get('parameters', ''), re.M)
         candidates = int(preset.group(1)) if preset else 0
         params['draft_num_predict'] = (candidates or 4) if values['mtp'] else 0
-    alias = 'maa-' + model['key'] + ':latest'
     stage('准备 Ollama 模型配置')
-    request(endpoint + '/api/create', {'model': alias, 'from': model['name'],
+    request(endpoint + '/api/create', {'model': model['name'], 'from': backup,
                                       'parameters': params, 'stream': False}, timeout=600)
-    return alias, info.get('parameters', '')
+    configured = next(row for row in request(endpoint + '/api/tags')['models'] if row['name'] == model['name'])
+    originals[model['name']] = {'digest': model['digest'], 'configured_digest': configured['digest'], 'backup': backup}
+    write(store.path('ollama-originals.json'), originals)
+    return model['name'], info.get('parameters', '')
 
 
 def ollama_wake(alias, values):
@@ -155,28 +168,6 @@ def ollama_wake(alias, values):
     request(endpoint + '/api/generate', {'model': alias, 'prompt': '', 'stream': False,
                                         'keep_alive': values['keep_alive']}, timeout=600)
     return ollama_observe(alias)
-
-
-def ollama_load(target):
-    alias, preset = ollama_prepare(target)
-    result = ollama_wake(alias, target['settings'])
-    result['preset_parameters'] = preset
-    return result
-
-
-def ollama_current(target, runtime):
-    """Observe a resident model; waking an expired model never recreates it."""
-    stage('检查当前 Ollama 模型')
-    alias = runtime['model']
-    rows = request(ollama_endpoint() + '/api/tags')['models']
-    original = next((row for row in rows if row['name'] == target['model']['name']), None)
-    adapted = next((row for row in rows if row['name'] == alias), None)
-    if not original or original.get('digest') != target['model'].get('digest') or not adapted:
-        raise Error('Ollama model changed or adaptation alias is missing; select it again in maa')
-    if runtime.get('native_digest') and adapted.get('digest') != runtime['native_digest']:
-        raise Error('Ollama adaptation configuration changed; select the model again in maa')
-    result = ollama_observe(alias, missing_ok=True)
-    return result if result is not None else ollama_wake(alias, target['settings'])
 
 
 def ollama_observe(alias, missing_ok=False):

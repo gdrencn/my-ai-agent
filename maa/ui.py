@@ -167,6 +167,8 @@ def status_lines(status):
     rows.append(value_line(t('last_output'), f'{output} tokens' if output is not None else t('unknown')))
     when = usage.get('recorded_at')
     rows.append(value_line(t('statistics_time'), datetime.datetime.fromtimestamp(when).astimezone().isoformat(timespec='seconds') if when else t('unknown')))
+    if status.get('usage_note'):
+        rows.append('直连模式：底座未提供可核验的最近请求 token 统计；未取得的字段不估算。')
     return rows
 
 
@@ -242,7 +244,7 @@ def local_models(ui, manager):
 
 def main(ui):
     manager, focused = Manager(), 'models_menu'
-    actions = ('models_menu', 'codex_config', 'codex_global', 'install', 'about', 'exit')
+    actions = ('models_menu', 'codex_global', 'codex_config', 'install', 'about', 'exit')
     while True:
         try:
             status = manager.model_status(include_gpu=False)

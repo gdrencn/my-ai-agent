@@ -43,7 +43,7 @@ def local_model(path, backend='llamacpp', name=None):
 
 
 @contextmanager
-def ollama_session(log):
+def ollama_session(log, values=None):
     # Callers suspend the single managed service first. No models are loaded here.
     try:
         request(ollama_endpoint() + '/api/version', timeout=1)
@@ -52,7 +52,7 @@ def ollama_session(log):
     else:
         raise Error('An unmanaged Ollama server is already running. Stop it before maa model operations.')
     with open(log, 'ab') as output:
-        process = subprocess.Popen([binary('ollama'), 'serve'], env=ollama_environment(),
+        process = subprocess.Popen([binary('ollama'), 'serve'], env=ollama_environment(values),
                                    stdout=output, stderr=output)
         try:
             wait_api(ollama_endpoint() + '/api/version', process)
@@ -67,7 +67,7 @@ def ollama_inventory(store):
     result = []
     for row in rows:
         name = row['name']
-        if re.fullmatch(r'maa-[0-9a-f]{24}:latest', name):
+        if re.fullmatch(r'maa-(?:(?:source-)?[0-9a-f]{24}|rollback-[0-9a-f]{32}):latest', name):
             continue  # Private adaptation aliases are not user model choices.
         info = request(ollama_endpoint() + '/api/show', {'model': name}, timeout=60)
         data = info.get('model_info', {})
@@ -75,8 +75,12 @@ def ollama_inventory(store):
         tensors = info.get('tensors', [])
         mtp = bool(data.get(arch + '.nextn_predict_layers', 0) or
                    (arch in ('qwen35', 'qwen35moe') and any(t.get('name', '').startswith('mtp.') for t in tensors)))
-        model = {'key': identity('ollama', name + '@' + str(row.get('digest'))), 'backend': 'ollama', 'name': name,
-                 'digest': row.get('digest'), 'metadata': data, 'mtp_supported': mtp,
+        from .store import read
+        origin = read(store.path('ollama-originals.json'), {}).get(name)
+        managed = origin and row.get('digest') in (origin['digest'], origin.get('configured_digest'))
+        digest = origin['digest'] if managed else row.get('digest')
+        model = {'key': identity('ollama', name + '@' + str(digest)), 'backend': 'ollama', 'name': name,
+                 'digest': digest, 'metadata': data, 'mtp_supported': mtp,
                  'source': 'ollama', 'capabilities': info.get('capabilities', [])}
         store.register(model)
         result.append(model)

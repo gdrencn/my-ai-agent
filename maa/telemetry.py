@@ -11,9 +11,7 @@ from pathlib import Path
 import re
 import shutil
 import subprocess
-import threading
-import time
-from .store import Error, read, write
+from .store import Error
 
 LOG_LIMIT = 4 * 1024 * 1024
 BUFFER = re.compile(r'([A-Za-z_][A-Za-z0-9_]*):\s+(\S+)\s+(model|KV|RS|compute|output)\s+buffer size\s*=\s*([\d.]+)\s*MiB')
@@ -103,7 +101,7 @@ def native_allocations(store, runtime):
     if not launch:
         return empty
     try:
-        with store.path('native.log').open('rb') as source:
+        with Path(runtime.get('log_path', store.path('native.log'))).open('rb') as source:
             import os
             stat = os.fstat(source.fileno())
             if [stat.st_dev, stat.st_ino] != [launch['device'], launch['inode']] or stat.st_size < launch['offset']:
@@ -153,34 +151,3 @@ def nvidia_memory():
         return {'devices': devices, 'error': None if devices else 'Driver returned no GPU memory data'}
     except (OSError, Error, subprocess.SubprocessError) as exc:
         return {'devices': [], 'error': str(exc)}
-
-
-class UsageRecorder:
-    """Only counts and identity; never store prompts, output or tool payloads."""
-    def __init__(self, store, runtime):
-        self.store, self.runtime, self.lock = store, runtime, threading.Lock()
-
-    def __call__(self, response):
-        with self.lock:
-            current = read(self.store.path('runtime.json'), {}) or {}
-            service_id = self.runtime.get('launch', {}).get('service_id')
-            if not service_id or current.get('launch', {}).get('service_id') != service_id:
-                return  # A retired service must not publish counters for its successor.
-            usage = response.get('usage') or {}
-            def count(key):
-                value = usage.get(key)
-                return value if type(value) is int and value >= 0 else None
-            write(self.store.path('usage.json'), {'service_id': service_id,
-                  'fingerprint': self.runtime['fingerprint'], 'key': self.runtime['key'],
-                  'load_id': native_allocations(self.store, self.runtime)['load_id'],
-                  'input_tokens': count('input_tokens'), 'output_tokens': count('output_tokens'),
-                  'recorded_at': time.time()})
-
-
-def last_usage(store, runtime, load_id):
-    usage = read(store.path('usage.json'))
-    if not usage or not load_id:
-        return None
-    expected = {'service_id': runtime.get('launch', {}).get('service_id'),
-                'fingerprint': runtime.get('fingerprint'), 'key': runtime.get('key'), 'load_id': load_id}
-    return usage if all(usage.get(key) == value for key, value in expected.items()) else None

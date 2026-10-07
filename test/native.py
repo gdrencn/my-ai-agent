@@ -45,7 +45,9 @@ def check(name, function):
 
 
 def api(body):
-    req = urllib.request.Request('http://127.0.0.1:18443/v1/responses',
+    runtime = read(Store().path('runtime.json'))
+    body = {'model': runtime['model'], **body}
+    req = urllib.request.Request(runtime['base_url'] + '/responses',
                                  data=json.dumps(body).encode(), headers={'Content-Type': 'application/json'})
     return urllib.request.urlopen(req, timeout=300).read()
 
@@ -174,10 +176,9 @@ def model_status_native():
     assert any(row['kind'] == 'KV' and row['location'] == 'gpu' for row in allocation['buffers']), allocation
     assert any(row['kind'] == 'compute' and row['location'] == 'gpu' for row in allocation['buffers']), allocation
     assert snapshot['gpu_memory']['devices'] and snapshot['gpu_memory']['devices'][0]['free_mib'] is not None, snapshot
-    assert snapshot['usage'] and snapshot['usage']['input_tokens'] > 0, snapshot
-    before = Store().path('usage.json').read_bytes()
+    assert snapshot['usage'] is None and 'no maa conversation interceptor' in snapshot['usage_note'], snapshot
     again = command('status')['model_status']
-    assert Store().path('usage.json').read_bytes() == before, 'Read-only status generated new inference usage'
+    assert again['usage'] is None, 'Native status invented conversation usage'
     assert again['allocations']['load_id'] == allocation['load_id'], (snapshot, again)
     assert again['allocations']['gpu_identified_mib'] == allocation['gpu_identified_mib'], (snapshot, again)
     return snapshot
@@ -204,7 +205,7 @@ def ollama_entry_reuse(wake=False):
     after = next(row for row in native_api('/api/tags')['models'] if row['name'] == runtime['model'])
     assert before['digest'] == after['digest'] and before['modified_at'] == after['modified_at'], (before, after)
     assert any(row['name'] == runtime['model'] for row in native_api('/api/ps')['models'])
-    return {'alias_unchanged': True, 'woke': wake, 'elapsed_seconds': round(time.monotonic() - started, 3),
+    return {'native_tag_unchanged': True, 'woke': wake, 'elapsed_seconds': round(time.monotonic() - started, 3),
             'diagnostic': diagnostic['diagnostic']}
 
 
@@ -214,9 +215,20 @@ def main():
     check('installed-version', lambda: command('--version', structured=False).strip())
     llama = check('hf-exact-download', lambda: command('add', 'llamacpp', '--repo', 'unsloth/Qwen3-0.6B-GGUF',
                                                        '--file', 'Qwen3-0.6B-Q4_K_M.gguf'))
-    ollama = check('ollama-native-pull', lambda: command('add', 'ollama', '--name', 'qwen3:0.6b'))
+    ollama = check('ollama-native-pull', lambda: command('add', 'ollama', '--name', 'qwen2.5:3b'))
     check('hf-invalid-file-rejected', lambda: command('add', 'llamacpp', '--repo', 'unsloth/Qwen3-0.6B-GGUF',
                                                       '--file', 'not-present.gguf', success=False))
+    def independent():
+        archive = Path.home() / '.local/share/my-ai-agent/maa.pyz'
+        detached = archive.with_suffix('.detached')
+        archive.rename(detached)
+        try:
+            result = codex_exec()
+            assert not Path('/etc/systemd/system/maa.service').exists()
+            assert 'maa.pyz' not in Path(LOCAL).read_text()
+            return {'archive_absent': True, 'codex': result}
+        finally:
+            detached.rename(archive)
     for model in (llama, ollama):
         check(model['backend'] + '-select', lambda: command('select', model['key'], '--set', 'context=32768',
                                                           '--set', 'kv=q8_0', '--set', 'keep_alive=5m'))
@@ -224,6 +236,7 @@ def main():
         check(model['backend'] + '-responses', inference)
         check(model['backend'] + '-native-function-call', native_tool_call)
         check(model['backend'] + '-codex-cli', codex_exec)
+        check(model['backend'] + '-manager-independent', independent)
         check(model['backend'] + '-model-status', model_status_native)
         try:
             from maa_testing.codex_ui import picker
@@ -232,6 +245,11 @@ def main():
         check(model['backend'] + '-codex-model-picker', lambda: picker(LOCAL, model['name']))
     check('ollama-resident-entry-reuses-alias', ollama_entry_reuse)
     check('ollama-expired-entry-wakes-existing-alias', lambda: ollama_entry_reuse(True))
+    try:
+        from maa_testing.codex_tool import main as tool_fixture
+    except ImportError:
+        from codex_tool import main as tool_fixture
+    check('codex-direct-shell-and-result-replay', tool_fixture)
     def retained():
         command('pause', structured=False)
         state = command('status')

@@ -29,6 +29,7 @@ def build():
     tester['maa_testing/__init__.py'] = b''
     tester['maa_testing/native.py'] = (ROOT / 'test/native.py').read_bytes()
     tester['maa_testing/codex_ui.py'] = (ROOT / 'test/codex_ui.py').read_bytes()
+    tester['maa_testing/codex_tool.py'] = (ROOT / 'test/codex_tool.py').read_bytes()
     with zipfile.ZipFile(out / 'maa-test.pyz', 'w', compression=zipfile.ZIP_DEFLATED) as archive:
         for name in sorted(tester):
             info = zipfile.ZipInfo(name, date_time=(2020, 1, 1, 0, 0, 0))
