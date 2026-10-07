@@ -1,0 +1,223 @@
+{
+  "version": "0.1.9",
+  "status": "passed",
+  "at": "2026-10-07T10:49:36.525468+00:00",
+  "release_commit": "0730dce2e7d8256ada14c4708fc5435e0c3c2768",
+  "release_url": "https://github.com/gdrencn/my-ai-agent/releases/tag/v0.1.9",
+  "initial_assets": 11,
+  "initial_asset_sha256": {
+    "VERSION.json": "2e415a2f23c372c9798d67354de482c70076c586d324597fe96d56243f686ed4",
+    "V0_1_9_NATIVE.json": "2b2e44d36a1418b19de4fcd14d9317e9439b5c518d1d632021039e7432f79d7f",
+    "VALIDATION_SHA256SUMS": "d61639bbb5cc82256011ac59fff455ee1a6e186819e0f7e30ccfd1a9d69d9b3e",
+    "V0_1_9_TERMINAL.json": "0aa6b797adad4b1f25c7ebdfafbf170c51cc26be55e0af24f34843ec4ef9ef3a",
+    "V0_1_9_ROOT_NATIVE.json": "c81331e57185983d004158c30a7f96f58059229b107b1095610febfa29d535ce",
+    "V0_1_9_LOCAL.json": "b7babf7b5ef4f68f0821e4d08157c853473fea5d60e95aa223cb80bf486123fb",
+    "SHA256SUMS": "cd2c8a8a035c47b6af74155911c415a11697cd0d9b8691c194cd38c31b5e73ff",
+    "install.sh": "71833da669c112156534c33feefc8f981e0bdd583cf9c0a3c55ee838bd1a45cf",
+    "maa-test.pyz": "01c0dd97a4658cd59770993efbfcfa43871684c97296fc1905e81107ea52e281",
+    "maa.pyz": "2dcda1dd4eba9697d4a4e1e7a47b74fd932685be19a548973d810d6c1af9b399",
+    "bootstrap.py": "29be87f1d96b102eead25f33edf77f37affda5bec710420c6eda11e2f4a7ed6b"
+  },
+  "all_initial_bytes_equal": true,
+  "both_initial_manifests_verified": true,
+  "public_default_install": {
+    "version": "0.1.9",
+    "status": "passed",
+    "kind": "public default install entry with --components none",
+    "artifact_sha256": "2dcda1dd4eba9697d4a4e1e7a47b74fd932685be19a548973d810d6c1af9b399",
+    "preserved_yolo_off": true,
+    "profile_and_selection_unchanged": true,
+    "native_instance_unchanged": true,
+    "before": {
+      "ActiveState": "active",
+      "SubState": "running",
+      "InvocationID": "ed84069dda91429cae30bd7f86ad8f84",
+      "MainPID": "5958",
+      "Result": "success"
+    },
+    "after": {
+      "ActiveState": "active",
+      "SubState": "running",
+      "InvocationID": "ed84069dda91429cae30bd7f86ad8f84",
+      "MainPID": "5958",
+      "Result": "success"
+    },
+    "diagnostic": "正在安装 my-ai-agent v0.1.9 test\nmy-ai-agent 已安装：/root/.local/share/my-ai-agent/maa.pyz\n运行 /root/.local/bin/maa 打开菜单。\n"
+  },
+  "public_test": {
+    "components": "none",
+    "portable_checks": 90,
+    "native_checks": 35,
+    "report_sha256": "6241a726ed551d6b83760d93f8f4917a442c7126821cbc6ccf73efcf01993df6",
+    "checks": [
+      {
+        "name": "installed-version",
+        "status": "passed"
+      },
+      {
+        "name": "explicit-yolo-test-baseline",
+        "status": "passed"
+      },
+      {
+        "name": "hf-exact-download",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-native-pull",
+        "status": "passed"
+      },
+      {
+        "name": "hf-invalid-file-rejected",
+        "status": "passed"
+      },
+      {
+        "name": "llamacpp-select",
+        "status": "passed"
+      },
+      {
+        "name": "llamacpp-catalog",
+        "status": "passed"
+      },
+      {
+        "name": "llamacpp-responses",
+        "status": "passed"
+      },
+      {
+        "name": "llamacpp-native-function-call",
+        "status": "passed"
+      },
+      {
+        "name": "llamacpp-codex-cli",
+        "status": "passed"
+      },
+      {
+        "name": "llamacpp-manager-independent",
+        "status": "passed"
+      },
+      {
+        "name": "llamacpp-model-status",
+        "status": "passed"
+      },
+      {
+        "name": "llamacpp-configuration-without-reload",
+        "status": "passed"
+      },
+      {
+        "name": "llamacpp-codex-model-picker",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-select",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-catalog",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-responses",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-native-function-call",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-codex-cli",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-manager-independent",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-model-status",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-configuration-without-reload",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-codex-model-picker",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-resident-entry-reuses-alias",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-expired-entry-wakes-existing-alias",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-explicit-start-wakes-without-restart",
+        "status": "passed"
+      },
+      {
+        "name": "ollama-unchanged-inventory-reuses-registry",
+        "status": "passed"
+      },
+      {
+        "name": "codex-direct-shell-and-result-replay",
+        "status": "passed"
+      },
+      {
+        "name": "pause-start-retains-target",
+        "status": "passed"
+      },
+      {
+        "name": "interrupted-candidate-restores-accepted-native-target",
+        "status": "passed"
+      },
+      {
+        "name": "native-load-failure-rollback",
+        "status": "passed"
+      },
+      {
+        "name": "invalid-fixture-cleaned",
+        "status": "passed"
+      },
+      {
+        "name": "yolo-off",
+        "status": "passed"
+      },
+      {
+        "name": "product-reinstall-retains-yolo-off-and-native-instance",
+        "status": "passed"
+      },
+      {
+        "name": "yolo-on",
+        "status": "passed"
+      }
+    ]
+  },
+  "ci": [
+    {
+      "conclusion": "success",
+      "databaseId": 37609314308,
+      "event": "push",
+      "headSha": "0730dce2e7d8256ada14c4708fc5435e0c3c2768",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 37609314130,
+      "event": "push",
+      "headSha": "0730dce2e7d8256ada14c4708fc5435e0c3c2768",
+      "status": "completed"
+    }
+  ],
+  "cleanup": {
+    "deleted_containers": [
+      "maa-v019-user-check",
+      "maa-v019-root-check"
+    ],
+    "remaining_managed_containers": []
+  },
+  "terminal_evidence_clarification": {
+    "official_codex_native_output_observed": "==> Updating Codex CLI",
+    "raw_sha256": "15dca23c4a607a0d0f297116617d12c41151f2d91ee0978dfaf7da0732291ada",
+    "initial_receipt_flag": "native_output_present is a limited sentinel check for pulling, Installing Codex CLI or % Total. Updating Codex CLI did not match that sentinel; the native update output was preserved and is explicitly verified here."
+  }
+}

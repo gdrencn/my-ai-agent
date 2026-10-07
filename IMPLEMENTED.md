@@ -2,7 +2,7 @@
 
 ## 0.1.9 shared output verification
 
-Verified all six authorized output requirements against the implementation on 2026-10-07. All 90 source portable/PTY checks and 90 paired-package checks outside the checkout passed. Fresh ordinary-user and root mas containers each passed 90 portable/PTY and 35 native checks against the final product/test bytes. Eight additional real-terminal installed-command checks passed. Immutable 0.1.9 test is ready for publication; stable requires user acceptance.
+Verified all six authorized output requirements against the implementation on 2026-10-07. All 90 source portable/PTY checks and 90 paired-package checks outside the checkout passed. Fresh ordinary-user and root mas containers each passed 90 portable/PTY and 35 native checks against the final product/test bytes. Eight additional real-terminal installed-command checks passed. Immutable 0.1.9 test is published and verified through its public entries; stable requires user acceptance.
 
 | Output requirement | Implementation and evidence |
 | --- | --- |
@@ -14,6 +14,8 @@ Verified all six authorized output requirements against the implementation on 20
 | Native flow acceptance | Actual Ollama selection/reconfiguration, llama.cpp selection, two pauses, official Codex update, Ollama pull and HF download each leave exactly one final success row and no old in-progress rows. The real Codex update retains the native MainPID/InvocationID. |
 
 Receipts: validation/V0_1_9_LOCAL.json, V0_1_9_NATIVE.json, V0_1_9_ROOT_NATIVE.json and V0_1_9_TERMINAL.json. The native suites use small models; this release does not claim large Qwen3.8/MTP performance acceptance. Earlier progress coverage missed the silent-command defect reported by the user; 0.1.9 explicitly verifies that case.
+
+All 11 initial assets downloaded identically and both initial manifests verified. The public default installer with --components none selects 0.1.9 and preserves disabled YOLO, profile, selection and native PID/InvocationID. The public test entry passes 90 portable/PTY and 35 native checks; release-commit and tag CI both passed. Both owned validation containers were deleted. validation/V0_1_9_PUBLIC.json records public verification and cleanup, and is appended with its own checksum without changing frozen assets. Its clarification records actual Updating Codex CLI output, which did not match the initial terminal receipt's narrower Installing Codex CLI sentinel.
 
 ## Historical 0.1.8 verification
 
