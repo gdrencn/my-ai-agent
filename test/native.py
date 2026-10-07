@@ -83,13 +83,17 @@ def native_tool_call():
 
 def codex_exec():
     with tempfile.TemporaryDirectory(prefix='maa-codex-native-') as folder:
+        # Reproduce installation from an existing shell: the official installer
+        # cannot add ~/.local/bin to this already-running process's PATH.
+        env = dict(os.environ, PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin')
         result = subprocess.run([LOCAL, 'exec', '--skip-git-repo-check', '--ephemeral', '-C', folder,
                                  'Reply with MAA_NATIVE_OK. Do not use tools.'], capture_output=True,
-                                text=True, timeout=600, stdin=subprocess.DEVNULL)
+                                text=True, timeout=600, stdin=subprocess.DEVNULL, env=env)
         assert result.returncode == 0, result.stdout + result.stderr
         assert result.stdout.strip(), result.stderr
         assert 'fallback metadata' not in result.stderr and 'requires embedded mode' not in result.stderr, result.stderr
-        return {'output': result.stdout, 'diagnostic': result.stderr[-8192:]}
+        return {'output': result.stdout, 'diagnostic': result.stderr[-8192:],
+                'launcher_path_without_user_bin': env['PATH']}
 
 
 @contextmanager

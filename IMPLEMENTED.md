@@ -1,6 +1,6 @@
-# my-ai-agent Implementation — 0.1.5 test
+# my-ai-agent Implementation — 0.1.6 test
 
-Verified against REQUIREMENTS.md on 2026-10-06 (America/Chicago). 0.1.5 corrects a test-only directory enumeration order assertion exposed by GitHub CI; native runtime behavior is unchanged from 0.1.4. Test publication is authorized; stable requires user acceptance. Historical releases and their evidence remain immutable in Git and validation/.
+0.1.6 adds the official user installation directory to the independent launcher's own PATH before exec. This fixes the user-reported 0.1.5 fresh-install failure without requiring shell startup files to be reloaded. Portable verification is complete; final native/public verification is pending. Test publication is authorized; stable requires user acceptance. Historical releases and their evidence remain immutable in Git and validation/.
 
 ## Current architecture
 
@@ -9,7 +9,7 @@ maa is a one-shot installation/configuration tool. There is no maa daemon or Res
 | Requirement | Implementation and verification |
 | --- | --- |
 | Native autostart | Ollama uses its official ollama.service with an owned drop-in. llama.cpp uses a native llama-server.service. ExecStart runs only the official executable; native curl preloads the selected Ollama model. No Python, maa.pyz or manager callback is in a boot command. Only the accepted backend is enabled. |
-| Independent local launcher | Shell script directly execs codex --no-daemon --profile maa-local and forwards normal user arguments. It does not import maa, read manager state, rewrite profiles, reload models or proxy requests. Tests remove the installed archive and use real Codex with both backends. Both paused targets also autostart after container restart with the archive absent. |
+| Independent local launcher | Shell script exports PATH with $HOME/.local/bin prepended to the inherited value, then directly execs codex --no-daemon --profile maa-local and forwards normal user arguments. It does not import maa, read manager state, rewrite profiles, reload models or proxy requests. The regression reproduces the old command-not-found error and verifies success with user bin absent from inherited PATH, spaces in HOME, literal arguments and unchanged exec PID. Prior native tests remove the installed archive and use real Codex with both backends; both paused targets autostart after container restart with the archive absent. |
 | Separate native connections | Selection writes the corresponding native backend configuration and Codex profile. Ollama and llama.cpp each use their own /v1/responses endpoint; no common protocol converter is retained. The single active profile points to the selected backend. Per-backend/model settings remain separate. |
 | Model identity | Profile, catalog and native request use the original model name. Ollama applies context settings to the public tag; native manifest copies preserve original presets and support rollback without copying model weights. Private original/rollback manifests are excluded from the maa chooser. Actual /model pickers contain only the selected local model and no fallback metadata warning. |
 | Lifecycle and recovery | Immediate stop/configure/start/verify/synchronize transaction. Normal failures restore native unit files/enablement, previous Ollama tag, runtime snapshot, Codex profile/launcher, saved config and previous running/paused state. Native crashes during automatic restart are reported promptly. Pause preserves native autostart. Unmanaged llama.cpp listeners and foreign unit files are refused. |
@@ -30,12 +30,12 @@ maa is a one-shot installation/configuration tool. There is no maa daemon or Res
 
 ## Evidence
 
-- 44 source portable/PTY checks and 44 paired-package checks outside the checkout, no skips.
-- 28 native acceptance checks in an ordinary-user disposable mas container: exact HF GGUF, native Ollama pull, two native APIs/tool replay paths, real Codex and /model, independent archive removal, native status, resident/idle reuse, pause/start, failed-load rollback, cleanup and YOLO restore.
-- Inherited from the byte-identical 0.1.4 runtime (only the product version constant changed): actual root official installation and active 0.1.3 llama.cpp migration; ordinary-user paused 0.1.3 Ollama migration. YOLO recovery backup hashes remain unchanged.
+- 45 source portable/PTY checks and 45 paired-package checks outside the checkout, no skips. The new regression reproduces the 0.1.5 launcher failure before applying the corrected launcher.
+- Prior 0.1.5: 28 native acceptance checks in an ordinary-user disposable mas container: exact HF GGUF, native Ollama pull, two native APIs/tool replay paths, real Codex and /model, independent archive removal, native status, resident/idle reuse, pause/start, failed-load rollback, cleanup and YOLO restore. The 0.1.6 paired native runner now removes the user install directory from each codex-local child PATH; final rerun pending.
+- Prior 0.1.4/0.1.5 evidence for unchanged native service/migration code: actual root official installation and active 0.1.3 llama.cpp migration; ordinary-user paused 0.1.3 Ollama migration. YOLO recovery backup hashes remain unchanged. 0.1.6 changes only the product version and generated Codex launcher PATH.
 - The same inherited architecture checks verify that both backends autostart from pause after container restart and serve real Codex while maa.pyz is absent. These additional root/ordinary-user checks are separate from the paired native runner.
 - Software: Ubuntu 26.04.1, Python 3.14.4, Ollama 0.40.0, llama app b11429, Codex 0.160.1. Native suite uses Qwen3-0.6B-Q4_K_M.gguf and qwen2.5:3b; extra reasoning probes use qwen3:0.6b and the Qwen3 GGUF.
-- Frozen hashes and receipts are in validation/V0_1_5_LOCAL.json and V0_1_5_NATIVE.json. validation/V0_1_5_PUBLIC.json records all nine public assets matching frozen bytes, both manifests, successful default-latest installation preserving the paused target, green GitHub CI and deletion of all three owned validation containers.
+- Prior 0.1.5 frozen hashes and receipts are in validation/V0_1_5_LOCAL.json and V0_1_5_NATIVE.json. validation/V0_1_5_PUBLIC.json records its nine public assets matching frozen bytes, both manifests, successful default-latest installation preserving the paused target, green GitHub CI and deletion of its three owned validation containers. 0.1.6 receipts follow final native/public verification.
 
 ## Limits
 

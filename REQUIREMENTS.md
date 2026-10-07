@@ -1,4 +1,8 @@
-# my-ai-agent Requirements — 0.1.5 test
+# my-ai-agent Requirements — 0.1.6 test
+
+## 0.1.6 immediate Codex entry after official installation
+
+修正 0.1.5 用户验收发现的 `exec: codex: not found`：官方安装器写入用户 `~/.local/bin` 后，不要求测试进程或通过绝对路径运行的 codex-local 先重开终端。独立启动脚本在自己的进程中将 `$HOME/.local/bin` 加入 PATH，保留继承的 PATH，再直接 exec 官方 Codex；不调用 maa、不启动后台服务、不修改父 shell 或全局配置。验证当前 PATH 不含用户安装目录、HOME 路径含空格、正常参数及 exec 进程身份；完整原生验收必须以不含用户安装目录的 PATH 启动 Codex 子进程。另发不可变 0.1.6 test，不覆盖 0.1.5 资产。
 
 ## 0.1.4 standalone tools and native direct connections
 
@@ -11,7 +15,7 @@
 5. 保留配置默认值、KV 跟随、YOLO 两键恢复、菜单颜色与操作计时。主菜单“Codex 配置”管理 YOLO，排在“codex-local 配置”之前；后者管理本地推理与上下文配置。HF 仍保留仓库和精确文件两项。
 6. 原生状态查询分别读取底座 API 和当前原生日志，日志与启动身份由原生服务确定。删除对 maa 对话中转收据的依赖；直连后无法可靠取得的统计显示未取得并说明来源，不能伪造旧数据或引入后台监听。
 7. 从旧版本迁移时仅清理可核验属于 maa 的旧服务和入口；保留模型、每模型配置、普通 Codex 配置和 YOLO 恢复备份。迁移失败给出明确诊断，不覆盖不属于项目的文件或服务。
-8. 在独立 mas 容器验证安装、原生直连、立即切换、回滚、暂停与重启自启动、maa 运行依赖移除、独立启动脚本、终端导航和可重现打包。记录原生限制；另发不可变 0.1.5 test，stable 仍需用户验收。
+8. 在独立 mas 容器验证安装、原生直连、立即切换、回滚、暂停与重启自启动、maa 运行依赖移除、独立启动脚本、终端导航和可重现打包。记录原生限制；当前另发不可变 0.1.6 test，stable 仍需用户验收。
 
 自动压缩比例固定 90%，不添加未确认的比例修改入口。旧版本的需求与实现记录保留在 Git 历史和 validation 收据中。实现及验证见 IMPLEMENTED.md。
 
@@ -91,7 +95,7 @@ llama.cpp 固定一个本地 agent 推理槽，保证 llama.cpp 的上下文设�
 5. 核验 YOLO 两键恢复、重复开启、无关 TOML 保留、跨进程备份。
 6. 核验本地 Responses 对话、流式、工具调用及 context/90% 同步。
 7. PTY 验证导航、输入编辑、窄终端、取消和终端恢复；结构化输出无控制码。
-8. 可重现构建、校验和、包边界、安装版本；不可变 v0.1.5 GitHub prerelease，回下载比较字节。stable 等待用户验收。
+8. 可重现构建、校验和、包边界、安装版本；不可变 v0.1.6 GitHub prerelease，回下载比较字节。stable 等待用户验收。
 9. IMPLEMENTED.md 区分 portable/native/fault-injected/user-reported 证据，不宣称未实测的大模型/GPU/MTP 结果。
 
 ## Official references

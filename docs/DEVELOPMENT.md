@@ -41,10 +41,12 @@ Native backend units run only official backend executables and native curl prelo
 
 Progress belongs on stderr. Real PTY checks cover immediate feedback, one-line phase/timer refresh, native output ownership, failure and cursor restoration. Nonterminal checks require parseable stdout JSON, no ANSI and no repeated timer ticks. `codex-local` explicitly uses the official `--no-daemon` option; do not hide native diagnostics. Catalogs use content-addressed immutable files so restoring a profile also restores its prior model/context metadata. Do not copy a developer's global Codex model cache or instructions into generated metadata.
 
+The independent launcher must find the official ~/.local/bin/codex immediately after installation without relying on .bashrc or inherited user PATH. Test it with a space-containing HOME and an environment that has only system binary directories; verify argument forwarding and exec PID with the installed manager absent. Each real native codex-local greeting check also uses a PATH without the user bin directory. Run fresh official installation and paired tests in one non-login process with that same baseline PATH.
+
 ## Artifacts and release
 
 Build produces maa.pyz, maa-test.pyz, VERSION.json, bootstrap.py, install.sh and SHA256SUMS. Numeric version lives only in maa/__init__.py. VERSION.json pairs the test channel/version; SHA256SUMS covers the other five payloads. Test publication can add frozen validation JSON and its checksum. The repository validation manifest covers all checked-in receipts; the release validation manifest covers that version's initial local/native receipts. Public evidence is appended with a separate PUBLIC_SHA256SUMS; never overwrite a released manifest.
 
-Commit verified source/docs to main, tag v0.1.5, publish GitHub prerelease. Never replace an existing tag/release/asset. Download every asset again and verify local byte equality, manifest and the public installer. Changes after freeze require a new version unless they only record validation/documentation and do not alter frozen payloads. Stable promotion needs user acceptance.
+Commit verified source/docs to main, tag v0.1.6, publish GitHub prerelease. Never replace an existing tag/release/asset. Download every asset again and verify local byte equality, manifest and the public installer. Changes after freeze require a new version unless they only record validation/documentation and do not alter frozen payloads. Stable promotion needs user acceptance.
 
 The official upstream installers resolve their own current versions; do not claim their future releases are identical to the versions in our validation receipt. Models are pinned to HF commits or native Ollama digests after download.

@@ -150,7 +150,10 @@ def launcher_path():
 
 def launcher():
     # The generated entrypoint is independent of this module and maa.pyz.
-    return '#!/bin/sh\n# managed by my-ai-agent\nexec codex --no-daemon --profile maa-local "$@"\n'
+    # The official installer updates shell startup files, not the caller's PATH.
+    return ('#!/bin/sh\n# managed by my-ai-agent\n'
+            'export PATH="$HOME/.local/bin:$PATH"\n'
+            'exec codex --no-daemon --profile maa-local "$@"\n')
 
 
 def install_launcher():

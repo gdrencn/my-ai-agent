@@ -2,7 +2,7 @@
 
 在 **my-ai-sandbox（mas）容器内**安装并管理 Ollama、llama.cpp 和 Codex CLI。
 
-当前版本：**0.1.5 test**。两种底座可共存，通过 `maa` 选择一个当前底座和模型，并同步 `codex-local`。
+当前版本：**0.1.6 test**。两种底座可共存，通过 `maa` 选择一个当前底座和模型，并同步 `codex-local`。
 
 ## Install
 
@@ -111,10 +111,11 @@ YOLO 只管理全局 `approval_policy = "never"` 和 `sandbox_mode = "danger-ful
 `codex-local` 是独立的 shell 脚本，内容为：
 
 ```sh
+export PATH="$HOME/.local/bin:$PATH"
 exec codex --no-daemon --profile maa-local "$@"
 ```
 
-它直接启动官方 Codex，不调用 maa、不检查管理状态、不改写配置、不自动启动暂停的底座。空闲模型由底座根据正常推理请求自行唤醒。删除 maa 程序后，已生成的 profile、模型目录和原生底座配置仍能使用。
+它在自身进程中补上官方用户安装目录，因此通过绝对路径运行时不要求先重开终端，也不修改父 shell 的 PATH。随后直接启动官方 Codex，不调用 maa、不检查管理状态、不改写配置、不自动启动暂停的底座。空闲模型由底座根据正常推理请求自行唤醒。删除 maa 程序后，已生成的 profile、模型目录和原生底座配置仍能使用。
 
 Ollama profile 直连其 `/v1/responses`；llama.cpp profile 直连自己的 `/v1/responses`。切换时 maa 写入对应底座的配置，随后退出。`/model`、profile 和模型目录使用原模型名称。Ollama 在原名称上应用上下文参数，并用只占清单、不复制权重的私有备份保留原模型预设；不再用不透明的运行别名。
 

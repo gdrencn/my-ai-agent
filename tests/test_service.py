@@ -35,6 +35,25 @@ class Service(unittest.TestCase):
         self.assertEqual(out.splitlines(), ['--no-daemon', '--profile', 'maa-local', 'exec', 'text with spaces', f'PID={process.pid}'])
         self.assertCountEqual(self.root.iterdir(), [folder, self.store.root])
 
+    def test_launcher_finds_official_codex_without_shell_restart(self):
+        home = self.root / 'user home'
+        folder = home / '.local/bin'; folder.mkdir(parents=True)
+        fake = folder / 'codex'
+        fake.write_text('#!/bin/sh\nprintf "%s\\n" "$@"\nprintf "PID=%s\\n" "$$"\n')
+        fake.chmod(0o755)
+        entry = folder / 'codex-local'; entry.write_text(codex.launcher()); entry.chmod(0o755)
+        # Official installation has finished, but this non-login process has
+        # never sourced .bashrc. No manager or profile is available to the stub.
+        env = {'PATH': '/usr/bin:/bin', 'HOME': str(home)}
+        process = subprocess.Popen([str(entry), 'exec', 'text with spaces', 'literal $value'],
+                                   env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        out, err = process.communicate(timeout=5)
+        self.assertEqual(process.returncode, 0, err)
+        self.assertEqual(out.splitlines(), ['--no-daemon', '--profile', 'maa-local', 'exec',
+                                           'text with spaces', 'literal $value', f'PID={process.pid}'])
+        self.assertEqual(env['PATH'], '/usr/bin:/bin')
+        self.assertCountEqual(home.iterdir(), [home / '.local'])
+
     def test_native_units_execute_only_native_programs(self):
         paths = {b: self.root / (b + '.service') for b in ('ollama', 'llamacpp')}
         def write_unit(path, text):path.write_text(text)
