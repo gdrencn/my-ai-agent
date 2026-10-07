@@ -1,0 +1,98 @@
+{
+  "version": "0.1.9",
+  "status": "passed",
+  "at": "2026-10-07T10:39:40.549693+00:00",
+  "artifact_sha256": "2dcda1dd4eba9697d4a4e1e7a47b74fd932685be19a548973d810d6c1af9b399",
+  "checks": [
+    {
+      "name": "ollama-select",
+      "status": "passed",
+      "elapsed_seconds": 6.8,
+      "raw_sha256": "64a9791f347ca3f14484b20b3a60b5c0bdabfe6b3e938cdd119a39905d9fa93d",
+      "raw_bytes": 7412,
+      "retained_progress_rows": [],
+      "final_result": "[成功] 应用模型配置：同步 Codex 本地配置和模型目录 — 耗时 6.5 秒",
+      "timer_refreshed": true,
+      "native_output_present": false
+    },
+    {
+      "name": "ollama-reconfigure",
+      "status": "passed",
+      "elapsed_seconds": 6.76,
+      "raw_sha256": "f76221c84e13664255621728ca2b54c0cbd39ac268e25259db297b4ce936756e",
+      "raw_bytes": 7316,
+      "retained_progress_rows": [],
+      "final_result": "[成功] 应用配置：同步 Codex 本地配置和模型目录 — 耗时 6.5 秒",
+      "timer_refreshed": true,
+      "native_output_present": false
+    },
+    {
+      "name": "pause",
+      "status": "passed",
+      "elapsed_seconds": 0.31,
+      "raw_sha256": "12873402efec90b4891a7e1f9f275869144e33807e0fd119a3d98288025e15fc",
+      "raw_bytes": 122,
+      "retained_progress_rows": [],
+      "final_result": "[成功] 暂停当前模型 — 耗时 0.1 秒",
+      "timer_refreshed": false,
+      "native_output_present": false
+    },
+    {
+      "name": "llamacpp-select",
+      "status": "passed",
+      "elapsed_seconds": 2.08,
+      "raw_sha256": "a7383487ed35d27e4727052c3d2a012d4fefee97cc9305b78f0ea8ff1832b850",
+      "raw_bytes": 12421,
+      "retained_progress_rows": [],
+      "final_result": "[成功] 应用模型配置：同步 Codex 本地配置和模型目录 — 耗时 1.8 秒",
+      "timer_refreshed": true,
+      "native_output_present": false
+    },
+    {
+      "name": "official-codex-install",
+      "status": "passed",
+      "elapsed_seconds": 1.23,
+      "raw_sha256": "15dca23c4a607a0d0f297116617d12c41151f2d91ee0978dfaf7da0732291ada",
+      "raw_bytes": 1003,
+      "retained_progress_rows": [],
+      "final_result": "[成功] 安装底座 / Codex CLI：官方安装：codex — 耗时 1.0 秒",
+      "timer_refreshed": true,
+      "native_output_present": false
+    },
+    {
+      "name": "ollama-pull",
+      "status": "passed",
+      "elapsed_seconds": 4.42,
+      "raw_sha256": "55fbee05e62d62e59acdfc9521547e51a38fd69c09a8aca725eae1c61fbda2d7",
+      "raw_bytes": 5523,
+      "retained_progress_rows": [],
+      "final_result": "[成功] 安装 / 登记模型：等待原生底座和模型加载；原生日志：maa logs — 耗时 4.2 秒",
+      "timer_refreshed": true,
+      "native_output_present": true
+    },
+    {
+      "name": "pause-before-hf",
+      "status": "passed",
+      "elapsed_seconds": 0.33,
+      "raw_sha256": "12873402efec90b4891a7e1f9f275869144e33807e0fd119a3d98288025e15fc",
+      "raw_bytes": 122,
+      "retained_progress_rows": [],
+      "final_result": "[成功] 暂停当前模型 — 耗时 0.1 秒",
+      "timer_refreshed": false,
+      "native_output_present": false
+    },
+    {
+      "name": "hf-download",
+      "status": "passed",
+      "elapsed_seconds": 10.74,
+      "raw_sha256": "68e175f980f9b9a0e73b9f644ef6d4da1b72f9930cb6ff9b73e916cc69ce1f0e",
+      "raw_bytes": 9237,
+      "retained_progress_rows": [],
+      "final_result": "[成功] 安装 / 登记模型：读取 GGUF 元数据和计算模型身份 — 耗时 10.5 秒",
+      "timer_refreshed": true,
+      "native_output_present": true
+    }
+  ],
+  "official_codex_update_keeps_native_instance": true,
+  "scope": "Actual installed commands in a real PTY in the owned sandbox-user mas container; retained terminal rows replay CR/erase/cursor movement. Model/Codex content unchanged by the output coordinator."
+}

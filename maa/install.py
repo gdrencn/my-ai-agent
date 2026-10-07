@@ -10,7 +10,7 @@ import urllib.request
 from . import codex
 from .service import Controller, privileged
 from .store import Error, Store, atomic, write
-from .output import operation, stage, native_output
+from .output import operation, stage, run, diagnostic
 
 URLS = {'ollama': 'https://ollama.com/install.sh',
         'llamacpp': 'https://llama.app/install.sh',
@@ -54,13 +54,12 @@ def _component(name):
         with tempfile.NamedTemporaryFile(suffix='.sh') as source:
             # Use the official command's curl behavior (redirects and TLS). Some
             # official CDN frontends reject Python's default HTTP user agent.
-            subprocess.run(['curl', '-fsSL', URLS[item], '-o', source.name], check=True)
+            run(['curl', '-fsSL', URLS[item], '-o', source.name], check=True)
             env = dict(os.environ, CODEX_NON_INTERACTIVE='true')
             try:
                 stage(f'官方安装：{item}')
-                with native_output():
-                    print(f'官方安装：{item} — {URLS[item]}', flush=True)
-                    subprocess.run(['sh', source.name], env=env, cwd=Path.home(), check=True)
+                diagnostic(f'官方安装：{item} — {URLS[item]}\n')
+                run(['sh', source.name], native=True, env=env, cwd=Path.home(), check=True)
             finally:
                 if item == 'ollama' and Path('/etc/systemd/system/ollama.service').exists():
                     # Also quiesce a partially installed official daemon on error.
@@ -113,7 +112,7 @@ def product(archive, components='all'):
                 raise Error(f'{primary}\n{detail}') from primary
             raise
         # Rejected inputs and failed entrypoint writes never migrate services.
-        was_running = (subprocess.run(['systemctl', 'is-active', '--quiet', 'maa.service']).returncode == 0
+        was_running = (run(['systemctl', 'is-active', '--quiet', 'maa.service']).returncode == 0
                        if legacy is not None else controller.running())
         controller.migrate()
     if components != 'none':

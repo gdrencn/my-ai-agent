@@ -298,6 +298,38 @@ class Core(unittest.TestCase):
         self.assertEqual(len(err.getvalue().splitlines()), 2)
         self.assertNotIn('\x1b', err.getvalue())
 
+    def test_shared_commands_preserve_captured_results_and_clean_json(self):
+        from maa.output import operation, run
+        err, out = io.StringIO(), io.StringIO()
+        with patch('sys.stderr', err), patch('sys.stdout', out):
+            with operation('共享命令'):
+                captured = run([sys.executable, '-c', "print('CAPTURED')"], capture_output=True, text=True, check=True)
+                self.assertEqual(captured.stdout, 'CAPTURED\n')
+                run([sys.executable, '-c', "import sys;print('ORDINARY_STDOUT');print('ORDINARY_STDERR',file=sys.stderr)"], check=True)
+                run([sys.executable, '-c', "print('NATIVE_STDOUT')"], native=True, check=True)
+            print(json.dumps({'ok': True}))
+        self.assertEqual(json.loads(out.getvalue()), {'ok': True})
+        self.assertNotIn('CAPTURED', err.getvalue())
+        self.assertIn('ORDINARY_STDOUT\nORDINARY_STDERR\n', err.getvalue())
+        self.assertIn('NATIVE_STDOUT\n', err.getvalue())
+        self.assertEqual(err.getvalue().count('[进行中]'), 1)
+        self.assertEqual(err.getvalue().count('[成功]'), 1)
+        self.assertNotIn('\x1b', err.getvalue())
+
+    def test_shared_commands_preserve_explicit_streams_and_timeout_diagnostics(self):
+        from maa.output import run
+        err = io.StringIO()
+        with patch('sys.stderr', err):
+            result = run([sys.executable, '-c', "import sys;print('SUPPRESSED');print('VISIBLE',file=sys.stderr)"],
+                         stdout=subprocess.DEVNULL, text=True, check=True)
+            self.assertIsNone(result.stdout)
+            self.assertIsNone(result.stderr)
+            with self.assertRaises(subprocess.TimeoutExpired):
+                run([sys.executable, '-c', "import sys,time;print('TIMEOUT_DETAIL',file=sys.stderr,flush=True);time.sleep(5)"], timeout=.2)
+        self.assertNotIn('SUPPRESSED', err.getvalue())
+        self.assertIn('VISIBLE', err.getvalue())
+        self.assertIn('TIMEOUT_DETAIL', err.getvalue())
+
 
     def test_native_bad_fixture_is_removed_after_interrupted_check(self):
         native = native_runner()
@@ -693,9 +725,12 @@ class Core(unittest.TestCase):
         codex.yolo(True)
         codex.yolo(False)
         original = (codex.home() / 'config.toml').read_bytes()
-        with patch('maa.install.require_container'), patch('maa.install.subprocess.run') as installer:
+        with patch('maa.install.require_container'), \
+             patch('maa.install.run', return_value=subprocess.CompletedProcess([], 0)) as installer:
             component('codex')
         self.assertEqual(installer.call_count, 2)
+        self.assertNotIn('native', installer.call_args_list[0].kwargs)
+        self.assertTrue(installer.call_args_list[1].kwargs['native'])
         self.assertEqual((codex.home() / 'config.toml').read_bytes(), original)
         self.assertEqual(codex.yolo_state(), {'enabled': False, 'managed': False})
 

@@ -11,7 +11,7 @@ from .backends import (binary, llama_arguments, llama_endpoint, llama_observe,
                        ollama_capabilities, check_options, ollama_environment,
                        ollama_endpoint, ollama_prepare, ollama_observe)
 from .http import request
-from .output import stage, native_output
+from .output import stage, run, diagnostic
 from .store import Error, atomic, read, write
 
 UNITS = {'ollama': 'ollama.service', 'llamacpp': 'llama-server.service'}
@@ -22,10 +22,7 @@ def fingerprint(target):
 
 
 def privileged(command, **kwargs):
-    if kwargs.get('capture_output') or (kwargs.get('stdout') is not None and kwargs.get('stderr') is not None):
-        return subprocess.run(([] if os.geteuid() == 0 else ['sudo']) + command, check=True, **kwargs)
-    with native_output():
-        return subprocess.run(([] if os.geteuid() == 0 else ['sudo']) + command, check=True, **kwargs)
+    return run(([] if os.geteuid() == 0 else ['sudo']) + command, check=True, **kwargs)
 
 
 def escaped(value):
@@ -148,9 +145,7 @@ class Controller:
                 self.model_backup = None
             except Error:
                 # An unused manifest is harmless; the accepted runtime is valid.
-                import sys
-                with native_output():
-                    print('Unused rollback manifest retained; native model configuration is committed.', file=sys.stderr)
+                diagnostic('Unused rollback manifest retained; native model configuration is committed.\n')
 
     def prepare(self, target):
         """Only official backend executables and curl run at boot."""

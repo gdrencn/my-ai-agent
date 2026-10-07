@@ -13,7 +13,7 @@ from .backends import binary, ollama_endpoint, ollama_environment, wait_api, sto
 from .gguf import metadata
 from .http import request
 from .store import Error, identity, read
-from .output import stage, native_output
+from .output import stage, run
 
 
 def file_identity(path):
@@ -157,8 +157,7 @@ def ollama_install(store, name, gguf=None):
     else:
         cmd = [binary('ollama'), 'pull', name]
     stage('执行 Ollama 原生下载 / 导入')
-    with native_output():
-        subprocess.run(cmd, check=True, env=ollama_environment())
+    run(cmd, native=True, check=True, env=ollama_environment())
     return name if ':' in name else name + ':latest'
 
 
@@ -250,8 +249,7 @@ def _hf_files(folder, names, repo, commit, files, headers):
         if config:
             cmd[1:1] = ['--config', '-']
         stage('下载 GGUF：' + name)
-        with native_output():
-            completed = subprocess.run(cmd, input=config, text=True)
+        completed = run(cmd, native=True, input=config, text=True)
         if completed.returncode:
             raise Error(f'HF download failed (curl {completed.returncode}); partial retained for retry: {partial}')
         if partial.stat().st_size == 0 or (size is not None and partial.stat().st_size != size):

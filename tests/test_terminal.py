@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 import pty
+import re
 import select
 import struct
 import subprocess
@@ -12,6 +13,27 @@ import fcntl
 
 
 class Terminal(unittest.TestCase):
+    def visible_lines(self, output):
+        """Replay the controls used by Progress; retain committed terminal rows."""
+        rows, line, cursor = [], [], 0
+        for token in re.findall(r'\x1b\[[0-9;?]*[A-Za-z]|[^\x1b]', output):
+            if token == '\x1b[2K':
+                line = []
+            elif token.startswith('\x1b'):
+                continue
+            elif token == '\r':
+                cursor = 0
+            elif token == '\n':
+                rows.append(''.join(line))
+                line, cursor = [], 0
+            else:
+                if cursor < len(line):
+                    line[cursor] = token
+                else:
+                    line.append(token)
+                cursor += 1
+        return rows + ([''.join(line)] if line else [])
+
     def session(self, operation, keys, marker, size=(12, 32)):
         pid, fd = pty.fork()
         if pid == 0:
@@ -72,7 +94,7 @@ class Terminal(unittest.TestCase):
         operation = ("import time\nfrom maa.output import operation, stage, native_output\n"
                      "with operation('加载模型'):\n"
                      " stage('准备')\n time.sleep(1.2)\n"
-                     " with native_output():\n  print('NATIVE_DOWNLOAD', flush=True)\n"
+                     " with native_output() as output:\n  output.write('NATIVE_DOWNLOAD\\n')\n"
                      " stage('核验')\n time.sleep(1.1)\n")
         output = self.session(operation, b'', '加载模型', (12, 60))
         self.assertIn('已等待 1.', output)
@@ -192,8 +214,91 @@ class Terminal(unittest.TestCase):
                      " with patch('maa.service.os.geteuid',return_value=0):\n"
                      "  privileged([sys.executable,'-c',\"import sys;print('NATIVE_STDERR',file=sys.stderr,flush=True)\"])\n")
         output = self.session(operation, b'', 'NATIVE_BOUNDARY', (12, 100))
-        self.assertIn('\nNATIVE_STDERR', output)
+        self.assertEqual(self.visible_lines(output)[0], 'NATIVE_STDERR')
+        self.assertEqual(len(self.visible_lines(output)), 2)
         self.assertNotIn('秒NATIVE_STDERR', output)
+
+    def test_silent_commands_keep_timer_and_leave_only_final_row(self):
+        operation = ("import sys\nfrom unittest.mock import patch\n"
+                     "from maa.output import operation,stage\nfrom maa.service import privileged\n"
+                     "with operation('SILENT_COMMANDS'),patch('maa.service.os.geteuid',return_value=0):\n"
+                     " stage('停止原底座')\n"
+                     " privileged([sys.executable,'-c','import time;time.sleep(1.2)'])\n"
+                     " stage('准备模型配置')\n"
+                     " for _ in range(3):\n  privileged([sys.executable,'-c','pass'])\n")
+        output = self.session(operation, b'', 'SILENT_COMMANDS', (12, 120))
+        self.assertIn('已等待 1.', output.split('准备模型配置', 1)[0])
+        rows = self.visible_lines(output)
+        self.assertEqual(len(rows), 1, rows)
+        self.assertTrue(rows[0].startswith('[成功] SILENT_COMMANDS：准备模型配置'), rows)
+
+    def test_command_failure_preserves_diagnostic_and_final_row(self):
+        operation = ("import sys,subprocess\nfrom maa.output import operation,run\n"
+                     "try:\n with operation('FAILED_COMMAND'):\n"
+                     "  run([sys.executable,'-c',\"import sys;print('NATIVE_FAILURE',file=sys.stderr);sys.exit(7)\"],check=True)\n"
+                     "except subprocess.CalledProcessError as exc:\n assert exc.returncode==7\n")
+        output = self.session(operation, b'', 'FAILED_COMMAND', (12, 120))
+        rows = self.visible_lines(output)
+        self.assertEqual(len(rows), 2, rows)
+        self.assertEqual(rows[0], 'NATIVE_FAILURE')
+        self.assertTrue(rows[1].startswith('[失败] FAILED_COMMAND'), rows)
+
+    def test_native_output_preserves_terminal_and_line_endings(self):
+        for ending in ('', '\\n'):
+            with self.subTest(ending=ending):
+                script = "import sys;assert sys.stdout.isatty() and sys.stderr.isatty();sys.stderr.write('NATIVE_TEXT" + ending + "');sys.stderr.flush()"
+                operation = ("import sys\nfrom maa.output import operation,run\n"
+                             "with operation('NATIVE_LINES'):\n"
+                             f" run([sys.executable,'-c',{script!r}],native=True,check=True)\n")
+                output = self.session(operation, b'', 'NATIVE_LINES', (12, 120))
+                rows = self.visible_lines(output)
+                self.assertEqual(len(rows), 2, rows)
+                self.assertEqual(rows[0], 'NATIVE_TEXT')
+                self.assertTrue(rows[1].startswith('[成功] NATIVE_LINES'), rows)
+
+    def test_silent_native_command_continues_timer(self):
+        operation = ("import sys\nfrom maa.output import operation,run\n"
+                     "with operation('SILENT_NATIVE'):\n"
+                     " run([sys.executable,'-c','import time;time.sleep(1.2)'],native=True,check=True)\n")
+        output = self.session(operation, b'', 'SILENT_NATIVE', (12, 120))
+        self.assertIn('已等待 1.', output)
+        self.assertEqual(len(self.visible_lines(output)), 1)
+
+    def test_native_live_utf8_and_progress_are_forwarded(self):
+        script = ("import os,sys,time;data='原生下载'.encode();os.write(2,data[:2]);time.sleep(.1);"
+                  "os.write(2,data[2:]);sys.stderr.write(' 1%\\r原生下载 100%\\n\\x1b[?2');sys.stderr.flush();"
+                  "time.sleep(.1);sys.stderr.write('5h');sys.stderr.flush()")
+        operation = ("import sys\nfrom maa.output import operation,run\n"
+                     "with operation('NATIVE_UTF8'):\n"
+                     f" run([sys.executable,'-c',{script!r}],native=True,check=True)\n")
+        output = self.session(operation, b'', 'NATIVE_UTF8', (12, 120))
+        self.assertNotIn('\ufffd', output)
+        self.assertIn('原生下载 1%', output)
+        rows = self.visible_lines(output)
+        self.assertEqual(len(rows), 2, rows)
+        self.assertEqual(rows[0], '原生下载 100%')
+
+    def test_native_interrupt_restores_output_and_cursor(self):
+        operation = ("import sys\nfrom maa.output import operation,run\n"
+                     "try:\n with operation('NATIVE_INTERRUPT'):\n"
+                     "  run([sys.executable,'-c',\"import time;print('NATIVE_READY',flush=True);time.sleep(60)\"],native=True,check=True)\n"
+                     "except KeyboardInterrupt:\n print('INTERRUPTED')\n")
+        output = self.session(operation, b'\x03', 'NATIVE_READY', (12, 120))
+        self.assertIn('[中断] NATIVE_INTERRUPT', output)
+        self.assertIn('INTERRUPTED', output)
+
+    def test_command_progress_returns_to_menu_without_old_rows(self):
+        operation = ("import sys\nfrom maa.output import operation,run\n"
+                     "def work(ui):\n ui.choose('BEFORE_COMMAND', [('go','执行')])\n"
+                     " with operation('MENU_COMMAND'):\n"
+                     "  for _ in range(3):\n   run([sys.executable,'-c','pass'],check=True)\n"
+                     " ui.choose('AFTER_COMMAND',[('back','返回')])\n"
+                     "interactive(work)\n")
+        output = self.session(operation, b'\r\r', 'BEFORE_COMMAND', (16, 120))
+        self.assertIn('AFTER_COMMAND', output)
+        command_area = output.split('[进行中] MENU_COMMAND', 1)[1].split('AFTER_COMMAND', 1)[0]
+        rows = self.visible_lines(command_area)
+        self.assertFalse(any('[进行中]' in row for row in rows), rows)
 
     def test_unavailable_mtp_activation_is_inert(self):
         operation = ("from maa.ui import edit_settings\nfrom maa.settings import settings\n"

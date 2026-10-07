@@ -1,6 +1,21 @@
-# my-ai-agent Implementation — 0.1.8 test
+# my-ai-agent Implementation — 0.1.9 test
 
-## 0.1.8 verification
+## 0.1.9 shared output verification
+
+Verified all six authorized output requirements against the implementation on 2026-10-07. All 90 source portable/PTY checks and 90 paired-package checks outside the checkout passed. Fresh ordinary-user and root mas containers each passed 90 portable/PTY and 35 native checks against the final product/test bytes. Eight additional real-terminal installed-command checks passed. Immutable 0.1.9 test is ready for publication; stable requires user acceptance.
+
+| Output requirement | Implementation and evidence |
+| --- | --- |
+| Shared command boundary | output.run centralizes terminal-facing command execution, buffering normal diagnostics or forwarding native progress. privileged only adds sudo. Official installer curl/sh, Ollama pull/create and HF curl use the common entry; notices use the same writer. |
+| One active progress row | Silent commands never commit the temporary row or add blank lines. The timer remains active during normal commands and before a native command emits output. PTYs verify consecutive commands and retained rows, instead of merely checking control-sequence counts. |
+| Actual diagnostics | The shared writer erases the active row when real output exists, retains diagnostics and adds only a missing line ending before resuming the same timer. Failure/timeout diagnostics remain available. Captured results are not printed. |
+| Native progress | Native terminal commands receive a PTY and stream output live; nonterminal commands use a pipe. Incremental decoding preserves split UTF-8, and line-boundary tracking handles split terminal controls. Real Ollama pull, HF curl transfer and the official Codex installer retain their native output. |
+| Exit and stream contracts | Progress/diagnostics use stderr and stdout JSON stays parseable. Nonterminal progress has no ANSI or repeated ticks. Real PTYs cover native interruption and cursor/input-mode restoration; existing transaction and 130 checks remain passing. Native readers terminate before the command returns. |
+| Native flow acceptance | Actual Ollama selection/reconfiguration, llama.cpp selection, two pauses, official Codex update, Ollama pull and HF download each leave exactly one final success row and no old in-progress rows. The real Codex update retains the native MainPID/InvocationID. |
+
+Receipts: validation/V0_1_9_LOCAL.json, V0_1_9_NATIVE.json, V0_1_9_ROOT_NATIVE.json and V0_1_9_TERMINAL.json. The native suites use small models; this release does not claim large Qwen3.8/MTP performance acceptance. Earlier progress coverage missed the silent-command defect reported by the user; 0.1.9 explicitly verifies that case.
+
+## Historical 0.1.8 verification
 
 Verified the seven authorized requirements against source on 2026-10-07. All 81 source portable/PTY checks, 81 paired-package checks outside the checkout, and 81 portable plus 35 native checks in each ordinary-user/root mas container passed. The same final product/test bytes were verified in both containers. Real official Codex update preserves disabled YOLO and the native instance; three container reboot checks use native autostart and real Codex with the installed manager archive absent. Immutable 0.1.8 test is published and verified through its public entries; stable requires user acceptance.
 
@@ -14,7 +29,7 @@ Verified the seven authorized requirements against source on 2026-10-07. All 81 
 | Model disambiguation | Collision labels include the source/path/revision; focus details retain full HF relative paths, fixed revisions and local absolute paths. Shared choice formatting and a real 32-column PTY verify current focus and same-basename distinctions. |
 | First-install YOLO | Product installation records successful initialization; existing archive/entries/model state/recovery records count as upgrades. Only first installation applies YOLO defaults. Product reinstall/update and the official Codex component preserve the user's current keys and backup. Private-home tests cover on/off, old state without archive and original recovery bytes. |
 
-Historical releases and their evidence remain immutable in Git and validation/. The architecture below incorporates the previously verified one-shot/direct-connection behavior and the 0.1.8 changes above.
+Historical releases and their evidence remain immutable in Git and validation/. The architecture below incorporates the previously verified one-shot/direct-connection behavior and the 0.1.8/0.1.9 changes above.
 
 ## Current architecture
 
@@ -36,13 +51,13 @@ maa is a one-shot installation/configuration tool. There is no maa daemon or Res
 | Codex profile | Actual context and floor(context × 90%) compaction; reasoning omitted by default or passed unchanged. No global permission/web_search override. Native capabilities determine reasoning, namespace and hosted-search support. The catalog omits custom/freeform apply_patch; normal shell editing remains available. |
 | Global YOLO | Only approval_policy and sandbox_mode. First enable saves existence and original TOML values; repeat-enable keeps the backup; disable restores/deletes exactly those two keys. Comments, multiline values, dates and unrelated later edits survive. Private-home and real-container tests verify recovery. |
 | Menu and presentation | Main order: local models, Codex configuration (YOLO), codex-local configuration, installation, About, exit. Current model/state at top; lightweight native summary skips log/GPU parsing. Backend/model defaults follow the current target, which is marked; wrapped focus details distinguish filenames/sources. Readonly and unavailable-MTP activation stays inside the prompt without recreating the menu. Paused/idle Codex context uses a clearly marked saved verification value; unavailable request statistics are consolidated in menu output. Grouped navigation and focus preserved. Values/status have the agreed colors, pending edits and explicit apply/cancel. NO_COLOR, narrow terminals and actual PTYs covered. |
-| Progress | Immediate stderr status, one terminal line updated with phase/elapsed time; native installer/download and uncaptured privileged-command output retain ownership, including systemctl diagnostics; timers and command diagnostics do not concatenate. Failure/recovery remains in the same timer. Redirected stdout stays parseable JSON, without ANSI or repeated ticks. |
+| Progress | output.run owns terminal-facing commands and output coordination. Silent commands retain the single active timer row; actual diagnostics clear that row, remain in history and end only as needed. Native downloads/installers stream through PTY/pipe with correct decoding. Failure/recovery stays in the same timer. Redirected stdout stays parseable JSON, without progress ANSI or repeated ticks. Retained-row tests and installed-command PTYs verify the 0.1.8 silent-handoff defect is fixed. |
 | Native status | Separate read-only Ollama /api/ps and llama.cpp /props observers. Native InvocationID plus current-load log boundary isolate buffers. Read at most 4 MiB; exclude fit probes/old loads, replace repeated buffers and distinguish main/MTP/RS/Host allocations. Missing values remain unknown; pause/idle hides old allocations. |
 | GPU memory | Driver total/used/free/reserved per NVIDIA GPU with bounded queries and older-NVML fallback. Identified native allocations do not claim complete process VRAM; CPU_Mapped is mapping and CUDA_Host is host memory. |
 | Token statistics | Removed the bridge usage recorder. Old usage.json is ignored. Recent input/output/time fields are unavailable through current read-only native status APIs and remain null with one menu explanation; saved_context is separate from actual context. No conversation interception or fabricated counters. |
 | Packaging | Deterministic product/test zipapps, paired numeric version and SHA256SUMS, pinned tomlkit license/provenance. Product excludes tests/docs/evidence/bridge. Tester includes only required test modules, native runner and Codex test fixtures. |
 
-## 0.1.8 evidence
+## Historical 0.1.8 evidence
 
 - 81 source and 81 paired portable/PTY checks; both ordinary-user and root containers run the same final tester/product pair with 81 portable and 35 native checks, no skips. Reproducible builds, Python 3.11 grammar for all 40 product/test Python files, shell syntax and product package boundaries passed.
 - Native checks cover each backend's Responses, function call/result replay, real Codex and /model, manager removal, read-only model status, reasoning-only configuration without reload, resident/idle reuse, pause/start, failed-load rollback and fixture cleanup. New native checks verify unchanged Ollama registry bytes/mtime and native PID, persistence of YOLO off during product reinstall, and restoration of the accepted native backend after an injected persisted candidate. Persisted-state injection is distinguished from forcibly killing a live process.
