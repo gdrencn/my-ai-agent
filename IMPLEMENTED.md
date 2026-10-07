@@ -1,6 +1,6 @@
-# my-ai-agent Implementation — 0.1.4 test
+# my-ai-agent Implementation — 0.1.5 test
 
-Verified against REQUIREMENTS.md on 2026-10-06 (America/Chicago). Test publication is authorized; stable requires user acceptance. Historical releases and their evidence remain immutable in Git and validation/.
+Verified against REQUIREMENTS.md on 2026-10-06 (America/Chicago). 0.1.5 corrects a test-only directory enumeration order assertion exposed by GitHub CI; native runtime behavior is unchanged from 0.1.4. Test publication is authorized; stable requires user acceptance. Historical releases and their evidence remain immutable in Git and validation/.
 
 ## Current architecture
 
@@ -32,10 +32,10 @@ maa is a one-shot installation/configuration tool. There is no maa daemon or Res
 
 - 44 source portable/PTY checks and 44 paired-package checks outside the checkout, no skips.
 - 28 native acceptance checks in an ordinary-user disposable mas container: exact HF GGUF, native Ollama pull, two native APIs/tool replay paths, real Codex and /model, independent archive removal, native status, resident/idle reuse, pause/start, failed-load rollback, cleanup and YOLO restore.
-- Actual root official installation and active 0.1.3 llama.cpp migration; ordinary-user paused 0.1.3 Ollama migration. YOLO recovery backup hashes remain unchanged.
-- Both backends autostart from pause after container restart and serve real Codex while maa.pyz is absent. These additional root/ordinary-user checks are separate from the paired native runner.
+- Inherited from the byte-identical 0.1.4 runtime (only the product version constant changed): actual root official installation and active 0.1.3 llama.cpp migration; ordinary-user paused 0.1.3 Ollama migration. YOLO recovery backup hashes remain unchanged.
+- The same inherited architecture checks verify that both backends autostart from pause after container restart and serve real Codex while maa.pyz is absent. These additional root/ordinary-user checks are separate from the paired native runner.
 - Software: Ubuntu 26.04.1, Python 3.14.4, Ollama 0.40.0, llama app b11429, Codex 0.160.1. Native suite uses Qwen3-0.6B-Q4_K_M.gguf and qwen2.5:3b; extra reasoning probes use qwen3:0.6b and the Qwen3 GGUF.
-- Frozen hashes and receipts are in validation/V0_1_4_LOCAL.json and V0_1_4_NATIVE.json. Public asset verification is recorded separately after publication.
+- Frozen hashes and receipts are in validation/V0_1_5_LOCAL.json and V0_1_5_NATIVE.json. Public asset verification is recorded separately after publication.
 
 ## Limits
 

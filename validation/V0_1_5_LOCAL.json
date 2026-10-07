@@ -1,0 +1,123 @@
+{
+  "version": "0.1.5",
+  "at": "2026-10-07T02:19:52.405258+00:00",
+  "status": "passed",
+  "asset_sha256": {
+    "maa.pyz": "35af3ca471bdd712af26a9dee12df44eb4145b394582a1750adb997ab6d83013",
+    "maa-test.pyz": "a5c1cff7d565450dbf2569804cbef9c2921307941664bb66c2835bf4dfa9a763",
+    "VERSION.json": "55ea891d8531bda44ccf145b02d0fcef481665c160b6080757e1e93a0475aa73",
+    "bootstrap.py": "29be87f1d96b102eead25f33edf77f37affda5bec710420c6eda11e2f4a7ed6b",
+    "install.sh": "71833da669c112156534c33feefc8f981e0bdd583cf9c0a3c55ee838bd1a45cf",
+    "SHA256SUMS": "6e24a731fb19381f2a632f76973a124a64c91395884a29d0c1bfd7f621f3ce5c"
+  },
+  "portable": {
+    "source_tests": 44,
+    "packaged_tests_outside_checkout": 44,
+    "container_packaged_tests": 44,
+    "skipped": 0
+  },
+  "build": {
+    "reproducible": true,
+    "python_3_11_grammar": 43,
+    "shell_syntax": true,
+    "package_boundaries": true
+  },
+  "native": {
+    "checks": 28,
+    "receipt": "V0_1_5_NATIVE.json",
+    "program_sha256": "35af3ca471bdd712af26a9dee12df44eb4145b394582a1750adb997ab6d83013"
+  },
+  "ci": {
+    "conclusion": "success",
+    "commit": "8ac1c3a3f5d7952f7e29ecd84c3156c82f02e7de",
+    "run": "https://github.com/gdrencn/my-ai-agent/actions/runs/37561170195"
+  },
+  "change_from_0_1_4": {
+    "product_files_changed": [
+      "maa/__init__.py"
+    ],
+    "product_runtime_byte_identical": true,
+    "tester_correction": "assertCountEqual for directory entries; no dependency on filesystem enumeration order",
+    "immutable_0_1_4_assets_retained": true
+  },
+  "inherited_architecture_checks": {
+    "receipt": "V0_1_4_LOCAL.json",
+    "migration": {
+      "from": "immutable v0.1.3",
+      "root_active_llamacpp": {
+        "selection_preserved": true,
+        "running_restored": true,
+        "legacy_service_removed": true,
+        "yolo_backup_hash_unchanged": true
+      },
+      "ordinary_paused_ollama": {
+        "selection_preserved": true,
+        "paused_restored": true,
+        "legacy_service_removed": true,
+        "yolo_backup_hash_unchanged": true
+      },
+      "phase": "0.1.4 development artifact before final whitespace cleanup; final frozen native transactions and independent entrypoints separately verified"
+    },
+    "boot_without_manager": [
+      {
+        "backend": "llamacpp",
+        "uid": 0,
+        "archive_absent": true,
+        "paused_target_autostarted": true,
+        "new_native_invocation": true,
+        "legacy_service_absent": true,
+        "codex_direct_output": "Hello! What's your name?\n"
+      },
+      {
+        "backend": "ollama",
+        "uid": 1001,
+        "archive_absent": true,
+        "paused_target_autostarted": true,
+        "new_native_invocation": true,
+        "legacy_service_absent": true,
+        "codex_direct_output": "hello\n"
+      }
+    ],
+    "native_reasoning_streams": [
+      {
+        "backend": "llamacpp",
+        "model": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+        "native_reasoning_closed_before_text": false,
+        "stream_and_completed_text_identical": true,
+        "text": "Hello",
+        "events": 139,
+        "reasoning_event_types": [
+          "response.reasoning_text.delta"
+        ]
+      },
+      {
+        "backend": "ollama",
+        "model": "qwen3:0.6b",
+        "native_reasoning_closed_before_text": true,
+        "stream_and_completed_text_identical": true,
+        "text": "Hi!",
+        "events": 121
+      }
+    ]
+  },
+  "limitations": [
+    "No full custom/freeform apply_patch compatibility; catalog retains ordinary shell tools",
+    "No native MTP or recurrent-model inference acceptance",
+    "No qwen3.8 large-model reproduction or partial-offload performance claim",
+    "No conversation interceptor or recent token receipts",
+    "Forced termination during configuration may leave native autostart disabled; maa start revalidates saved target"
+  ],
+  "preliminary_failure": {
+    "model": "ollama qwen3:0.6b",
+    "check": "ollama-codex-cli",
+    "result": "exit 0 with thinking but no final body; recorded as failed",
+    "failed_receipt_started": "2026-10-07T01:59:32.777638+00:00",
+    "resolution": "No product output patch; native suite uses qwen2.5:3b. Other qwen3 runs and its direct reasoning stream produced body text."
+  },
+  "cleanup": {
+    "invalid_test_fixture_removed": true,
+    "selected_target_paused": true,
+    "container": "maa-public-014",
+    "retained_for": "public release installer verification; final deletion is recorded in V0_1_5_PUBLIC.json"
+  }
+}

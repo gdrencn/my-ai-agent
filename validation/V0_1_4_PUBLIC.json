@@ -1,0 +1,30 @@
+{
+  "version": "0.1.4",
+  "at": "2026-10-07T02:16:09.626823+00:00",
+  "release": "https://github.com/gdrencn/my-ai-agent/releases/tag/v0.1.4",
+  "assets_match_local": true,
+  "product_and_validation_manifests_verified": true,
+  "asset_sha256": {
+    "VERSION.json": "830dbb76e58e390b78d95dbdc5b64a4a366a2d2b2e2eba64f79126db3671fa6a",
+    "VALIDATION_SHA256SUMS": "8d20118513065dfe88e458ce6fba0d4892e22e8a63d7141126b673953b46877a",
+    "V0_1_4_NATIVE.json": "eb62456af2bee578cca34f674c5e45173a300879f505e446476d3d591e663b72",
+    "V0_1_4_LOCAL.json": "8c40cb3881e5cf99d18a65622db60c7beb3196104816c4ba810aad08cd2bbeaf",
+    "bootstrap.py": "29be87f1d96b102eead25f33edf77f37affda5bec710420c6eda11e2f4a7ed6b",
+    "install.sh": "71833da669c112156534c33feefc8f981e0bdd583cf9c0a3c55ee838bd1a45cf",
+    "SHA256SUMS": "fe28959efa7360471c554828e57220249e03e8dbae37b4c4ac5e6104c80383d3",
+    "maa.pyz": "2c68badb463a3b086b4093d4ba8f830b88da0f1cec2dfc787d0cad613bac0a9c",
+    "maa-test.pyz": "bcb88b158c8f0b0b2cc7dfd4a335e38d08509939164fdda51a2c59604cec4fec"
+  },
+  "public_install_inside_mas": {
+    "passed": true,
+    "components": "none",
+    "installed_version": "0.1.4"
+  },
+  "ci": {
+    "conclusion": "failed",
+    "reason": "Test incorrectly assumed filesystem directory enumeration order; product runtime unaffected",
+    "run": "https://github.com/gdrencn/my-ai-agent/actions/runs/37560969204",
+    "correction": "Tests use assertCountEqual; corrected immutable payload released as 0.1.5"
+  },
+  "superseded_by": "0.1.5 test"
+}

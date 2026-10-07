@@ -1,4 +1,4 @@
-# my-ai-agent Requirements — 0.1.4 test
+# my-ai-agent Requirements — 0.1.5 test
 
 ## 0.1.4 standalone tools and native direct connections
 
@@ -11,7 +11,7 @@
 5. 保留配置默认值、KV 跟随、YOLO 两键恢复、菜单颜色与操作计时。主菜单“Codex 配置”管理 YOLO，排在“codex-local 配置”之前；后者管理本地推理与上下文配置。HF 仍保留仓库和精确文件两项。
 6. 原生状态查询分别读取底座 API 和当前原生日志，日志与启动身份由原生服务确定。删除对 maa 对话中转收据的依赖；直连后无法可靠取得的统计显示未取得并说明来源，不能伪造旧数据或引入后台监听。
 7. 从旧版本迁移时仅清理可核验属于 maa 的旧服务和入口；保留模型、每模型配置、普通 Codex 配置和 YOLO 恢复备份。迁移失败给出明确诊断，不覆盖不属于项目的文件或服务。
-8. 在独立 mas 容器验证安装、原生直连、立即切换、回滚、暂停与重启自启动、maa 运行依赖移除、独立启动脚本、终端导航和可重现打包。记录原生限制；另发不可变 0.1.4 test，stable 仍需用户验收。
+8. 在独立 mas 容器验证安装、原生直连、立即切换、回滚、暂停与重启自启动、maa 运行依赖移除、独立启动脚本、终端导航和可重现打包。记录原生限制；另发不可变 0.1.5 test，stable 仍需用户验收。
 
 自动压缩比例固定 90%，不添加未确认的比例修改入口。旧版本的需求与实现记录保留在 Git 历史和 validation 收据中。实现及验证见 IMPLEMENTED.md。
 
@@ -91,7 +91,7 @@ llama.cpp 固定一个本地 agent 推理槽，保证 llama.cpp 的上下文设�
 5. 核验 YOLO 两键恢复、重复开启、无关 TOML 保留、跨进程备份。
 6. 核验本地 Responses 对话、流式、工具调用及 context/90% 同步。
 7. PTY 验证导航、输入编辑、窄终端、取消和终端恢复；结构化输出无控制码。
-8. 可重现构建、校验和、包边界、安装版本；不可变 v0.1.4 GitHub prerelease，回下载比较字节。stable 等待用户验收。
+8. 可重现构建、校验和、包边界、安装版本；不可变 v0.1.5 GitHub prerelease，回下载比较字节。stable 等待用户验收。
 9. IMPLEMENTED.md 区分 portable/native/fault-injected/user-reported 证据，不宣称未实测的大模型/GPU/MTP 结果。
 
 ## Official references
@@ -119,3 +119,5 @@ llama.cpp 固定一个本地 agent 推理槽，保证 llama.cpp 的上下文设�
 状态按底座分别采集：Ollama /api/ps，llama.cpp /props。只读查询不推理、不调用会唤醒的 /slots、不启停服务。当前原生启动 InvocationID 与当前真实加载日志决定分配记录；日志最多读取 4 MiB，排除 fit 试算与旧加载，重复记录替换，不重复合计。
 
 依次显示底座、模型、状态、GPU 层装载、权重、主 KV、RS、计算/输出缓冲区、MTP 额外 KV/计算、已识别显存分配合计、整卡显存、有效上下文、请求统计未取得原因、刷新/返回。CPU_Mapped 为映射而非 RSS，CUDA_Host 为系统内存，MTP 共享 KV 不重复计数。没有 MTP 显示不可用；独立 MTP 权重和实时 KV token 占用不提供。分项不能冒充完整进程占用。NVIDIA 驱动分别读取总量/已用/可用/预留；未知保留未知，不填 0 或推导可用量。暂停/空闲/加载不展示旧分项。
+
+0.1.5 修正 portable 测试对目录枚举顺序的错误依赖；产品行为沿用 0.1.4。不得覆盖已发布 0.1.4 的资产。

@@ -2,7 +2,7 @@
 
 在 **my-ai-sandbox（mas）容器内**安装并管理 Ollama、llama.cpp 和 Codex CLI。
 
-当前版本：**0.1.4 test**。两种底座可共存，通过 `maa` 选择一个当前底座和模型，并同步 `codex-local`。
+当前版本：**0.1.5 test**。两种底座可共存，通过 `maa` 选择一个当前底座和模型，并同步 `codex-local`。
 
 ## Install
 
