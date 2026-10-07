@@ -12,7 +12,7 @@ from urllib.parse import quote
 from .backends import binary, ollama_endpoint, ollama_environment, wait_api, stop_process
 from .gguf import metadata
 from .http import request
-from .store import Error, identity
+from .store import Error, identity, read
 from .output import stage, native_output
 
 
@@ -99,29 +99,42 @@ def ollama_session(log, values=None):
             stop_process(process)
 
 
-def ollama_inventory(store):
+def ollama_inventory(store, name=None):
     stage('读取 Ollama 原生模型清单')
     rows = request(ollama_endpoint() + '/api/tags')['models']
+    if name is not None:
+        rows = [row for row in rows if row['name'] == name]
+    registered = store.models()
+    originals = read(store.path('ollama-originals.json'), {})
     result = []
     for row in rows:
-        name = row['name']
-        if re.fullmatch(r'maa-(?:(?:source-)?[0-9a-f]{24}|rollback-[0-9a-f]{32}):latest', name):
+        model_name = row['name']
+        if re.fullmatch(r'maa-(?:(?:source-)?[0-9a-f]{24}|rollback-[0-9a-f]{32}):latest', model_name):
             continue  # Private adaptation aliases are not user model choices.
-        info = request(ollama_endpoint() + '/api/show', {'model': name}, timeout=60)
+        origin = originals.get(model_name)
+        managed = origin and row.get('digest') in (origin['digest'], origin.get('configured_digest'))
+        digest = origin['digest'] if managed else row.get('digest')
+        key = identity('ollama', model_name + '@' + str(digest))
+        cached = registered.get(key)
+        if (row.get('digest') and cached and cached.get('backend') == 'ollama'
+                and cached.get('name') == model_name and cached.get('digest') == digest
+                and isinstance(cached.get('metadata'), dict) and type(cached.get('mtp_supported')) is bool
+                and isinstance(cached.get('capabilities'), list)):
+            # A tracked configured manifest changes parameters, not weights or
+            # architecture. Untracked digests receive a new identity and show.
+            result.append(cached)
+            continue
+        info = request(ollama_endpoint() + '/api/show', {'model': model_name}, timeout=60)
         data = info.get('model_info', {})
         arch = data.get('general.architecture', '')
         tensors = info.get('tensors', [])
         mtp = bool(data.get(arch + '.nextn_predict_layers', 0) or
                    (arch in ('qwen35', 'qwen35moe') and any(t.get('name', '').startswith('mtp.') for t in tensors)))
-        from .store import read
-        origin = read(store.path('ollama-originals.json'), {}).get(name)
-        managed = origin and row.get('digest') in (origin['digest'], origin.get('configured_digest'))
-        digest = origin['digest'] if managed else row.get('digest')
-        model = {'key': identity('ollama', name + '@' + str(digest)), 'backend': 'ollama', 'name': name,
+        model = {'key': key, 'backend': 'ollama', 'name': model_name,
                  'digest': digest, 'metadata': data, 'mtp_supported': mtp,
                  'source': 'ollama', 'capabilities': info.get('capabilities', [])}
-        store.register(model)
         result.append(model)
+    store.register_many(result)
     return result
 
 

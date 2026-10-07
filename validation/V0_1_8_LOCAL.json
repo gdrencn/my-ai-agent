@@ -1,0 +1,54 @@
+{
+  "version": "0.1.8",
+  "status": "passed",
+  "at": "2026-10-07T09:17:41.317566+00:00",
+  "asset_sha256": {
+    "maa-test.pyz": "d6b4701c862cae99fc469127606b061ed3857e3c0e5df2817353f32b8057b1b1",
+    "bootstrap.py": "29be87f1d96b102eead25f33edf77f37affda5bec710420c6eda11e2f4a7ed6b",
+    "maa.pyz": "46ccec1b00606b6d7e8a11f6525903e8d9ab48ea9e15d2b5f8201107042050f4",
+    "SHA256SUMS": "5f6ae0d05477f275c09cf9b10996da328ecdc1f6fb59a31743659fde6d8405f5",
+    "PUBLIC_SHA256SUMS": "41a92ae1da011adb2b4cf3aea44e326934a4e0675b1cf04dd8d2263f4040b98e",
+    "VERSION.json": "08419671efd36d649bb05efeaaaba4609f4c6fbc9ebd69aa0a999314729a57cf",
+    "VALIDATION_SHA256SUMS": "58e66d91bdd3a0430e84ba0fe4ec3d15352a8937003f5800106265eabaa4ffcb",
+    "install.sh": "71833da669c112156534c33feefc8f981e0bdd583cf9c0a3c55ee838bd1a45cf"
+  },
+  "portable": {
+    "source": 81,
+    "paired_outside_checkout": 81,
+    "ordinary_user_container": 81,
+    "root_container": 81,
+    "skipped": 0
+  },
+  "build": {
+    "reproducible": true,
+    "python_3_11_grammar_files": 40,
+    "shell_syntax": true,
+    "package_boundaries": true
+  },
+  "native": {
+    "ordinary_user_checks": 35,
+    "root_checks": 35,
+    "receipts": [
+      "V0_1_8_NATIVE.json",
+      "V0_1_8_ROOT_NATIVE.json"
+    ],
+    "official_codex_update": "V0_1_8_UPGRADE.json",
+    "independent_autostart": "V0_1_8_AUTOSTART.json"
+  },
+  "fault_injected": [
+    "uncommitted candidate and same-target pending recovery",
+    "no resident model cannot reuse saved context",
+    "maintenance Ctrl+C at stop/body/restore and failed restoration keeps 130",
+    "installation preflight and exact file/mode rollback",
+    "first-install-only YOLO with original recovery bytes preserved",
+    "digest reuse and unknown replacement refresh",
+    "batched registry update"
+  ],
+  "native_installation_note": "Official dependencies were installed in clean disposable containers; final pair reinstalled and fully checked against those installations.",
+  "limitations": [
+    "No native large-model/MTP acceptance",
+    "No guarantee of automatic recovery after SIGKILL/power loss",
+    "Official dependency installer changes are not rolled back"
+  ],
+  "test_baseline": "Native tester explicitly enables YOLO for tool checks; installer preserves existing user settings."
+}

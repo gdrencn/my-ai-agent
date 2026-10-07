@@ -83,12 +83,13 @@ class Manager:
         try:
             stage('准备底座服务')
             self.controller.ensure()
+            write(self.store.path('pending.json'), target)
             self.controller.begin()
             stage('停止原底座')
             self.controller.stop()
             write(self.store.path('target.json'), target)
             self.controller.prepare(target)
-            self.controller.start()
+            self.controller.start(target)
             runtime = self.controller.wait(target)
             runtime['display_name'] = target['model']['name']
             write(self.store.path('runtime.json'), runtime)
@@ -121,7 +122,7 @@ class Manager:
                 else:
                     config_path.unlink(missing_ok=True)
                 if active and old:
-                    self.controller.start()
+                    self.controller.start(old_target)
                     self.controller.wait(old_target)
                     recovery = 'Previous service restored.'
                 else:
@@ -153,7 +154,15 @@ class Manager:
             self._start_saved(target)
             return self.status()
 
+    def _interrupted_target(self, target):
+        return self.store.target() != target or self.store.path('pending.json').exists()
+
     def _start_saved(self, target):
+        if self._interrupted_target(target):
+            stage('恢复已提交目标并重新核验原生配置')
+            write(self.store.path('target.json'), target)
+            self._apply(target)
+            return
         runtime = read(self.store.path('runtime.json'))
         valid = (runtime and runtime.get('fingerprint') == fingerprint(target) and
                  self.controller.configuration_matches(target))
@@ -174,7 +183,7 @@ class Manager:
             path = codex.profile_path()
             old_profile = path.read_bytes() if path.exists() else None
             try:
-                self.controller.start()
+                self.controller.start(target)
                 runtime = self.controller.wait(target)
                 runtime['display_name'] = target['model']['name']
                 write(self.store.path('runtime.json'), runtime)
@@ -260,26 +269,37 @@ class Manager:
     @contextmanager
     def maintenance(self):
         active = self.controller.running()
+        target = self.store.selected()
         stage('准备模型管理服务')
         self.controller.ensure()
-        self.controller.stop()
         primary = None
         try:
+            self.controller.stop()
             yield
         except BaseException as exc:
             primary = exc
             raise
         finally:
-            if active:
+            if active and target:
                 try:
                     stage('恢复原底座和模型')
-                    self.controller.start()
-                    runtime = self.controller.wait(self.store.selected())
-                    codex.profile(runtime, self.store.selected()['settings'])
+                    if self._interrupted_target(target):
+                        self._start_saved(target)
+                    else:
+                        self.controller.start(target)
+                        runtime = self.controller.wait(target)
+                        codex.profile(runtime, target['settings'])
+                        self.controller.commit(target)
                 except BaseException as exc:
+                    detail = f'Restoring previous service failed: {exc}; saved selection retained. Run maa start.'
+                    if isinstance(primary, KeyboardInterrupt) or isinstance(exc, KeyboardInterrupt):
+                        raise KeyboardInterrupt(detail) from (primary or exc)
                     if primary:
-                        raise Error(f'{primary}\nRestoring previous service failed: {exc}') from primary
+                        raise Error(f'{primary}\n{detail}') from primary
                     raise
+                else:
+                    if isinstance(primary, KeyboardInterrupt):
+                        raise KeyboardInterrupt('Previous service restored.') from primary
 
     def inventory(self, backend):
         with operation('读取本地模型清单'), self.store.lock():
@@ -322,7 +342,7 @@ class Manager:
 
     def _installed_ollama(self, name):
         try:
-            model = next(row for row in ollama_inventory(self.store) if row['name'] == name)
+            model = next(iter(ollama_inventory(self.store, name=name)))
         except StopIteration:
             raise Error('Native installation completed but model is absent from the native inventory') from None
         selected = self.store.selected()

@@ -214,8 +214,8 @@ class Controller:
             if self.owned(backend):
                 privileged(['systemctl', 'stop', UNITS[backend]])
 
-    def start(self):
-        target = self.store.target() or self.store.selected()
+    def start(self, target):
+        # The caller owns the transaction: never infer a candidate from disk.
         if not target:
             raise Error('Select a local model first')
         backend = target['model']['backend']
@@ -268,9 +268,7 @@ class Controller:
         model = target['model']
         runtime = ollama_observe(model['name'], missing_ok=True) if model['backend'] == 'ollama' else llama_observe(model['name'])
         if runtime is None:
-            runtime = read(self.store.path('runtime.json'), {})
-            if runtime.get('fingerprint') != fingerprint(target):
-                runtime = {'model': model['name'], 'upstream': ollama_endpoint(), 'context': None, 'resources': {}}
+            runtime = {'model': model['name'], 'upstream': ollama_endpoint(), 'context': None, 'resources': {}}
         info = self.unit_info(target)
         log = self.store.path('native') / (model['backend'] + '.log')
         launch = None
@@ -296,7 +294,9 @@ class Controller:
                 if self.unit_info(target).get('ActiveState') == 'failed':
                     raise Error('Native service failed; inspect maa logs')
                 observed = self.observe(target)
-                if observed.get('context') and not observed.get('resources', {}).get('sleeping'):
+                context = observed.get('context')
+                if (type(context) is int and context > 0 and not observed.get('resources', {}).get('sleeping')
+                        and self.unit_info(target).get('ActiveState') == 'active'):
                     if observed['backend'] == 'llamacpp':
                         request(observed['base_url'] + '/responses', {'model': observed['model'], 'input': 'Hi',
                                 'max_output_tokens': 1, 'stream': False}, timeout=600)

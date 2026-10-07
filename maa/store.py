@@ -69,9 +69,13 @@ class Store:
             raise Error(f'Model is not registered: {key}') from None
 
     def register(self, model):
+        self.register_many([model])
+
+    def register_many(self, rows):
         models = self.models()
-        models[model['key']] = model
-        write(self.path('models.json'), models)
+        updated = {**models, **{model['key']: model for model in rows}}
+        if updated != models:
+            write(self.path('models.json'), updated)
 
     def selected(self):
         return read(self.path('selected.json'))

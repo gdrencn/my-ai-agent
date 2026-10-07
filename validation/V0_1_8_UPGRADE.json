@@ -1,0 +1,23 @@
+{
+  "version": "0.1.8",
+  "status": "passed",
+  "kind": "real official Codex installer update",
+  "artifact_sha256": "46ccec1b00606b6d7e8a11f6525903e8d9ab48ea9e15d2b5f8201107042050f4",
+  "disabled_yolo_preserved": true,
+  "native_instance_unchanged": true,
+  "before": {
+    "ActiveState": "active",
+    "SubState": "running",
+    "InvocationID": "c97b9efe4a184ee69fbd48d16590e709",
+    "MainPID": "11884",
+    "Result": "success"
+  },
+  "after": {
+    "ActiveState": "active",
+    "SubState": "running",
+    "InvocationID": "c97b9efe4a184ee69fbd48d16590e709",
+    "MainPID": "11884",
+    "Result": "success"
+  },
+  "diagnostic": "官方安装：codex — https://chatgpt.com/codex/install.sh\n==> Updating Codex CLI\n==> Detected platform: Linux (x64)\n==> Resolved version: 0.160.1\n==> Current terminal: export PATH=\"/home/sandbox/.local/bin:$PATH\" && codex\n==> Future terminals: open a new terminal and run: codex\n==> PATH is already configured in /home/sandbox/.bashrc\nCodex CLI 0.160.1 installed successfully.\n[进行中] 安装底座 / Codex CLI — 已等待 0.0 秒\n[成功] 安装底座 / Codex CLI：官方安装：codex — 耗时 1.0 秒\n"
+}

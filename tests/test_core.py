@@ -1,4 +1,5 @@
 import io
+from contextlib import contextmanager, nullcontext
 import json
 import os
 from pathlib import Path
@@ -69,7 +70,7 @@ class FakeController:
     def stop(self):
         self.active = False
         self.stops += 1
-    def start(self):
+    def start(self, target):
         self.active = True
         self.starts += 1
     def wait(self, target):
@@ -499,6 +500,248 @@ class Core(unittest.TestCase):
         with self.assertRaisesRegex(Error, 'Previous stopped state restored'):
             manager.start()
         self.assertFalse(ctrl.active)
+
+    def test_start_revalidates_and_repairs_crashed_candidate(self):
+        first, second, ctrl = self.model('accepted'), self.model('candidate'), FakeController()
+        manager = Manager(self.store, ctrl)
+        manager.select(first['key'])
+        manager.pause()
+        accepted = self.store.selected()
+        ctrl.valid = True
+        write(self.store.path('target.json'), {'model': second, 'settings': manager.config(second)})
+        with patch.object(ctrl, 'prepare', wraps=ctrl.prepare) as prepare, patch.object(ctrl, 'start', wraps=ctrl.start) as start:
+            manager.start()
+        prepare.assert_called_once_with(accepted)
+        start.assert_called_once_with(accepted)
+        self.assertEqual(self.store.target(), accepted)
+        self.assertEqual(self.store.selected(), accepted)
+
+    def test_pending_same_target_forces_revalidation_and_failure_keeps_pause(self):
+        model, ctrl = self.model('accepted'), FakeController()
+        manager = Manager(self.store, ctrl)
+        manager.select(model['key'])
+        manager.pause()
+        accepted = self.store.selected()
+        ctrl.valid, ctrl.fail = True, 1
+        write(self.store.path('pending.json'), accepted)
+        with patch.object(ctrl, 'prepare', wraps=ctrl.prepare) as prepare, self.assertRaises(Error):
+            manager.start()
+        prepare.assert_called_once_with(accepted)
+        self.assertFalse(ctrl.active)
+        self.assertEqual(self.store.target(), accepted)
+        self.assertEqual(self.store.selected(), accepted)
+        self.assertFalse(self.store.path('pending.json').exists())
+
+    def test_maintenance_interrupt_during_stop_restores_and_exits_130(self):
+        from maa.cli import run
+        model, ctrl = self.model('accepted'), FakeController()
+        manager = Manager(self.store, ctrl)
+        manager.select(model['key'])
+        accepted = self.store.selected()
+        stop = ctrl.stop
+        def interrupt():
+            stop()
+            raise KeyboardInterrupt
+        with patch.object(ctrl, 'stop', side_effect=interrupt), patch.object(ctrl, 'start', wraps=ctrl.start) as start, \
+             patch('maa.cli.Manager', return_value=manager), patch('sys.stderr', new_callable=io.StringIO) as output:
+            self.assertEqual(run(['models', 'ollama']), 130)
+        start.assert_called_once_with(accepted)
+        self.assertTrue(ctrl.active)
+        self.assertIn('Previous service restored', output.getvalue())
+
+    def test_maintenance_interrupt_and_failed_restore_keep_130(self):
+        from maa.cli import run
+        model, ctrl = self.model('accepted'), FakeController()
+        manager = Manager(self.store, ctrl)
+        manager.select(model['key'])
+        with patch('maa.manager.ollama_session', return_value=nullcontext()), \
+             patch('maa.manager.ollama_inventory', side_effect=KeyboardInterrupt), \
+             patch.object(ctrl, 'start', side_effect=Error('injected restoration failure')), \
+             patch('maa.cli.Manager', return_value=manager), patch('sys.stderr', new_callable=io.StringIO) as output:
+            self.assertEqual(run(['models', 'ollama']), 130)
+        self.assertIn('已中断', output.getvalue())
+        self.assertIn('injected restoration failure', output.getvalue())
+        self.assertEqual(self.store.selected()['model']['key'], model['key'])
+
+    def test_maintenance_restore_uses_accepted_target_and_retains_new_interrupt(self):
+        model, ctrl = self.model('accepted'), FakeController()
+        manager = Manager(self.store, ctrl)
+        manager.select(model['key'])
+        accepted = self.store.selected()
+        with patch.object(ctrl, 'start', side_effect=KeyboardInterrupt) as start:
+            with self.assertRaisesRegex(KeyboardInterrupt, 'Restoring previous service failed'):
+                with manager.maintenance():
+                    pass
+        start.assert_called_once_with(accepted)
+
+    def test_maintenance_revalidates_interrupted_same_backend_and_restores_autostart(self):
+        first, second, ctrl = self.model('accepted'), self.model('candidate'), FakeController()
+        manager = Manager(self.store, ctrl)
+        manager.select(first['key'])
+        accepted = self.store.selected()
+        write(self.store.path('target.json'), {'model': second, 'settings': manager.config(second)})
+        with patch.object(ctrl, 'prepare', wraps=ctrl.prepare) as prepare, patch.object(ctrl, 'commit') as commit:
+            with manager.maintenance():
+                pass
+        prepare.assert_called_once_with(accepted)
+        commit.assert_called_once_with(accepted)
+        self.assertEqual(self.store.target(), accepted)
+        self.assertEqual(self.store.selected(), accepted)
+        self.assertTrue(ctrl.active)
+        with patch.object(ctrl, 'commit') as commit:
+            with manager.maintenance():
+                pass
+        commit.assert_called_once_with(accepted)
+
+    @contextmanager
+    def product_environment(self):
+        from maa.install import product
+        source = self.root / 'product.pyz'
+        source.write_bytes(b'new product fixture')
+        ctrl = FakeController()
+        with patch('maa.install.require_container'), patch('maa.install.Controller', return_value=ctrl), \
+             patch.object(ctrl, 'legacy_path', return_value=None, create=True), \
+             patch.object(ctrl, 'migrate', create=True) as migrate, patch('maa.install.Path.home', return_value=self.root):
+            yield product, source, migrate
+
+    def test_install_preflight_preserves_archive_and_service_for_foreign_commands_and_bad_toml(self):
+        archive = self.root / '.local/share/my-ai-agent/maa.pyz'
+        archive.parent.mkdir(parents=True)
+        archive.write_bytes(b'old installed archive')
+        for problem in ('maa', 'codex-local', 'toml'):
+            with self.subTest(problem=problem), self.product_environment() as (product, source, migrate):
+                path = (self.root / '.local/bin/maa' if problem == 'maa' else codex.launcher_path()
+                        if problem == 'codex-local' else codex.home() / 'config.toml')
+                path.parent.mkdir(parents=True, exist_ok=True)
+                content = 'user command' if problem != 'toml' else 'invalid = ['
+                path.write_text(content)
+                try:
+                    with self.assertRaises(Error):
+                        product(source, components='none')
+                    self.assertEqual(archive.read_bytes(), b'old installed archive')
+                    self.assertEqual(path.read_text(), content)
+                    migrate.assert_not_called()
+                finally:
+                    path.unlink()
+
+    def test_entrypoint_failure_rolls_back_new_install_and_upgrade(self):
+        archive = self.root / '.local/share/my-ai-agent/maa.pyz'
+        entry = self.root / '.local/bin/maa'
+        for upgrade in (False, True):
+            if upgrade:
+                archive.parent.mkdir(parents=True, exist_ok=True)
+                archive.write_bytes(b'old archive')
+                archive.chmod(0o750)
+                entry.parent.mkdir(parents=True, exist_ok=True)
+                entry.write_text('# managed by my-ai-agent\nold entry')
+                entry.chmod(0o750)
+            with self.product_environment() as (product, source, migrate), \
+                 patch('maa.codex.install_launcher', side_effect=OSError('injected entrypoint write failure')):
+                with self.assertRaisesRegex(OSError, 'injected entrypoint'):
+                    product(source, components='none')
+                migrate.assert_not_called()
+            if upgrade:
+                self.assertEqual(archive.read_bytes(), b'old archive')
+                self.assertEqual(entry.read_text(), '# managed by my-ai-agent\nold entry')
+                self.assertEqual(archive.stat().st_mode & 0o777, 0o750)
+            else:
+                self.assertFalse(archive.exists())
+                self.assertFalse(entry.exists())
+            self.assertFalse(codex.launcher_path().exists())
+            self.assertFalse(self.store.path('installation.json').exists())
+
+    def test_install_yolo_default_only_once_and_old_state_is_upgrade(self):
+        with self.product_environment() as (product, source, _):
+            product(source, components='none')
+            self.assertEqual(codex.yolo_state(), {'enabled': True, 'managed': True})
+            saved = (codex.home() / 'maa-yolo-recovery.json').read_bytes()
+            product(source, components='none')
+            self.assertEqual((codex.home() / 'maa-yolo-recovery.json').read_bytes(), saved)
+            codex.yolo(False)
+            original = (codex.home() / 'config.toml').read_bytes()
+            product(source, components='none')
+            self.assertEqual(codex.yolo_state(), {'enabled': False, 'managed': False})
+            self.assertEqual((codex.home() / 'config.toml').read_bytes(), original)
+        # Existing model state from a legacy installation also suppresses the
+        # default even if someone removed the old management archive/entries.
+        for path in (self.root / '.local/share/my-ai-agent/maa.pyz', self.root / '.local/bin/maa',
+                     codex.launcher_path(), self.store.path('installation.json')):
+            path.unlink()
+        self.store.register(self.model('legacy'))
+        with self.product_environment() as (product, source, _):
+            product(source, components='none')
+        self.assertEqual(codex.yolo_state(), {'enabled': False, 'managed': False})
+
+    def test_first_install_failure_after_yolo_restores_original_keys_and_removes_entries(self):
+        config = codex.home() / 'config.toml'
+        config.parent.mkdir(parents=True)
+        original = '# user settings\napproval_policy = "on-request"\nmodel = "user-model"\n'
+        config.write_text(original)
+        with self.product_environment() as (product, source, migrate), \
+             patch('maa.install.write', side_effect=OSError('injected installation-marker failure')):
+            with self.assertRaisesRegex(OSError, 'installation-marker'):
+                product(source, components='none')
+            migrate.assert_not_called()
+        self.assertEqual(config.read_text(), original)
+        self.assertFalse((codex.home() / 'maa-yolo-recovery.json').exists())
+        self.assertFalse((self.root / '.local/share/my-ai-agent/maa.pyz').exists())
+        self.assertFalse((self.root / '.local/bin/maa').exists())
+        self.assertFalse(codex.launcher_path().exists())
+
+    def test_codex_official_update_preserves_disabled_yolo(self):
+        from maa.install import component
+        codex.yolo(True)
+        codex.yolo(False)
+        original = (codex.home() / 'config.toml').read_bytes()
+        with patch('maa.install.require_container'), patch('maa.install.subprocess.run') as installer:
+            component('codex')
+        self.assertEqual(installer.call_count, 2)
+        self.assertEqual((codex.home() / 'config.toml').read_bytes(), original)
+        self.assertEqual(codex.yolo_state(), {'enabled': False, 'managed': False})
+
+    def test_ollama_inventory_reuses_details_and_batches_registration(self):
+        from maa.models import ollama_inventory
+        rows = [{'name': f'model-{n}:latest', 'digest': f'digest-{n}'} for n in range(10)]
+        def api(url, value=None, **kwargs):
+            return {'models': rows} if url.endswith('/api/tags') else {'model_info': {'general.architecture': 'qwen3'}, 'capabilities': ['completion']}
+        with patch('maa.models.request', side_effect=api) as native, patch('maa.store.write', wraps=write) as save:
+            first = ollama_inventory(self.store)
+            stored = self.store.path('models.json').read_bytes()
+            second = ollama_inventory(self.store)
+        self.assertEqual(first, second)
+        self.assertEqual(native.call_count, 12)
+        save.assert_called_once()
+        self.assertEqual(self.store.path('models.json').read_bytes(), stored)
+
+    def test_ollama_inventory_tracks_configured_digest_and_refreshes_external_replacement(self):
+        from maa.models import ollama_inventory
+        rows = [{'name': 'model:tag', 'digest': 'original'}]
+        def api(url, value=None, **kwargs):
+            return {'models': rows} if url.endswith('/api/tags') else {'model_info': {}, 'capabilities': ['completion']}
+        with patch('maa.models.request', side_effect=api) as native:
+            original = ollama_inventory(self.store)[0]
+            write(self.store.path('ollama-originals.json'), {'model:tag': {'digest': 'original', 'configured_digest': 'configured'}})
+            rows[0]['digest'] = 'configured'
+            self.assertEqual(ollama_inventory(self.store)[0], original)
+            self.assertEqual(native.call_count, 3)
+            rows[0]['digest'] = 'foreign'
+            replacement = ollama_inventory(self.store)[0]
+            self.assertNotEqual(replacement['key'], original['key'])
+            self.assertEqual(native.call_count, 5)
+
+    def test_ollama_installed_target_does_not_fetch_unrelated_details(self):
+        from maa.models import ollama_inventory
+        rows = [{'name': 'wanted:latest', 'digest': 'a'}, {'name': 'other:latest', 'digest': 'b'}]
+        def api(url, value=None, **kwargs):
+            if url.endswith('/api/tags'):
+                return {'models': rows}
+            self.assertEqual(value['model'], 'wanted:latest')
+            return {'model_info': {}, 'capabilities': []}
+        with patch('maa.models.request', side_effect=api) as native:
+            model = Manager(self.store, FakeController())._installed_ollama('wanted:latest')
+        self.assertEqual(model['name'], 'wanted:latest')
+        self.assertEqual(native.call_count, 2)
+        self.assertEqual(len(self.store.models()), 1)
 
     def test_current_ollama_tag_download_invalidates_native_reuse_without_reloading(self):
         model, ctrl = self.model('one'), FakeController()

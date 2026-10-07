@@ -1,6 +1,20 @@
-# my-ai-agent Implementation — 0.1.7 test
+# my-ai-agent Implementation — 0.1.8 test
 
-Verified against REQUIREMENTS.md on 2026-10-07 (America/Chicago). 0.1.7 separates Codex-only edits from native lifecycle transactions, makes readonly activation inert, reuses running instances and verified saved units, reads owned live Ollama inventory directly, verifies complete GGUF shards and repairs pinned HF caches. All 62 portable/PTY checks and both 31-check ordinary-user/root native suites passed against the frozen product/test pair. Test publication is authorized; stable requires user acceptance. Historical releases and their evidence remain immutable in Git and validation/.
+## 0.1.8 verification
+
+Verified the seven authorized requirements against source on 2026-10-07. All 81 source portable/PTY checks, 81 paired-package checks outside the checkout, and 81 portable plus 35 native checks in each ordinary-user/root mas container passed. The same final product/test bytes were verified in both containers. Real official Codex update preserves disabled YOLO and the native instance; three container reboot checks use native autostart and real Codex with the installed manager archive absent. Test publication is authorized; public verification is pending and stable requires user acceptance.
+
+| Authorized change | Implementation and current evidence |
+| --- | --- |
+| Accepted startup target | Controller.start requires an explicit target. Selection, rollback, paused start and maintenance pass their own candidate or accepted target. Pending/stale state forces explicit start or maintenance recovery to repair and revalidate selected.json; injected tests cover stale candidates, same-backend candidates, same-target pending state and failed revalidation preserving pause. Successful maintenance re-enables the accepted boot target after an official installer disables its default service. |
+| Live readiness | Ollama observe never substitutes historical context when no native resident model exists. Acceptance requires a live positive integer context, no sleeping state and an active native unit. Tests wait through empty native inventories and reject activating services despite reported context. |
+| Maintenance interruption | Initial stop is inside the recovery scope; restore uses the captured accepted target. Ctrl+C during stop/body/restore retains 130 and restoration diagnostics, including double failures. |
+| Installation preflight and file rollback | Both command paths, native/legacy ownership and Codex TOML are checked before archive/entry changes. Archive, entrypoints, installation marker and initial YOLO files are restored after entry-writing failure, preserving previous modes; migration follows successful entry commit. Official dependency installation and later migration errors remain explicit and do not promise reversal of official installers. |
+| Inventory reuse | Original-configuration records and registry are read once per scan. Cached metadata is reused for unchanged native identities and tracked configured manifests of the same original weights. Unknown replacements fetch new details. Registration uses a single conditional atomic batch write; installed-target queries ignore unrelated model details. The ten-model/two-scan test uses 12 native API calls and one registry write, versus the reviewed 22 calls/20 writes. |
+| Model disambiguation | Collision labels include the source/path/revision; focus details retain full HF relative paths, fixed revisions and local absolute paths. Shared choice formatting and a real 32-column PTY verify current focus and same-basename distinctions. |
+| First-install YOLO | Product installation records successful initialization; existing archive/entries/model state/recovery records count as upgrades. Only first installation applies YOLO defaults. Product reinstall/update and the official Codex component preserve the user's current keys and backup. Private-home tests cover on/off, old state without archive and original recovery bytes. |
+
+Historical releases and their evidence remain immutable in Git and validation/. The architecture below incorporates the previously verified one-shot/direct-connection behavior and the 0.1.8 changes above.
 
 ## Current architecture
 
@@ -28,7 +42,16 @@ maa is a one-shot installation/configuration tool. There is no maa daemon or Res
 | Token statistics | Removed the bridge usage recorder. Old usage.json is ignored. Recent input/output/time fields are unavailable through current read-only native status APIs and remain null with one menu explanation; saved_context is separate from actual context. No conversation interception or fabricated counters. |
 | Packaging | Deterministic product/test zipapps, paired numeric version and SHA256SUMS, pinned tomlkit license/provenance. Product excludes tests/docs/evidence/bridge. Tester includes only required test modules, native runner and Codex test fixtures. |
 
-## Evidence
+## 0.1.8 evidence
+
+- 81 source and 81 paired portable/PTY checks; both ordinary-user and root containers run the same final tester/product pair with 81 portable and 35 native checks, no skips. Reproducible builds, Python 3.11 grammar for all 40 product/test Python files, shell syntax and product package boundaries passed.
+- Native checks cover each backend's Responses, function call/result replay, real Codex and /model, manager removal, read-only model status, reasoning-only configuration without reload, resident/idle reuse, pause/start, failed-load rollback and fixture cleanup. New native checks verify unchanged Ollama registry bytes/mtime and native PID, persistence of YOLO off during product reinstall, and restoration of the accepted native backend after an injected persisted candidate. Persisted-state injection is distinguished from forcibly killing a live process.
+- The additional actual official Codex installation/update preserves disabled YOLO/config/recovery bytes and the running Ollama MainPID/InvocationID. Ordinary-user Ollama and llama.cpp, and root Ollama, independently autostart after pause/container restart with the installed manager archive absent, then run real codex-local successfully.
+- Recovery/install fault simulations cover live-readiness gating with empty native inventories, explicit candidate/accepted targets, Ctrl+C at initial maintenance stop/body/restore and failed restoration, preflight refusal, file-write rollback including initial YOLO edits, original file modes, digest cache invalidation and batch writes. Real PTYs cover full path/revision distinctions at 32 columns. These are not native crash or large-model performance claims.
+- Environment: Ubuntu 26.04.1, Python 3.14.4, Ollama 0.40.0, llama app b11429, Codex 0.160.1. Native model paths use Qwen3-0.6B-Q4_K_M.gguf and qwen2.5:3b. Official dependencies were installed in clean disposable containers, then the final frozen pair was reinstalled and tested against those native installations.
+- Receipts: validation/V0_1_8_LOCAL.json, V0_1_8_NATIVE.json, V0_1_8_ROOT_NATIVE.json, V0_1_8_UPGRADE.json and V0_1_8_AUTOSTART.json freeze artifact identity and distinguish the evidence types. Public verification and owned-container cleanup are recorded after publication.
+
+## Historical 0.1.7 evidence
 
 - 62 source portable/PTY checks, 62 paired-package checks outside the checkout, and 62 paired checks in each ordinary-user/root validation container; no skips. Passed diagnostics are buffered; failures retain original output. The real Codex shell fixture stores declarations/stdout/diagnostics in its report instead of dumping JSON between check results.
 - 31 native checks per user context against the same frozen product/test hashes. Coverage includes exact HF GGUF size/SHA validation, native Ollama pull, two native Responses/function/replay paths, real Codex and /model, independent archive removal, native status, resident/idle reuse, pause/start, failed-load rollback, fixture cleanup and YOLO recovery.

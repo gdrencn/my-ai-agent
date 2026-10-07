@@ -18,7 +18,7 @@ Python 3.11+, Linux/systemd inside mas. Product has only standard-library runtim
 | cli / install | public commands, container guard and official installation |
 | bootstrap | numeric prerelease discovery and checksummed version pairing |
 
-## Lifecycle trigger audit (0.1.7)
+## Lifecycle trigger audit (0.1.8)
 
 | Entry | Native lifecycle behavior |
 | --- | --- |
@@ -27,7 +27,7 @@ Python 3.11+, Linux/systemd inside mas. Product has only standard-library runtim
 | Apply unchanged settings | No lifecycle operation |
 | Select another backend/model; change a backend key | Full stop/prepare/start/verify/commit transaction with rollback |
 | Select the current unchanged target; maa start | Reuse resident instance, wake idle model, or start verified saved units from pause |
-| Missing/changed/unverified native configuration | Full revalidation on explicit start/select; unit/preload file hashes guard saved-unit reuse |
+| Missing/changed/unverified native configuration or interrupted pending target | Full revalidation on explicit start/select using the accepted selection; unit/preload file hashes guard saved-unit reuse |
 | Pull/create the selected Ollama public tag | No automatic switch; invalidate native-configuration reuse because native model parameters may change |
 | Update the active backend or install all components | Maintenance stop/install/start/verify, synchronize actual context; preserve previous paused state |
 | Install an inactive backend | Ownership preflight plus official installer; retain the current model |
@@ -40,6 +40,14 @@ Python 3.11+, Linux/systemd inside mas. Product has only standard-library runtim
 | Full status/logs/codex-local | Read-only observations or direct native client execution; no maa-triggered reload |
 
 Ctrl+C restores the previous target/state and retains KeyboardInterrupt/130. Paused saved-unit startup failures restore the paused state. Interrupted transfer and restore failures retain accurate diagnostics. Forced termination remains outside normal rollback guarantees.
+
+Native startup always receives an explicit target: only an active selection transaction passes a candidate. Readiness never consumes a saved Ollama context as evidence of current residency. Maintenance recovery includes the initial stop and retains interrupt identity if restoration also fails.
+
+Maintenance revalidates an interrupted candidate using the accepted target and re-enables accepted autostart after successful recovery from an official backend update.
+
+Product installation validates entrypoint/native ownership and both Codex TOML files before replacing files. Entry-writing failure restores the previous archive/commands/modes and initial Codex edits; migration and official component installation happen after entry commit. First product installation enables YOLO, while later product/Codex updates retain current settings and recovery bytes. Existing legacy state counts as an upgrade. Official dependency installers are external and their own modifications are not rolled back.
+
+Ollama inventory caches registered metadata by native/original digest, recognizes tracked configured manifests, batches changed rows once and avoids unchanged writes. A newly installed target query ignores unrelated details. Model choice details preserve full HF paths/revisions and local paths; collision labels include enough source information to distinguish them.
 
 GGUF records contain the entire shard set (path, file identity, SHA-256). Verify all identities before lifecycle mutation. Legacy split records without full identities require registration again. HF requests file metadata (`blobs=true`), pins the repository commit, checks size and available LFS SHA-256, and retries only damaged cached shards once. The API's file-metadata behavior is documented in the [official HfApi reference](https://huggingface.co/docs/huggingface_hub/en/package_reference/hf_api#huggingface_hub.HfApi.model_info). Cached symlinks outside the target directory are refused.
 
@@ -74,6 +82,6 @@ The independent launcher must find the official ~/.local/bin/codex immediately a
 
 Build produces maa.pyz, maa-test.pyz, VERSION.json, bootstrap.py, install.sh and SHA256SUMS. Numeric version lives only in maa/__init__.py. VERSION.json pairs the test channel/version; SHA256SUMS covers the other five payloads. Test publication can add frozen validation JSON and its checksum. The repository validation manifest covers all checked-in receipts; the release validation manifest covers that version's initial local/native receipts. Public evidence is appended with a separate PUBLIC_SHA256SUMS; never overwrite a released manifest.
 
-Commit verified source/docs to main, tag v0.1.7, publish GitHub prerelease. Never replace an existing tag/release/asset. Download every asset again and verify local byte equality, manifest and the public installer. Changes after freeze require a new version unless they only record validation/documentation and do not alter frozen payloads. Stable promotion needs user acceptance.
+Commit verified source/docs to main, tag v0.1.8, publish GitHub prerelease. Never replace an existing tag/release/asset. Download every asset again and verify local byte equality, manifest and the public installer. Changes after freeze require a new version unless they only record validation/documentation and do not alter frozen payloads. Stable promotion needs user acceptance.
 
 The official upstream installers resolve their own current versions; do not claim their future releases are identical to the versions in our validation receipt. Models are pinned to HF commits or native Ollama digests after download.

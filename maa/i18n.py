@@ -23,6 +23,7 @@ MESSAGES = {
     'repo': 'HF 仓库（publisher/repository）：',
     'filename': '精确 GGUF 相对路径（包含 .gguf，不含网址）：',
     'path': '已有 GGUF 文件的绝对路径：',
+    'model_file': '模型：', 'model_source': '来源：', 'model_revision': 'Revision：', 'model_path': '路径：',
     'context': '上下文大小', 'kv': '主模型 KV 格式',
     'flash_attention': 'Flash Attention', 'fit': '自动适配显存',
     'reserve_mib': '显存预留（MiB）', 'keep_alive': '模型空闲驻留时间',

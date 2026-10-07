@@ -1,0 +1,42 @@
+{
+  "version": "0.1.8",
+  "status": "passed",
+  "at": "2026-10-07T09:10:59.408301+00:00",
+  "artifact_sha256": "46ccec1b00606b6d7e8a11f6525903e8d9ab48ea9e15d2b5f8201107042050f4",
+  "checks": [
+    {
+      "backend": "ollama",
+      "context": 32768,
+      "uid": 1001,
+      "manager_archive_absent": true,
+      "native_autostart_after_pause": true,
+      "codex_stdout": "Hello. How can I assist you today?\n",
+      "diagnostic": "Reading additional input from stdin...\nOpenAI Codex v0.160.1\n--------\nworkdir: /tmp/maa-v018-independent-a5n1jhwn\nmodel: qwen2.5:3b\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a115a0-f10c-7ef0-8977-50a12ad823cb\n--------\nuser\nReply hello. Do not use tools.\ncodex\nHello. How can I assist you today?\ntokens used\n3,715\n",
+      "native_unit": "ActiveState=active\nInvocationID=11c6a3ef3c2949148eebb2599194a738\nMainPID=329\n",
+      "status": "passed"
+    },
+    {
+      "backend": "llamacpp",
+      "context": 32768,
+      "uid": 1001,
+      "manager_archive_absent": true,
+      "native_autostart_after_pause": true,
+      "codex_stdout": "Hello! How can I assist you today?\n",
+      "diagnostic": "Reading additional input from stdin...\nOpenAI Codex v0.160.1\n--------\nworkdir: /tmp/maa-v018-independent-ftnn_pe3\nmodel: unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a115a1-1cb3-7202-9c56-38941612c1de\n--------\nuser\nReply hello. Do not use tools.\ncodex\nHello! How can I assist you today?\ntokens used\n3,264\n",
+      "native_unit": "ActiveState=active\nInvocationID=42d1327800534df6abc8f1c2be99c5ad\nMainPID=341\n",
+      "status": "passed"
+    },
+    {
+      "backend": "ollama",
+      "context": 32768,
+      "uid": 0,
+      "manager_archive_absent": true,
+      "native_autostart_after_pause": true,
+      "codex_stdout": "Hello! How can I assist you today?\n",
+      "diagnostic": "Reading additional input from stdin...\nOpenAI Codex v0.160.1\n--------\nworkdir: /tmp/maa-v018-independent-z_jwdamz\nmodel: qwen2.5:3b\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a115a1-59b2-7f92-ab0a-b54cac53a77a\n--------\nuser\nReply hello. Do not use tools.\ncodex\nHello! How can I assist you today?\ntokens used\n3,713\n",
+      "native_unit": "ActiveState=active\nInvocationID=d5d6327c5dc742bb8a1572a18db48097\nMainPID=329\n",
+      "status": "passed"
+    }
+  ],
+  "scope": "Real container restart after pause; native service and real Codex work with installed manager absent."
+}

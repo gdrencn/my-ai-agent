@@ -164,6 +164,27 @@ class Terminal(unittest.TestCase):
         self.assertIn('publisher/repository', output)
         self.assertIn('RESULT b', output)
 
+    def test_same_basename_model_choices_show_paths_revision_and_current_focus(self):
+        operation = ("from maa.ui import choose, model_choices\n"
+                     "rows=[{'key':'a','filename':'dir-a/model.gguf','repo':'publisher/repo','revision':'rev-a'},\n"
+                     " {'key':'b','filename':'dir-b/model.gguf','repo':'publisher/repo','revision':'rev-b'}]\n"
+                     "options,details=model_choices(rows,'b')\n"
+                     "assert options[0][1] != options[1][1]\n"
+                     "print('RESULT',interactive(lambda ui: choose(ui,'DISTINCT_MODELS',options,'b',details)))")
+        output = self.session(operation, b'\r', 'DISTINCT_MODELS', (14, 32))
+        self.assertIn('dir-b/model.gguf', output)
+        self.assertIn('rev-b', output)
+        self.assertIn('RESULT b', output)
+
+    def test_local_same_basename_choices_include_full_paths(self):
+        from maa.ui import model_choices
+        options, details = model_choices([
+            {'key': 'a', 'name': 'model.gguf', 'path': '/models/a/model.gguf'},
+            {'key': 'b', 'name': 'model.gguf', 'path': '/models/b/model.gguf'}])
+        self.assertNotEqual(options[0][1], options[1][1])
+        self.assertIn('/models/a/model.gguf', details['a'])
+        self.assertIn('/models/b/model.gguf', details['b'])
+
     def test_native_command_diagnostic_starts_on_its_own_line(self):
         operation = ("import sys\nfrom unittest.mock import patch\n"
                      "from maa.output import operation\nfrom maa.service import privileged\n"

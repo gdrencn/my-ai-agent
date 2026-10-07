@@ -42,6 +42,33 @@ def backend(ui, current=None):
     return choose(ui, t('backend'), [('ollama', 'Ollama'), ('llamacpp', 'llama.cpp')], current)
 
 
+def model_choices(rows, current_key=None):
+    short = {row['key']: PurePosixPath(row['filename']).name if row.get('filename') else row['name'] for row in rows}
+    counts = {}
+    for label in short.values():
+        counts[label] = counts.get(label, 0) + 1
+    options, details = [], {}
+    for row in rows:
+        key, label = row['key'], short[row['key']]
+        if row.get('filename'):
+            full = row['repo'] + '/' + row['filename']
+            if row.get('revision'):
+                full += ' @ ' + row['revision']
+            detail = t('model_file') + row['filename'] + '\n' + t('model_source') + row['repo']
+            if row.get('revision'):
+                detail += '\n' + t('model_revision') + row['revision']
+        else:
+            full = row.get('path') or row['name']
+            detail = t('model_file') + row['name']
+            if row.get('path'):
+                detail += '\n' + t('model_path') + row['path']
+        if counts[label] > 1:
+            label = full
+        options.append((key, label + ('（当前）' if key == current_key else '')))
+        details[key] = detail
+    return options, details
+
+
 def edit_settings(ui, model, values, keys=MODEL_KEYS, title=None, readonly=()):
     values = dict(values)
     original, focused = dict(values), keys[0]
@@ -232,10 +259,7 @@ def local_models(ui, manager):
                     say(t('empty'))
                     continue
                 current_key = current['model']['key'] if current else None
-                labels = [(row['key'], (PurePosixPath(row['filename']).name if row.get('filename') else row['name']) +
-                           ('（当前）' if row['key'] == current_key else '')) for row in rows]
-                details = {row['key']: '模型：' + (PurePosixPath(row['filename']).name + '\n来源：' + row['repo']
-                           if row.get('filename') else row['name']) for row in rows}
+                labels, details = model_choices(rows, current_key)
                 key = choose(ui, t('ollama_model_title' if selected_backend == 'ollama' else 'model_title'),
                              labels, current_key, details=details)
                 select_model(ui, manager, key)

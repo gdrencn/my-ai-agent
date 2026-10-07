@@ -9,7 +9,7 @@ import tempfile
 import urllib.request
 from . import codex
 from .service import Controller, privileged
-from .store import Error, Store, atomic
+from .store import Error, Store, atomic, write
 from .output import operation, stage, native_output
 
 URLS = {'ollama': 'https://ollama.com/install.sh',
@@ -65,8 +65,6 @@ def _component(name):
                 if item == 'ollama' and Path('/etc/systemd/system/ollama.service').exists():
                     # Also quiesce a partially installed official daemon on error.
                     privileged(['systemctl', 'disable', '--now', 'ollama.service'])
-        if item == 'codex':
-            codex.yolo(True)
 
 
 def product(archive, components='all'):
@@ -74,29 +72,52 @@ def product(archive, components='all'):
     from .manager import Manager
     store = Store()
     controller = Controller(store)
-    controller.ensure()
-    legacy = controller.legacy_path()
-    if legacy is not None:
-        was_running = subprocess.run(['systemctl', 'is-active', '--quiet', 'maa.service']).returncode == 0
-    else:
-        was_running = controller.running()
-    controller.migrate()
     root = Path.home() / '.local/share/my-ai-agent'
     executable = root / 'maa.pyz'
-    atomic(executable, Path(archive).read_bytes(), 0o755)
     bindir = Path.home() / '.local/bin'
     import shlex
-    for name, command in [('maa', '')]:
-        path = bindir / name
-        marker = '# managed by my-ai-agent\n'
-        if path.exists() and marker not in path.read_text():
-            raise Error(f'Existing command is not owned by maa: {path}')
-        wrapper = '#!/bin/sh\n' + marker + 'exec ' + shlex.quote(sys.executable) + ' ' + shlex.quote(str(executable)) + command + ' "$@"\n'
-        atomic(path, wrapper, 0o755)
-    codex.install_launcher()
-    codex.yolo(True)
+    entry = bindir / 'maa'
+    blob = Path(archive).read_bytes()
+    with store.lock():
+        controller.ensure()
+        legacy = controller.legacy_path()
+        codex.check_entrypoint(entry)
+        codex.check_entrypoint(codex.launcher_path())
+        codex.preflight()
+        marker = store.path('installation.json')
+        first = not any(path.exists() for path in (executable, entry, codex.launcher_path(), marker,
+                        store.path('selected.json'), store.path('models.json'), codex.home() / 'maa-yolo-recovery.json')) and legacy is None
+        paths = (executable, entry, codex.launcher_path(), marker,
+                 codex.home() / 'config.toml', codex.home() / 'maa-yolo-recovery.json')
+        backup = {path: (path.read_bytes(), path.stat().st_mode & 0o777) if path.exists() else None for path in paths}
+        try:
+            atomic(executable, blob, 0o755)
+            wrapper = ('#!/bin/sh\n# managed by my-ai-agent\nexec ' + shlex.quote(sys.executable) +
+                       ' ' + shlex.quote(str(executable)) + ' "$@"\n')
+            atomic(entry, wrapper, 0o755)
+            codex.install_launcher()
+            if first:
+                codex.yolo(True)
+            write(marker, {'version': 1})
+        except BaseException as primary:
+            try:
+                for path, saved in backup.items():
+                    if saved is None:
+                        path.unlink(missing_ok=True)
+                    else:
+                        atomic(path, *saved)
+            except BaseException as secondary:
+                detail = f'Installation rollback failed: {secondary}'
+                if isinstance(primary, KeyboardInterrupt):
+                    raise KeyboardInterrupt(detail) from primary
+                raise Error(f'{primary}\n{detail}') from primary
+            raise
+        # Rejected inputs and failed entrypoint writes never migrate services.
+        was_running = (subprocess.run(['systemctl', 'is-active', '--quiet', 'maa.service']).returncode == 0
+                       if legacy is not None else controller.running())
+        controller.migrate()
     if components != 'none':
-        manager = Manager()
+        manager = Manager(store, controller)
         manager.install(components)
     if store.selected() and legacy is not None:
         manager = Manager(store, controller)

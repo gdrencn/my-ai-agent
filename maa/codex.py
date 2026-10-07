@@ -158,9 +158,24 @@ def launcher():
 
 def install_launcher():
     path = launcher_path()
-    if path.exists() and '# managed by my-ai-agent\n' not in path.read_text():
-        raise Error('codex-local is not owned by maa; refusing to overwrite it')
+    check_entrypoint(path)
     atomic(path, launcher(), 0o755)
+
+
+def check_entrypoint(path):
+    if path.is_symlink() or (path.exists() and '# managed by my-ai-agent\n' not in path.read_text()):
+        raise Error(f'Existing command is not owned by maa: {path}')
+
+
+def preflight():
+    config = home() / 'config.toml'
+    parse(config.read_text() if config.exists() else '')
+    local = profile_path()
+    if local.exists():
+        text = local.read_text()
+        if not text.startswith('# Managed by my-ai-agent.'):
+            raise Error('maa-local.config.toml already exists and is not owned by maa; refusing to overwrite it')
+        parse(text)
 
 
 def executable():

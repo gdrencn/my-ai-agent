@@ -1,4 +1,18 @@
-# my-ai-agent Requirements — 0.1.7 test
+# my-ai-agent Requirements — 0.1.8 test
+
+## 0.1.8 recovery, inventory and upgrade boundaries
+
+用户授权修复本轮审查确认的七项问题，保留一次性工具和原生直连结构。
+
+1. 显式启动、维护恢复和切换回滚使用明确的已提交目标；仅当前切换事务允许启动其候选。强制中断留下的 target.json 不得优先于 selected.json，显式启动应修复临时目标并重新核验未完成的事务，不能启动未提交的底座。失败仍保留已提交选择。
+2. Ollama 启动就绪必须来自当前原生 API 的驻留模型及有效上下文；历史 runtime.json 只作已保存状态展示，不能代替本次启动验收。空模型清单、未加载或无有效上下文继续等待；明确服务失败保留诊断。
+3. 模型管理维护的恢复范围覆盖最初停止原底座的阶段。Ctrl+C 在停止、维护操作或恢复阶段发生时保留中断退出码 130；恢复失败附带准确诊断，不将原中断转换成普通失败。原服务恢复只使用已提交目标。
+4. 产品安装先核验原生服务、maa/codex-local 命令归属和 Codex TOML，再迁移或替换归档。拒绝输入不留下归档、入口或旧服务变更；归档及入口写入阶段异常恢复已有归档、入口和 Codex 配置，首次安装不遗留半成品入口。入口提交之后再迁移或安装官方依赖；后续失败保留可用的管理入口和准确诊断，官方依赖安装器自身的变更不承诺回滚。
+5. Ollama 原生清单保留完整本地模型来源和准确身份。未变化的 digest 复用已登记详情，只读取新增/变化的详情；原配置备份每次清单只读取一次。注册变更合并为一次原子保存，清单未变化不写文件；安装后的目标查询不重新读取无关模型详情。配置后 digest 与原权重身份分别处理，不能复用已变化模型的旧详情。
+6. 模型选项保留当前选择和短名称；同名 GGUF 在选项中补充可区分的目录信息。焦点详情显示完整 HF 仓库、文件相对路径和已固定 revision；本地文件显示完整路径。窄终端换行保留区别，不仅依赖 basename。
+7. 全局 YOLO 默认开启仅用于首次安装产品。后续产品更新、重装和 Codex CLI 更新不改变用户当前开关或已有恢复备份；安装前已存在的旧产品/状态按升级处理。显式 YOLO 开启/关闭仍只修改或恢复原有两键。
+
+验收覆盖隔离故障模拟、真实 PTY、可重现配对包和独立 mas 容器的原生流程。测试套件为工具验收显式设置 YOLO 基线，不假定升级前用户已开启；该操作归属测试而非安装器。另发不可变 0.1.8 test，不替换已有资产；stable 仍需用户验收。
 
 ## 0.1.7 selective lifecycle and interaction improvements
 
@@ -34,7 +48,7 @@
 
 ## Scope
 
-安装在 mas 容器内，不修改宿主 mas。支持 Ollama 和 llama.cpp 共存，不包含 vLLM。提供官方一键安装、内联菜单 maa、专用本地入口 codex-local。项目安装默认开启 Codex 全局 YOLO。底座可以分开安装，但 maa 管理的运行服务同时只有一个底座/模型。
+安装在 mas 容器内，不修改宿主 mas。支持 Ollama 和 llama.cpp 共存，不包含 vLLM。提供官方一键安装、内联菜单 maa、专用本地入口 codex-local。项目首次安装默认开启 Codex 全局 YOLO，后续更新保留用户选择。底座可以分开安装，但 maa 管理的运行服务同时只有一个底座/模型。
 
 官方命令：
 - Ollama: curl -fsSL https://ollama.com/install.sh | sh
@@ -108,7 +122,7 @@ llama.cpp 固定一个本地 agent 推理槽，保证 llama.cpp 的上下文设�
 5. 核验 YOLO 两键恢复、重复开启、无关 TOML 保留、跨进程备份。
 6. 核验本地 Responses 对话、流式、工具调用及 context/90% 同步。
 7. PTY 验证导航、输入编辑、窄终端、取消和终端恢复；结构化输出无控制码。
-8. 可重现构建、校验和、包边界、安装版本；不可变 v0.1.7 GitHub prerelease，回下载比较字节。stable 等待用户验收。
+8. 可重现构建、校验和、包边界、安装版本；不可变 v0.1.8 GitHub prerelease，回下载比较字节。stable 等待用户验收。
 9. IMPLEMENTED.md 区分 portable/native/fault-injected/user-reported 证据，不宣称未实测的大模型/GPU/MTP 结果。
 
 ## Official references

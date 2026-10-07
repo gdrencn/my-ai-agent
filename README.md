@@ -2,7 +2,7 @@
 
 在 **my-ai-sandbox（mas）容器内**安装并管理 Ollama、llama.cpp 和 Codex CLI。
 
-当前版本：**0.1.7 test**。两种底座可共存，通过 `maa` 选择一个当前底座和模型，并同步 `codex-local`。
+当前版本：**0.1.8 test**。两种底座可共存，通过 `maa` 选择一个当前底座和模型，并同步 `codex-local`。
 
 ## Install
 
@@ -110,6 +110,8 @@ GPU 层数、采样、对话模板、服务地址没有修改入口，保留模�
 
 YOLO 只管理全局 `approval_policy = "never"` 和 `sandbox_mode = "danger-full-access"`。首次开启保存原值及存在状态，重复开启不覆盖备份；关闭恢复原值，原来没有的键删除。其他 TOML 配置保留。尊重 `CODEX_HOME`。
 
+YOLO 默认开启只发生在首次安装 maa。后续更新、重装 maa 或更新 Codex CLI 保留当前开关和原设置备份，不自动重新开启。安装前先检查已有命令归属与 Codex 配置格式，拒绝时保留原程序；入口写入失败恢复原有文件，官方依赖安装失败保留准确诊断。
+
 `codex-local` 使用专用 `maa-local.config.toml` profile，不覆盖普通 Codex 的模型设置，也不强制 YOLO 启动参数。模型与有效上下文同步，自动压缩阈值固定为有效上下文的 90%（262144 对应 235929）。推理档位按选定字符串传递，支持情况由客户端、底座和模型决定。
 
 `codex-local` 是独立的 shell 脚本，内容为：
@@ -157,7 +159,7 @@ codex-local exec --skip-git-repo-check 'Explain this directory.'
 
 ## Test
 
-完整安装及小模型验证会修改当前选择，请在**新建的专用临时 mas 容器**运行：
+完整安装及小模型验证会修改当前选择，并显式开关 YOLO 验证工具执行与恢复；测试结束保持 YOLO 开启。请在**新建的专用临时 mas 容器**运行：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/test.sh | bash

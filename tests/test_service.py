@@ -7,9 +7,9 @@ import tempfile
 import unittest
 from unittest.mock import patch
 from maa import backends, codex
-from maa.service import Controller
+from maa.service import Controller, fingerprint
 from maa.settings import settings
-from maa.store import Error, Store, read
+from maa.store import Error, Store, read, write
 
 
 class Service(unittest.TestCase):
@@ -126,10 +126,9 @@ class Service(unittest.TestCase):
 
     def test_candidate_does_not_enable_autostart_before_commit(self):
         target = {'model': {'backend': 'llamacpp'}}
-        with patch.object(self.store, 'target', return_value=target), \
-             patch.object(self.controller, 'owned', return_value=True), patch('maa.service.privileged') as native:
+        with patch.object(self.controller, 'owned', return_value=True), patch('maa.service.privileged') as native:
             self.controller.begin()
-            self.controller.start()
+            self.controller.start(target)
             self.assertFalse(any('enable' in c.args[0] for c in native.call_args_list))
             self.controller.commit(target)
             self.assertEqual(native.call_args.args[0], ['systemctl', 'enable', 'llama-server.service'])
@@ -141,6 +140,41 @@ class Service(unittest.TestCase):
             with self.assertRaisesRegex(Error, 'Native service failed'):
                 self.controller.wait({'model': {'backend': 'llamacpp'}})
             observe.assert_not_called()
+
+    def test_start_uses_explicit_target_even_with_uncommitted_candidate(self):
+        accepted = {'model': {'backend': 'ollama'}}
+        write(self.store.path('target.json'), {'model': {'backend': 'llamacpp'}})
+        with patch.object(self.store, 'target', side_effect=AssertionError('Do not infer startup target')), \
+             patch.object(self.controller, 'owned', return_value=True), patch('maa.service.privileged') as native:
+            self.controller.start(accepted)
+        starts = [call.args[0] for call in native.call_args_list if 'start' in call.args[0]]
+        self.assertEqual(starts, [['systemctl', 'start', 'ollama.service']])
+
+    def test_ollama_readiness_waits_for_live_residency_instead_of_saved_context(self):
+        target = {'model': {'backend': 'ollama', 'name': 'model:tag', 'key': 'key'}, 'settings': settings()}
+        saved = {'context': 8192, 'fingerprint': fingerprint(target)}
+        write(self.store.path('runtime.json'), saved)
+        payloads = [{'models': []}, {'models': []}, {'models': [{'name': 'model:tag', 'context_length': 4096}]}]
+        def sleep(seconds):
+            self.assertEqual(read(self.store.path('runtime.json')), saved)
+        with patch('maa.backends.request', side_effect=payloads) as api, \
+             patch.object(self.controller, 'unit_info', return_value={'ActiveState': 'active'}), \
+             patch.object(self.controller, 'configuration_signature', return_value={}), patch('maa.service.time.sleep', side_effect=sleep):
+            result = self.controller.wait(target)
+        self.assertEqual(api.call_count, 3)
+        self.assertEqual(result['context'], 4096)
+        self.assertEqual(read(self.store.path('runtime.json'))['context'], 4096)
+
+    def test_resident_model_does_not_accept_activating_service(self):
+        target = {'model': {'backend': 'ollama', 'name': 'model:tag', 'key': 'key'}, 'settings': settings()}
+        with patch.dict(os.environ, {'MAA_START_TIMEOUT': '1'}), \
+             patch('maa.backends.request', return_value={'models': [{'name': 'model:tag', 'context_length': 4096}]}), \
+             patch.object(self.controller, 'unit_info', return_value={'ActiveState': 'activating'}), \
+             patch.object(self.controller, 'configuration_signature', return_value={}), \
+             patch('maa.service.time.monotonic', side_effect=[0, 0, 2]), patch('maa.service.time.sleep'):
+            with self.assertRaisesRegex(Error, 'readiness timed out'):
+                self.controller.wait(target)
+        self.assertFalse(self.store.path('runtime.json').exists())
 
     def test_unmanaged_llama_endpoint_refused_before_unit_write(self):
         target = {'model': {'backend': 'llamacpp', 'name': 'model'}, 'settings': settings()}

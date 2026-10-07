@@ -264,6 +264,14 @@ def main():
     assert Path('/dev/lxd/sock').exists(), 'Run in a disposable mas container'
     cleanup_legacy_fixture()
     check('installed-version', lambda: command('--version', structured=False).strip())
+    def yolo_baseline():
+        initial = command('status')['yolo']
+        # The installer preserves an existing user's off choice. This dedicated
+        # destructive test suite, rather than an upgrade, enables tool execution.
+        enabled = command('yolo', 'on')
+        assert enabled == {'enabled': True, 'managed': True}, enabled
+        return {'initial_state': initial, 'test_baseline': enabled, 'explicit_test_operation': True}
+    check('explicit-yolo-test-baseline', yolo_baseline)
     llama = check('hf-exact-download', lambda: command('add', 'llamacpp', '--repo', 'unsloth/Qwen3-0.6B-GGUF',
                                                        '--file', 'Qwen3-0.6B-Q4_K_M.gguf'))
     ollama = check('ollama-native-pull', lambda: command('add', 'ollama', '--name', 'qwen2.5:3b'))
@@ -298,6 +306,22 @@ def main():
     check('ollama-resident-entry-reuses-alias', ollama_entry_reuse)
     check('ollama-expired-entry-wakes-existing-alias', lambda: ollama_entry_reuse(True))
     check('ollama-explicit-start-wakes-without-restart', ollama_start_idle_without_restart)
+    def inventory_reuse():
+        from maa.service import Controller
+        store = Store()
+        controller = Controller(store)
+        before = controller.unit_info()
+        first = command('models', 'ollama')
+        registry = store.path('models.json').read_bytes()
+        stat = store.path('models.json').stat()
+        second = command('models', 'ollama')
+        after = controller.unit_info()
+        assert first == second
+        assert store.path('models.json').read_bytes() == registry
+        assert store.path('models.json').stat().st_mtime_ns == stat.st_mtime_ns
+        assert before['MainPID'] == after['MainPID'] and before['InvocationID'] == after['InvocationID']
+        return {'unchanged_registry_not_written': True, 'native_instance_unchanged': True}
+    check('ollama-unchanged-inventory-reuses-registry', inventory_reuse)
     try:
         from maa_testing.codex_tool import main as tool_fixture
     except ImportError:
@@ -312,6 +336,22 @@ def main():
         assert state['running'] and state['selected']['model']['key'] == ollama['key']
         return state
     check('pause-start-retains-target', retained)
+    def recovery():
+        from maa.service import Controller
+        store = Store()
+        accepted = store.selected()
+        command('pause', structured=False)
+        candidate = {'model': llama, 'settings': accepted['settings']}
+        write(store.path('target.json'), candidate)
+        write(store.path('pending.json'), candidate)
+        state = command('start')
+        assert state['running'] and state['selected'] == accepted, state
+        assert store.target() == accepted and not store.path('pending.json').exists()
+        info = Controller(store).unit_info(candidate)
+        assert info['ActiveState'] == 'inactive', info
+        return {'injected_uncommitted_target': True, 'accepted_native_backend_restored': True,
+                'candidate_backend_not_started': True}
+    check('interrupted-candidate-restores-accepted-native-target', recovery)
     def rollback():
         # A metadata-valid but weight-less file reaches native loading and fails.
         with invalid_fixture() as bad:
@@ -327,6 +367,21 @@ def main():
         return {'cleaned': True}
     check('invalid-fixture-cleaned', cleaned)
     check('yolo-off', lambda: command('yolo', 'off'))
+    def upgrade_yolo():
+        from maa import codex
+        from maa.service import Controller
+        controller = Controller(Store())
+        before = controller.unit_info()
+        paths = [codex.home() / 'config.toml', codex.home() / 'maa-yolo-recovery.json', codex.profile_path()]
+        saved = {path: path.read_bytes() if path.exists() else None for path in paths}
+        result = command('_install', '--components', 'none', structured=False)
+        after = controller.unit_info()
+        assert saved == {path: path.read_bytes() if path.exists() else None for path in paths}
+        assert not command('status')['yolo']['managed']
+        assert before['MainPID'] == after['MainPID'] and before['InvocationID'] == after['InvocationID']
+        return {'global_config_and_recovery_unchanged': True, 'profile_and_native_instance_unchanged': True,
+                'diagnostic': result}
+    check('product-reinstall-retains-yolo-off-and-native-instance', upgrade_yolo)
     check('yolo-on', lambda: command('yolo', 'on'))
     command('pause', structured=False)
 
