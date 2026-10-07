@@ -1,0 +1,49 @@
+{
+  "version": "0.1.6",
+  "at": "2026-10-07T03:03:21.168137+00:00",
+  "status": "passed",
+  "release": "https://github.com/gdrencn/my-ai-agent/releases/tag/v0.1.6",
+  "tag_commit": "dbde97dba4e84fc91deceff6fdb1eb3a7fdf7cda",
+  "assets_match_local": true,
+  "product_and_validation_manifests_verified": true,
+  "asset_sha256": {
+    "SHA256SUMS": "4b7f2e30881e8b190147955640cee7e7eaf1e34af6f6de4d539e2227e29c09a5",
+    "V0_1_6_LOCAL.json": "53d55881c696591bbcc749279eb0d2837984f5561960f4e7f367a469db0cb546",
+    "V0_1_6_NATIVE.json": "4a6a240b1266d24af6cd70db6d38d758817780fb0f6987a407817af22c0ecdf1",
+    "VALIDATION_SHA256SUMS": "9e87021ad75d2c14dbca2001fc2ab9a60d970b9722e3663733fc1b872e5b58a1",
+    "VERSION.json": "d0b2b451cf29a77218b20adef728ba52bd0dd5d5d42ae1ff935a6fb68eac0ccd",
+    "bootstrap.py": "29be87f1d96b102eead25f33edf77f37affda5bec710420c6eda11e2f4a7ed6b",
+    "install.sh": "71833da669c112156534c33feefc8f981e0bdd583cf9c0a3c55ee838bd1a45cf",
+    "maa-test.pyz": "845c3d97c33963512e0ab53abf2a568efba66753b74b347dcfef0f4a8efe46b3",
+    "maa.pyz": "b6783dc4930e5fbfe269dd5a12f9eb86d0e02f625820dab86dd7ac4ba6ec562d"
+  },
+  "public_install_inside_mas": {
+    "passed": true,
+    "entrypoint": "https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/install.sh",
+    "components": "none",
+    "version_selection": "default newest numeric test release without explicit version override",
+    "uid": 1001,
+    "installed_version": "0.1.6",
+    "inherited_PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "non_login_shell": true,
+    "codex_local_version_check": "codex-cli 0.160.1",
+    "paused_state_and_configuration_preserved": true,
+    "yolo_recovery_preserved": true
+  },
+  "ci": {
+    "conclusion": "success",
+    "commit": "dbde97dba4e84fc91deceff6fdb1eb3a7fdf7cda",
+    "runs": [
+      "https://github.com/gdrencn/my-ai-agent/actions/runs/37564776340",
+      "https://github.com/gdrencn/my-ai-agent/actions/runs/37564839498"
+    ]
+  },
+  "cleanup": {
+    "all_owned_validation_containers_deleted": true,
+    "containers": [
+      "maa-path-016"
+    ]
+  },
+  "immutable_previous_assets_retained": true,
+  "stable_promotion": "requires user acceptance"
+}
