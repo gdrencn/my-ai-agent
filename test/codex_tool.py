@@ -67,10 +67,10 @@ def main():
             assert (folder / 'codex-proof.txt').read_text() == 'MAA_REAL_CODEX_TOOL_OK'
             assert seen and 'MAA_REAL_CODEX_TOOL_OK' in str(seen[0]['output']), seen
             assert not any(t['type'] == 'custom' for t in declarations), declarations
-            print(json.dumps({'status': 'passed', 'kind': 'real Codex / native Responses deterministic fixture',
+            return {'status': 'passed', 'kind': 'real Codex / native Responses deterministic fixture',
                   'tool_output_replayed': True, 'file_created_by_codex_tool': True,
                   'declarations': [(t['type'], t.get('name')) for t in declarations],
-                  'stdout': result.stdout, 'diagnostic': result.stderr[-8192:]}, indent=2))
+                  'stdout': result.stdout, 'diagnostic': result.stderr[-8192:]}
     finally:
         if previous_home is None:
             os.environ.pop('CODEX_HOME', None)
@@ -81,4 +81,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    print(json.dumps(main(), indent=2))

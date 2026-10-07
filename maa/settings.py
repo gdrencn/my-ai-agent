@@ -6,6 +6,7 @@ KEEP = ('5m', '10m', '30m', '-1')
 EFFORT = ('default', 'none', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max', 'ultra')
 DEFAULTS = dict(context=262144, kv='q8_0', flash_attention=True, fit=True,
                 reserve_mib=0, keep_alive='5m', mtp=True, mtp_kv='follow', reasoning='default')
+BACKEND_KEYS = tuple(key for key in DEFAULTS if key != 'reasoning')
 
 
 def settings(saved=None, changes=None, mtp_supported=False):

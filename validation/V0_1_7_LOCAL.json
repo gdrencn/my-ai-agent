@@ -1,0 +1,51 @@
+{
+  "version": "0.1.7",
+  "at": "2026-10-07T07:27:41.618348+00:00",
+  "status": "passed",
+  "asset_sha256": {
+    "maa.pyz": "c32ffe0be8d807fc40b36dbcb033989619167ff5297b93f35f5519c1c1e15e4e",
+    "maa-test.pyz": "19a1ab9e329c61d403dcdb79d4261201db8f9d8813792a65857c0dd20d51906e",
+    "VERSION.json": "221e6a89d3a6475e275c80d70e2dba3ec0e43015fa645a69e40d4da1d24676ed",
+    "bootstrap.py": "29be87f1d96b102eead25f33edf77f37affda5bec710420c6eda11e2f4a7ed6b",
+    "install.sh": "71833da669c112156534c33feefc8f981e0bdd583cf9c0a3c55ee838bd1a45cf",
+    "SHA256SUMS": "6e7cfb374fe91e15834f1693c3902d3d79c96f6cf563ffd68f3aa5e56d6a7b26"
+  },
+  "portable": {
+    "source_tests": 62,
+    "packaged_tests_outside_checkout": 62,
+    "ordinary_user_container_packaged_tests": 62,
+    "root_container_packaged_tests": 62,
+    "skipped": 0
+  },
+  "build": {
+    "reproducible": true,
+    "python_3_11_grammar": 43,
+    "shell_syntax": true,
+    "package_boundaries": true
+  },
+  "native": {
+    "ordinary_user_checks": 31,
+    "root_checks": 31,
+    "receipts": [
+      "V0_1_7_NATIVE.json",
+      "V0_1_7_ROOT_NATIVE.json"
+    ],
+    "autostart_receipt": "V0_1_7_AUTOSTART.json"
+  },
+  "fault_injected": [
+    "Ctrl+C rollback and exit 130",
+    "profile-save rollback without backend calls",
+    "GGUF shard missing/replacement preflight",
+    "same-size GGUF checksum repair",
+    "download control-lock availability",
+    "pause during native transfer does not restore stale target",
+    "failed saved-unit start restores pause",
+    "product upgrade/Codex/inactive backend installation keeps running native instance"
+  ],
+  "limitations": [
+    "No native MTP/recurrent or large qwen3.8 performance acceptance",
+    "Temporary Ollama metadata service still coordinates the single backend lifecycle",
+    "Pause/switch can interrupt native Ollama transfer",
+    "Forced termination during configuration can leave autostart disabled; explicit maa start revalidates saved target"
+  ]
+}

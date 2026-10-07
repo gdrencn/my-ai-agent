@@ -117,6 +117,25 @@ class Status(unittest.TestCase):
             self.assertEqual(manager.model_status(False)['state'], 'paused')
             call.assert_not_called()
 
+    def test_lightweight_summary_skips_logs_and_paused_context_is_saved(self):
+        controller = type('Controller', (), {'running': lambda self: True})()
+        manager = Manager(self.store, controller)
+        with patch('maa.manager.ollama_status', return_value={'state': 'running', 'context': 8192}), \
+             patch('maa.telemetry.native_allocations') as logs, patch('maa.telemetry.nvidia_memory') as gpu:
+            result = manager.model_status(include_gpu=False, include_allocations=False)
+            self.assertEqual(result['context'], 8192)
+            logs.assert_not_called()
+            gpu.assert_not_called()
+        with patch.object(controller, 'running', return_value=False):
+            result = manager.model_status(False)
+        self.assertIsNone(result['context'])
+        self.assertEqual(result['saved_context'], 8192)
+        lines = '\n'.join(menu.rendered(line, 1000, color=False) for line in ui.status_lines(result))
+        self.assertIn('已保存上下文：8192 tokens（上次核验）', lines)
+        self.assertNotIn('最近一次生成', lines)
+        self.assertNotIn('统计时间', lines)
+        self.assertEqual(lines.count('直连模式'), 1)
+
 
 
     def test_driver_free_is_not_derived_and_unavailable_is_not_zero(self):

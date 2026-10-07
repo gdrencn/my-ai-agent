@@ -245,7 +245,7 @@ class Screen:
         return [(line, False) for line in lines]
 
     def choose(self, title, options, default=None, multiple=False, checked=(), radio=False,
-               cancel=None, description=()):
+               cancel=None, description=(), disabled=(), details=None):
         if not options:
             raise ValueError('Menu requires at least one option')
         index = next((i for i, (value, _) in enumerate(options) if value == default), 0)
@@ -263,7 +263,12 @@ class Screen:
             while True:
                 width, height = self.size()
                 footer_lines = self.instructions(footer)
-                count = max(1, height - len(footer_lines) - 1)
+                detail_lines = []
+                if details:
+                    detail = details.get(selection.options[selection.index][0], '')
+                    detail_lines = [(line, False) for line in wrapped(detail, width - 1)] if detail else []
+                    detail_lines = detail_lines[:max(0, height - len(footer_lines) - 3)]
+                count = max(1, height - len(footer_lines) - len(detail_lines) - 1)
                 offset = max(0, selection.index - count + 1)
                 lines = []
                 for index in range(offset, min(len(options), offset + count)):
@@ -273,10 +278,10 @@ class Screen:
                     prefix = ('❯ ' if focused else '  ') + (marker + ' ' if marker else '')
                     row = prefix + label if isinstance(label, str) else replace(label, prefix=prefix)
                     lines.append((row, focused))
-                lines.extend(footer_lines)
+                lines.extend(detail_lines + footer_lines)
                 self.draw(lines)
                 key = self.key()
-                while key == 'idle':
+                while key == 'idle' or (key in ('activate', 'right') and selection.options[selection.index][0] in disabled):
                     key = self.key()
                 if key in ('up', 'down'):
                     selection.move(-1 if key == 'up' else 1)

@@ -21,9 +21,35 @@ def file_identity(path):
     return [stat.st_dev, stat.st_ino, stat.st_size, stat.st_mtime_ns]
 
 
+def shard_paths(path):
+    path = Path(path)
+    split = re.fullmatch(r'(.*)-(\d{5})-of-(\d{5})\.gguf', path.name)
+    if not split:
+        return [path]
+    count = int(split[3])
+    if split[2] != '00001' or not 1 <= count <= 10000:
+        raise Error('Select the first GGUF shard of a valid shard set (-00001-of-....gguf)')
+    return [path.with_name(f'{split[1]}-{n:05d}-of-{count:05d}.gguf') for n in range(1, count + 1)]
+
+
 def verify_file(model):
-    if model['backend'] == 'llamacpp' and file_identity(model['path']) != model['file_identity']:
-        raise Error('Registered GGUF changed or was replaced; register it again before using it')
+    if model['backend'] != 'llamacpp':
+        return
+    paths = shard_paths(model['path'])
+    records = model.get('files')
+    if records is None:
+        if len(paths) > 1:
+            raise Error('Legacy GGUF shard registration is incomplete; register the first shard again before using it')
+        records = [{'path': model['path'], 'file_identity': model['file_identity']}]
+    if [str(path) for path in paths] != [row['path'] for row in records]:
+        raise Error('Registered GGUF shard set is incomplete; register it again')
+    for row in records:
+        try:
+            valid = file_identity(row['path']) == row['file_identity']
+        except OSError:
+            valid = False
+        if not valid:
+            raise Error('Registered GGUF changed, is missing or was replaced; register it again before using it: ' + row['path'])
 
 
 def local_model(path, backend='llamacpp', name=None):
@@ -31,14 +57,26 @@ def local_model(path, backend='llamacpp', name=None):
     path = Path(path).expanduser().resolve(strict=True)
     if not path.is_file():
         raise Error('Model path must be a regular GGUF file')
-    info = metadata(path)
-    digest = hashlib.sha256()
-    with path.open('rb') as source:
-        for chunk in iter(lambda: source.read(4 * 1024 * 1024), b''):
-            digest.update(chunk)
-    key = identity(backend, str(path) + '@' + digest.hexdigest())
+    info, records = None, []
+    for shard in shard_paths(path):
+        if not shard.is_file():
+            raise Error('GGUF shard must be an existing regular file: ' + str(shard))
+        initial = file_identity(shard)
+        shard_info = metadata(shard)
+        if info is None:
+            info = shard_info
+        digest = hashlib.sha256()
+        with shard.open('rb') as source:
+            for chunk in iter(lambda: source.read(4 * 1024 * 1024), b''):
+                digest.update(chunk)
+        if file_identity(shard) != initial:
+            raise Error('GGUF changed during registration; retry: ' + str(shard))
+        records.append({'path': str(shard), 'file_identity': initial, 'sha256': digest.hexdigest()})
+    digest = records[0]['sha256'] if len(records) == 1 else hashlib.sha256(
+        json.dumps([(row['path'], row['sha256']) for row in records]).encode()).hexdigest()
+    key = identity(backend, str(path) + '@' + digest)
     return {'key': key, 'backend': backend, 'name': name or path.name, 'path': str(path),
-            'file_identity': file_identity(path), 'sha256': digest.hexdigest(), 'metadata': info,
+            'file_identity': records[0]['file_identity'], 'sha256': digest, 'files': records, 'metadata': info,
             'mtp_supported': info['maa.mtp_supported'], 'source': 'local'}
 
 
@@ -87,12 +125,19 @@ def ollama_inventory(store):
     return result
 
 
-def ollama_install(store, name, gguf=None):
-    if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_./:-]*', name) or '..' in name:
+def ollama_input(name, gguf=None):
+    if not isinstance(name, str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_./:-]*', name) or '..' in name:
         raise Error('Invalid Ollama model name/tag')
     if gguf:
         path = Path(gguf).expanduser().resolve(strict=True)
-        metadata(path)
+        for shard in shard_paths(path):
+            metadata(shard)
+
+
+def ollama_install(store, name, gguf=None):
+    ollama_input(name, gguf)
+    if gguf:
+        path = Path(gguf).expanduser().resolve(strict=True)
         spec = store.path('import.Modelfile')
         spec.write_text('FROM ' + json.dumps(str(path)) + '\n')
         cmd = [binary('ollama'), 'create', name, '-f', str(spec)]
@@ -101,12 +146,7 @@ def ollama_install(store, name, gguf=None):
     stage('执行 Ollama 原生下载 / 导入')
     with native_output():
         subprocess.run(cmd, check=True, env=ollama_environment())
-    models = ollama_inventory(store)
-    normalized = name if ':' in name else name + ':latest'
-    try:
-        return next(row for row in models if row['name'] == normalized)
-    except StopIteration:
-        raise Error('Native installation completed but model is absent from the native inventory') from None
+    return name if ':' in name else name + ':latest'
 
 
 def hf_input(repo, filename):
@@ -125,7 +165,7 @@ def hf_download(store, repo, filename):
     headers = {}
     if os.environ.get('HF_TOKEN'):
         headers['Authorization'] = 'Bearer ' + os.environ['HF_TOKEN']
-    url = 'https://huggingface.co/api/models/' + repo + '/revision/main'
+    url = 'https://huggingface.co/api/models/' + repo + '/revision/main?blobs=true'
     try:
         with urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=30) as response:
             info = json.load(response)
@@ -134,25 +174,60 @@ def hf_download(store, repo, filename):
         raise Error(f'{reason}: HTTP {exc.code}: {repo}') from exc
     except (OSError, ValueError) as exc:
         raise Error(f'HF metadata/network error: {exc}') from exc
-    files = {row['rfilename'] for row in info['siblings']}
+    files = {row['rfilename']: row for row in info['siblings']}
     if filename not in files:
         raise Error(f'Exact GGUF file not found: {repo}/{filename}')
     names = [filename]
     split = re.fullmatch(r'(.*)-(\d{5})-of-(\d{5})\.gguf', filename)
     if split:
-        if split[2] != '00001':
+        if split[2] != '00001' or not 1 <= int(split[3]) <= 10000:
             raise Error('Select the first GGUF shard (-00001-of-....gguf)')
         names = [f'{split[1]}-{n:05d}-of-{int(split[3]):05d}.gguf' for n in range(1, int(split[3]) + 1)]
         if any(name not in files for name in names):
             raise Error('HF repository has an incomplete GGUF shard set')
     commit = info['sha']
     folder = store.path('models') / identity('hf', repo + '@' + commit)
+    with store.lock('download-' + identity('hf', repo + '@' + commit + '/' + filename)):
+        for attempt in range(2):
+            _hf_files(folder, names, repo, commit, files, headers)
+            model = local_model(folder / filename)
+            damaged = [name for row, name in zip(model['files'], names)
+                       if (files[name].get('lfs') or {}).get('sha256') and
+                       row['sha256'] != files[name]['lfs']['sha256']]
+            if not damaged:
+                break
+            for name in damaged:
+                (folder / name).unlink()
+            if attempt:
+                raise Error('HF GGUF checksum mismatch after retry; damaged cache removed: ' + ', '.join(damaged))
+            stage('重新下载校验失败的 GGUF 缓存：' + ', '.join(damaged))
+    model.update(key=identity('llamacpp', repo + '@' + commit + '/' + filename),
+                 name=repo + '/' + filename, source='hf', repo=repo, filename=filename, revision=commit)
+    return model
+
+
+def _hf_files(folder, names, repo, commit, files, headers):
     for name in names:
+        hf_input(repo, name)
         destination = folder / name
+        if not destination.parent.resolve().is_relative_to(folder.resolve()) or destination.is_symlink():
+            raise Error('HF cache path was replaced by a symbolic link; remove it before retrying: ' + str(destination))
         destination.parent.mkdir(parents=True, exist_ok=True)
+        record = files[name]
+        size = record.get('size') or (record.get('lfs') or {}).get('size')
         if destination.exists():
-            continue
+            try:
+                metadata(destination)
+                valid = size is None or destination.stat().st_size == size
+            except (Error, OSError):
+                valid = False
+            if valid:
+                continue
+            stage('修复不完整的 GGUF 缓存：' + name)
+            destination.unlink()
         partial = destination.with_name(destination.name + '.part')
+        if partial.is_symlink():
+            raise Error('HF partial cache is a symbolic link; remove it before retrying: ' + str(partial))
         # curl owns native progress and transfer failures; the model name is not
         # misreported as invalid when a network/disk failure occurs.
         link = f'https://huggingface.co/{repo}/resolve/{commit}/{quote(name, safe="/")}'
@@ -166,11 +241,12 @@ def hf_download(store, repo, filename):
             completed = subprocess.run(cmd, input=config, text=True)
         if completed.returncode:
             raise Error(f'HF download failed (curl {completed.returncode}); partial retained for retry: {partial}')
-        if partial.stat().st_size == 0:
-            raise Error('HF returned an empty GGUF file')
+        if partial.stat().st_size == 0 or (size is not None and partial.stat().st_size != size):
+            partial.unlink()
+            raise Error('HF returned an incomplete GGUF file; retry: ' + name)
+        try:
+            metadata(partial)
+        except Error:
+            partial.unlink()
+            raise Error('HF returned invalid GGUF data; retry: ' + name) from None
         partial.replace(destination)
-    model = local_model(folder / filename)
-    model.update(key=identity('llamacpp', repo + '@' + commit + '/' + filename),
-                 name=repo + '/' + filename, source='hf', repo=repo, filename=filename, revision=commit)
-    store.register(model)
-    return model

@@ -54,8 +54,8 @@ class Store:
         return self.root / name
 
     @contextmanager
-    def lock(self):
-        with self.path('control.lock').open('a') as lock:
+    def lock(self, name='control'):
+        with self.path(name + '.lock').open('a') as lock:
             fcntl.flock(lock, fcntl.LOCK_EX)
             yield
 

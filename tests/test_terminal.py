@@ -145,6 +145,43 @@ class Terminal(unittest.TestCase):
         self.assertNotIn('\x1b[32m', value)
         self.assertIn('NO_COLOR_EXIT', value)
 
+    def test_readonly_activation_keeps_same_prompt_and_does_not_apply(self):
+        operation = ("from maa.ui import edit_settings, value_line\nfrom maa.settings import settings\n"
+                     "try:\n interactive(lambda ui: edit_settings(ui, {'mtp_supported':False}, settings(),\n"
+                     " keys=('reasoning',), title='READONLY_TEST', readonly=[('ctx',value_line('只读上下文','8192'))]))\n"
+                     "except Cancelled:\n print('READONLY_CANCELLED')")
+        output = self.session(operation, b'\x1b[B\r\x1b[C\x1b[A\x1b', 'READONLY_TEST', (16, 100))
+        self.assertEqual(output.count('READONLY_TEST'), 1)
+        self.assertIn('READONLY_CANCELLED', output)
+
+    def test_long_model_details_and_current_default_in_narrow_terminal(self):
+        operation = ("from maa.ui import choose\n"
+                     "print('RESULT', interactive(lambda ui: choose(ui, 'MODEL_PICKER',\n"
+                     " [('a','short.gguf'),('b','Qwen3-27B-UD-Q4_K_XL.gguf（当前）')], 'b',\n"
+                     " details={'b':'模型：Qwen3-27B-UD-Q4_K_XL.gguf\\n来源：publisher/repository'})))")
+        output = self.session(operation, b'\r', 'MODEL_PICKER', (12, 32))
+        self.assertIn('UD-Q4_K_XL.gguf', output)
+        self.assertIn('publisher/repository', output)
+        self.assertIn('RESULT b', output)
+
+    def test_native_command_diagnostic_starts_on_its_own_line(self):
+        operation = ("import sys\nfrom unittest.mock import patch\n"
+                     "from maa.output import operation\nfrom maa.service import privileged\n"
+                     "with operation('NATIVE_BOUNDARY'):\n"
+                     " with patch('maa.service.os.geteuid',return_value=0):\n"
+                     "  privileged([sys.executable,'-c',\"import sys;print('NATIVE_STDERR',file=sys.stderr,flush=True)\"])\n")
+        output = self.session(operation, b'', 'NATIVE_BOUNDARY', (12, 100))
+        self.assertIn('\nNATIVE_STDERR', output)
+        self.assertNotIn('秒NATIVE_STDERR', output)
+
+    def test_unavailable_mtp_activation_is_inert(self):
+        operation = ("from maa.ui import edit_settings\nfrom maa.settings import settings\n"
+                     "try:\n interactive(lambda ui: edit_settings(ui,{'mtp_supported':False},settings(),title='UNAVAILABLE_MTP'))\n"
+                     "except Cancelled:\n print('MTP_CANCELLED')")
+        output = self.session(operation, b'\x1b[B'*6+b'\r\x1b[C\x1b', 'UNAVAILABLE_MTP', (24, 120))
+        self.assertEqual(output.count('UNAVAILABLE_MTP'), 1)
+        self.assertIn('MTP_CANCELLED', output)
+
 
 if __name__ == '__main__':
     unittest.main()

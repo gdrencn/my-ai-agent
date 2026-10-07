@@ -1,14 +1,15 @@
 """Task-oriented menus call the same Manager operations as CLI."""
 import datetime
 import subprocess
-from . import __version__, codex, install, menu
+from pathlib import PurePosixPath
+from . import __version__, codex, menu
 from .i18n import t
 from .manager import Manager
 from .output import say, operation
-from .settings import DEFAULTS, KV, KEEP, EFFORT, settings
+from .settings import BACKEND_KEYS, KV, KEEP, EFFORT, settings
 from .store import Error
 
-MODEL_KEYS = tuple(key for key in DEFAULTS if key != 'reasoning')
+MODEL_KEYS = BACKEND_KEYS
 
 
 def value_line(label, value, tone='cyan'):
@@ -28,17 +29,17 @@ def setting_line(key, value, model):
     return value_line(t(key), t(value) if value in ('follow', 'default') else value)
 
 
-def choose(ui, title, options, default=None):
+def choose(ui, title, options, default=None, details=None):
     if default is None and options:
         default = options[0][0]
-    result = ui.choose(title, options + [(None, t('back'))], default=default)
+    result = ui.choose(title, options + [(None, t('back'))], default=default, details=details)
     if result is None:
         raise menu.Cancelled
     return result
 
 
-def backend(ui):
-    return choose(ui, t('backend'), [('ollama', 'Ollama'), ('llamacpp', 'llama.cpp')])
+def backend(ui, current=None):
+    return choose(ui, t('backend'), [('ollama', 'Ollama'), ('llamacpp', 'llama.cpp')], current)
 
 
 def edit_settings(ui, model, values, keys=MODEL_KEYS, title=None, readonly=()):
@@ -46,8 +47,10 @@ def edit_settings(ui, model, values, keys=MODEL_KEYS, title=None, readonly=()):
     original, focused = dict(values), keys[0]
     while True:
         options = [(key, setting_line(key, values[key], model)) for key in keys]
-        action = ui.choose(title or t('configure'), options + list(readonly) + [('apply', t('apply')), (None, t('back'))],
-                           default=focused, description=[t('dirty' if values != original else 'applied')])
+        disabled = [key for key, _ in readonly] + [key for key in keys if key in ('mtp', 'mtp_kv') and not model['mtp_supported']]
+        action = ui.choose(title or t('configure'), options + list(readonly) + [('apply', t('apply_codex' if keys == ('reasoning',) else 'apply')), (None, t('back'))],
+                           default=focused, disabled=disabled,
+                           description=[t('dirty' if values != original else 'applied')])
         if action is None:
             raise menu.Cancelled
         focused = action
@@ -83,13 +86,17 @@ def configure(ui, manager, codex_only=False):
         raise Error(t('no_target'))
     readonly = []
     if codex_only:
-        observed = manager.model_status(include_gpu=False)
-        context = observed['context']
-        readonly = [('context_readonly', value_line(t('context_readonly'), f'{context} tokens' if context else t('unknown'))),
-                    ('compact_readonly', value_line(t('compact_readonly'), f'{context * 90 // 100} tokens' if context else t('unknown')))]
-    manager.configure(edit_settings(ui, current['model'], current['settings'],
-                                    keys=('reasoning',) if codex_only else MODEL_KEYS,
-                                    title=t('codex_config' if codex_only else 'configure'), readonly=readonly))
+        observed = manager.model_status(include_gpu=False, include_allocations=False)
+        context = observed['context'] or observed.get('saved_context')
+        suffix = '' if observed['context'] else '（上次核验，已保存）'
+        readonly = [('context_readonly', value_line(t('context_readonly'), f'{context} tokens{suffix}' if context else t('unknown'))),
+                    ('compact_readonly', value_line(t('compact_readonly'), f'{context * 90 // 100} tokens{suffix}' if context else t('unknown')))]
+    keys = ('reasoning',) if codex_only else MODEL_KEYS
+    values = edit_settings(ui, current['model'], current['settings'], keys=keys,
+                           title=t('codex_config' if codex_only else 'configure'), readonly=readonly)
+    changes = {key: values[key] for key in keys if values[key] != current['settings'][key]}
+    manager.configure(changes, expected=current)
+    say(t('unchanged') if not changes else t('codex_saved') if codex_only else t('model_applied'))
 
 
 def select_model(ui, manager, key):
@@ -100,7 +107,8 @@ def select_model(ui, manager, key):
 
 
 def add_model(ui, manager):
-    selected = backend(ui)
+    current = manager.store.selected()
+    selected = backend(ui, current['model']['backend'] if current else None)
     sources = [('official', t('official')), ('local', t('local'))] if selected == 'ollama' else [('hf', t('hf')), ('local', t('local'))]
     source = choose(ui, t('source'), sources)
     if selected == 'ollama':
@@ -160,13 +168,16 @@ def status_lines(status):
     rows.append(t('gpu_note'))
     context, usage = status.get('context'), status.get('usage') or {}
     rows.append(value_line(t('effective_context'), f'{context} tokens' if context else t('unknown')))
-    tokens = usage.get('input_tokens')
-    occupied = f'{tokens} / {context} tokens（{tokens*100/context:.1f}%）' if tokens is not None and context else t('unknown')
-    rows.append(value_line(t('context_input'), occupied))
-    output = usage.get('output_tokens')
-    rows.append(value_line(t('last_output'), f'{output} tokens' if output is not None else t('unknown')))
-    when = usage.get('recorded_at')
-    rows.append(value_line(t('statistics_time'), datetime.datetime.fromtimestamp(when).astimezone().isoformat(timespec='seconds') if when else t('unknown')))
+    if not context and status.get('saved_context'):
+        rows.append(value_line(t('saved_context'), f"{status['saved_context']} tokens（上次核验）"))
+    if usage:
+        tokens = usage.get('input_tokens')
+        occupied = f'{tokens} / {context} tokens（{tokens*100/context:.1f}%）' if tokens is not None and context else t('unknown')
+        rows.append(value_line(t('context_input'), occupied))
+        output = usage.get('output_tokens')
+        rows.append(value_line(t('last_output'), f'{output} tokens' if output is not None else t('unknown')))
+        when = usage.get('recorded_at')
+        rows.append(value_line(t('statistics_time'), datetime.datetime.fromtimestamp(when).astimezone().isoformat(timespec='seconds') if when else t('unknown')))
     if status.get('usage_note'):
         rows.append('直连模式：底座未提供可核验的最近请求 token 统计；未取得的字段不估算。')
     return rows
@@ -214,18 +225,23 @@ def local_models(ui, manager):
             if action == 'add':
                 add_model(ui, manager)
             elif action == 'select':
-                selected_backend = backend(ui)
+                current = manager.store.selected()
+                selected_backend = backend(ui, current['model']['backend'] if current else None)
                 rows = manager.inventory(selected_backend)
                 if not rows:
                     say(t('empty'))
                     continue
+                current_key = current['model']['key'] if current else None
+                labels = [(row['key'], (PurePosixPath(row['filename']).name if row.get('filename') else row['name']) +
+                           ('（当前）' if row['key'] == current_key else '')) for row in rows]
+                details = {row['key']: '模型：' + (PurePosixPath(row['filename']).name + '\n来源：' + row['repo']
+                           if row.get('filename') else row['name']) for row in rows}
                 key = choose(ui, t('ollama_model_title' if selected_backend == 'ollama' else 'model_title'),
-                             [(row['key'], row['name']) for row in rows])
+                             labels, current_key, details=details)
                 select_model(ui, manager, key)
                 say(t('done'))
             elif action == 'configure':
                 configure(ui, manager)
-                say(t('done'))
             elif action == 'model_status':
                 model_status(ui, manager)
                 continue
@@ -247,7 +263,7 @@ def main(ui):
     actions = ('models_menu', 'codex_global', 'codex_config', 'install', 'about', 'exit')
     while True:
         try:
-            status = manager.model_status(include_gpu=False)
+            status = manager.model_status(include_gpu=False, include_allocations=False)
             description = [value_line(t('current_model'), status['model'] or t('unselected')), state_line(status['state'])]
             try:
                 focused = ui.choose(t('title'), [(v, t(v)) for v in actions], default=focused, cancel='exit', description=description)
@@ -259,15 +275,13 @@ def main(ui):
             if focused == 'install':
                 component = choose(ui, t('install'), [('all', '全部安装'), ('ollama', 'Ollama'),
                                                       ('llamacpp', 'llama.cpp'), ('codex', 'Codex CLI')])
-                with operation(t('install')), manager.store.lock(), manager.maintenance():
-                    install.component(component)
+                manager.install(component)
                 say(t('done'))
             elif focused == 'models_menu':
                 local_models(ui, manager)
                 continue
             elif focused == 'codex_config':
                 configure(ui, manager, codex_only=True)
-                say(t('done'))
             elif focused == 'codex_global':
                 global_settings(ui)
                 continue

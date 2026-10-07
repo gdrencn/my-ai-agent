@@ -105,14 +105,12 @@ def run(argv=None):
                 codex.yolo(args.state == 'on')
             result = codex.yolo_state()
         elif args.action == 'install':
-            from .install import component
-            with operation('安装底座 / Codex CLI'), manager.store.lock(), manager.maintenance():
-                component(args.component)
+            manager.install(args.component)
         if result is not None:
             print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0
-    except KeyboardInterrupt:
-        print('maa: 已中断。', file=sys.stderr)
+    except KeyboardInterrupt as exc:
+        print('maa: 已中断。' + ('\n' + str(exc) if str(exc) else ''), file=sys.stderr)
         return 130
     except (Error, OSError, ValueError, subprocess.SubprocessError) as exc:
         print(f'maa: {exc}', file=sys.stderr)

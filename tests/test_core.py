@@ -12,7 +12,7 @@ from maa import codex, backends
 from maa.cli import change_pairs
 from maa.gguf import metadata
 from maa.manager import Manager
-from maa.models import hf_input, local_model
+from maa.models import hf_input, local_model, verify_file, hf_download
 from maa.service import fingerprint
 from maa.settings import settings, draft_kv
 from maa.store import Error, Store, read, write
@@ -45,6 +45,11 @@ def native_runner():
 class FakeController:
     def __init__(self):
         self.active, self.fail, self.stops, self.starts = False, 0, 0, 0
+        self.valid = False
+    def owned(self, backend):
+        return True
+    def configuration_matches(self, target):
+        return self.valid
     def ensure(self):
         pass
     def snapshot(self):
@@ -346,6 +351,218 @@ class Core(unittest.TestCase):
         with patch('maa.ui.edit_settings', side_effect=AssertionError('Saved config should be reused')):
             ui.select_model(None, manager, model['key'])
         self.assertEqual(self.store.selected()['settings']['kv'], 'q4_0')
+
+    def test_reasoning_only_and_unchanged_preserve_running_and_paused(self):
+        model, ctrl = self.model('one'), FakeController()
+        manager = Manager(self.store, ctrl)
+        manager.select(model['key'])
+        for active in (True, False):
+            ctrl.active = active
+            before = (ctrl.starts, ctrl.stops)
+            manager.configure({'reasoning': 'high' if active else 'low'})
+            manager.configure({})
+            self.assertEqual((ctrl.starts, ctrl.stops), before)
+            self.assertEqual(ctrl.active, active)
+            self.assertEqual(self.store.selected(), self.store.target())
+            runtime = read(self.store.path('runtime.json'))
+            self.assertEqual(runtime['fingerprint'], fingerprint(self.store.selected()))
+            self.assertEqual(codex.parse(codex.profile_path().read_text())['model_context_window'], 8192)
+        manager.configure({'reasoning': 'default'})
+        self.assertNotIn('model_reasoning_effort', codex.parse(codex.profile_path().read_text()))
+
+    def test_reasoning_failure_restores_profile_and_saved_state_without_service_calls(self):
+        model, ctrl = self.model('one'), FakeController()
+        manager = Manager(self.store, ctrl)
+        manager.select(model['key'])
+        old = self.store.selected()
+        profile = codex.profile_path().read_bytes()
+        before = (ctrl.starts, ctrl.stops)
+        with patch.object(manager, 'save_config', side_effect=Error('injected save failure')):
+            with self.assertRaises(Error):
+                manager.configure({'reasoning': 'high'})
+        self.assertEqual(self.store.selected(), old)
+        self.assertEqual(codex.profile_path().read_bytes(), profile)
+        self.assertEqual(read(self.store.path('runtime.json'))['fingerprint'], fingerprint(old))
+        self.assertEqual((ctrl.starts, ctrl.stops), before)
+
+    def test_configure_rejects_changed_target_during_menu_editing(self):
+        first, second, ctrl = self.model('one'), self.model('two'), FakeController()
+        manager = Manager(self.store, ctrl)
+        manager.select(first['key'])
+        original = self.store.selected()
+        manager.select(second['key'])
+        before = ctrl.starts
+        with self.assertRaisesRegex(Error, 'changed during editing'):
+            manager.configure({'reasoning': 'high'}, expected=original)
+        self.assertEqual(ctrl.starts, before)
+        self.assertEqual(self.store.selected()['model']['key'], second['key'])
+
+    def test_start_running_reuses_instance_and_paused_reuses_native_configuration(self):
+        model, ctrl = self.model('one'), FakeController()
+        manager = Manager(self.store, ctrl)
+        manager.select(model['key'])
+        ctrl.valid = True
+        before = (ctrl.starts, ctrl.stops)
+        with patch('maa.manager.llama_status', return_value={'state': 'running', 'context': 8192}):
+            manager.start()
+            manager.select(model['key'])
+        self.assertEqual((ctrl.starts, ctrl.stops), before)
+        manager.pause()
+        with patch.object(ctrl, 'prepare', side_effect=AssertionError('Must reuse saved unit')):
+            manager.start()
+        self.assertEqual(ctrl.starts, before[0] + 1)
+
+    def test_ctrl_c_rolls_back_and_keeps_exit_code_130(self):
+        from maa.cli import run
+        first, second, ctrl = self.model('one'), self.model('two'), FakeController()
+        manager = Manager(self.store, ctrl)
+        manager.select(first['key'])
+        original_wait = ctrl.wait
+        def interrupted(target):
+            if target['model']['key'] == second['key']:
+                raise KeyboardInterrupt
+            return original_wait(target)
+        with patch.object(ctrl, 'wait', side_effect=interrupted), patch('maa.cli.Manager', return_value=manager), \
+                patch('sys.stderr', new_callable=io.StringIO) as output:
+            self.assertEqual(run(['select', second['key']]), 130)
+        self.assertIn('已中断', output.getvalue())
+        self.assertIn('Previous service restored', output.getvalue())
+        self.assertTrue(ctrl.active)
+        self.assertEqual(self.store.selected()['model']['key'], first['key'])
+
+    def test_running_ollama_inventory_and_codex_install_do_not_stop_backend(self):
+        model, ctrl = self.model('one'), FakeController()
+        model.update(backend='ollama', name='fixture:latest')
+        self.store.register(model)
+        manager = Manager(self.store, ctrl)
+        manager.select(model['key'])
+        before = (ctrl.starts, ctrl.stops)
+        with patch('maa.manager.ollama_inventory', return_value=[model]), patch('maa.manager.ollama_session') as session:
+            self.assertEqual(manager.inventory('ollama'), [model])
+            session.assert_not_called()
+        with patch('maa.install.component') as installer:
+            manager.install('codex')
+            installer.assert_called_once_with('codex')
+        self.assertEqual((ctrl.starts, ctrl.stops), before)
+        with self.assertRaises(Error):
+            manager.add_model('ollama', name='../invalid')
+        self.assertEqual((ctrl.starts, ctrl.stops), before)
+
+    def test_running_ollama_download_allows_pause_without_restoring_stale_state(self):
+        model, ctrl = self.model('one'), FakeController()
+        model.update(backend='ollama', name='fixture:latest')
+        self.store.register(model)
+        manager = Manager(self.store, ctrl)
+        manager.select(model['key'])
+        before = ctrl.starts
+        def transfer(*args):
+            manager.pause()  # Would deadlock if the transfer kept control.lock.
+            raise Error('Native transfer interrupted by service stop')
+        with patch('maa.manager.ollama_install', side_effect=transfer), self.assertRaisesRegex(Error, 'transfer interrupted'):
+            manager.add_model('ollama', name='other:latest')
+        self.assertEqual(ctrl.starts, before)
+        self.assertFalse(ctrl.active)
+        self.assertEqual(self.store.selected()['model']['key'], model['key'])
+
+    def test_product_upgrade_keeps_backend_for_none_codex_and_inactive_component(self):
+        from maa.install import product
+        model, ctrl = self.model('one'), FakeController()
+        manager = Manager(self.store, ctrl)
+        manager.select(model['key'])
+        before = (ctrl.starts, ctrl.stops)
+        saved = self.store.selected()
+        profile = codex.profile_path().read_bytes()
+        source = self.root / 'upgrade.pyz'
+        source.write_bytes(b'owned upgrade fixture')
+        with patch('maa.install.require_container'), patch('maa.install.Controller', return_value=ctrl), \
+             patch('maa.manager.Controller', return_value=ctrl), patch.object(ctrl, 'legacy_path', return_value=None, create=True), \
+             patch.object(ctrl, 'migrate', create=True), patch('maa.install.Path.home', return_value=self.root):
+            for component in ('none', 'codex', 'ollama'):
+                with self.subTest(component=component), patch('maa.install.component') as installer:
+                    product(source, components=component)
+                    if component == 'none':
+                        installer.assert_not_called()
+                    else:
+                        installer.assert_called_once_with(component)
+                    self.assertEqual((ctrl.starts, ctrl.stops), before)
+                    self.assertTrue(ctrl.active)
+                    self.assertEqual(self.store.selected(), saved)
+                    self.assertEqual(codex.profile_path().read_bytes(), profile)
+                    self.assertEqual((self.root / '.local/share/my-ai-agent/maa.pyz').read_bytes(), source.read_bytes())
+
+    def test_saved_start_failure_returns_to_paused_state(self):
+        model, ctrl = self.model('one'), FakeController()
+        manager = Manager(self.store, ctrl)
+        manager.select(model['key'])
+        manager.pause()
+        ctrl.valid, ctrl.fail = True, 1
+        with self.assertRaisesRegex(Error, 'Previous stopped state restored'):
+            manager.start()
+        self.assertFalse(ctrl.active)
+
+    def test_current_ollama_tag_download_invalidates_native_reuse_without_reloading(self):
+        model, ctrl = self.model('one'), FakeController()
+        model.update(backend='ollama', name='fixture:latest')
+        self.store.register(model)
+        manager = Manager(self.store, ctrl)
+        manager.select(model['key'])
+        before = (ctrl.starts, ctrl.stops)
+        with patch('maa.manager.ollama_install', return_value=model['name']), \
+             patch('maa.manager.ollama_inventory', return_value=[model]):
+            manager.add_model('ollama', name=model['name'])
+        self.assertEqual((ctrl.starts, ctrl.stops), before)
+        self.assertIsNone(read(self.store.path('runtime.json'))['native_config'])
+
+    def test_all_gguf_shards_checked_before_service_stop(self):
+        first, second = self.root / 'model-00001-of-00002.gguf', self.root / 'model-00002-of-00002.gguf'
+        gguf(first)
+        gguf(second)
+        model = local_model(first)
+        self.store.register(model)
+        self.assertEqual(len(model['files']), 2)
+        ctrl, manager = FakeController(), None
+        manager = Manager(self.store, ctrl)
+        for damage in ('deleted', 'replaced'):
+            if damage == 'deleted':
+                second.unlink()
+            else:
+                gguf(second, True)
+            with self.assertRaisesRegex(Error, 'GGUF changed'):
+                manager.select(model['key'])
+            self.assertEqual(ctrl.stops, 0)
+        legacy = {key: value for key, value in model.items() if key != 'files'}
+        with self.assertRaisesRegex(Error, 'Legacy GGUF'):
+            verify_file(legacy)
+
+    def test_hf_cache_repairs_only_damaged_shard_and_releases_control_lock(self):
+        names = ['model-00001-of-00002.gguf', 'model-00002-of-00002.gguf']
+        import hashlib
+        sample = self.root / 'sample.gguf'
+        gguf(sample)
+        blob = sample.read_bytes()
+        document = {'sha': 'pinned-commit', 'siblings': [{'rfilename': name, 'size': len(blob),
+                    'lfs': {'size': len(blob), 'sha256': hashlib.sha256(blob).hexdigest()}} for name in names]}
+        downloaded = []
+        run_process = subprocess.run
+        def transfer(args, **kwargs):
+            path = Path(args[args.index('--output') + 1])
+            downloaded.append(path.name)
+            probe = run_process([sys.executable, '-c',
+                'import fcntl,sys; fcntl.flock(open(sys.argv[1],"a"),fcntl.LOCK_EX|fcntl.LOCK_NB)',
+                str(self.store.path('control.lock'))], capture_output=True)
+            self.assertEqual(probe.returncode, 0, probe.stderr)
+            gguf(path)
+            return subprocess.CompletedProcess(args, 0)
+        from contextlib import nullcontext
+        with patch('maa.models.urllib.request.urlopen', side_effect=lambda *a, **k: nullcontext(io.StringIO(json.dumps(document)))), \
+                patch('maa.models.subprocess.run', side_effect=transfer):
+            # transfer uses the unpatched subprocess call for its independent lock probe.
+            model = hf_download(self.store, 'publisher/repo', names[0])
+            gguf(Path(model['files'][1]['path']), True)  # Valid header and size, wrong content hash.
+            restored = hf_download(self.store, 'publisher/repo', names[0])
+        self.assertEqual(len(downloaded), 3)
+        self.assertEqual(downloaded[-1], names[1] + '.part')
+        verify_file(restored)
 
 
 

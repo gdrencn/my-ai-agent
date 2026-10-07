@@ -11,7 +11,7 @@ from .backends import (binary, llama_arguments, llama_endpoint, llama_observe,
                        ollama_capabilities, check_options, ollama_environment,
                        ollama_endpoint, ollama_prepare, ollama_observe)
 from .http import request
-from .output import stage
+from .output import stage, native_output
 from .store import Error, atomic, read, write
 
 UNITS = {'ollama': 'ollama.service', 'llamacpp': 'llama-server.service'}
@@ -22,7 +22,10 @@ def fingerprint(target):
 
 
 def privileged(command, **kwargs):
-    return subprocess.run(([] if os.geteuid() == 0 else ['sudo']) + command, check=True, **kwargs)
+    if kwargs.get('capture_output') or (kwargs.get('stdout') is not None and kwargs.get('stderr') is not None):
+        return subprocess.run(([] if os.geteuid() == 0 else ['sudo']) + command, check=True, **kwargs)
+    with native_output():
+        return subprocess.run(([] if os.geteuid() == 0 else ['sudo']) + command, check=True, **kwargs)
 
 
 def escaped(value):
@@ -146,7 +149,8 @@ class Controller:
             except Error:
                 # An unused manifest is harmless; the accepted runtime is valid.
                 import sys
-                print('Unused rollback manifest retained; native model configuration is committed.', file=sys.stderr)
+                with native_output():
+                    print('Unused rollback manifest retained; native model configuration is committed.', file=sys.stderr)
 
     def prepare(self, target):
         """Only official backend executables and curl run at boot."""
@@ -219,7 +223,16 @@ class Controller:
             if other != backend and self.owned(other):
                 privileged(['systemctl', 'disable', '--now', UNITS[other]], stdout=subprocess.DEVNULL)
         stage('启动原生底座')
-        privileged(['systemctl', 'restart', UNITS[backend]])
+        privileged(['systemctl', 'start', UNITS[backend]])
+
+    def wake(self, target):
+        if target['model']['backend'] == 'ollama':
+            from .backends import ollama_wake
+            ollama_wake(target['model']['name'], target['settings'])
+        else:
+            stage('唤醒 llama.cpp 模型')
+            request(llama_endpoint() + '/v1/responses', {'model': target['model']['name'],
+                    'input': 'Hi', 'max_output_tokens': 1, 'stream': False}, timeout=600)
 
     def unit_info(self, target=None):
         target = target or self.store.selected()
@@ -239,6 +252,17 @@ class Controller:
     def running(self):
         return self.state() == 'active'
 
+    def configuration_signature(self, target):
+        paths = [self.unit_path(target['model']['backend'])]
+        if target['model']['backend'] == 'ollama':
+            paths.append(self.store.path('native') / 'ollama-preload.json')
+        return {str(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths if path.exists()}
+
+    def configuration_matches(self, target):
+        runtime = read(self.store.path('runtime.json'), {})
+        return (self.owned(target['model']['backend']) and runtime.get('native_config') is not None
+                and runtime['native_config'] == self.configuration_signature(target))
+
     def observe(self, target=None):
         target = target or self.store.selected()
         model = target['model']
@@ -255,6 +279,7 @@ class Controller:
             launch = launch_reference(log, 0, info.get('InvocationID'))
         return {**runtime, 'model': model['name'], 'display_name': model['name'], 'backend': model['backend'],
                 'key': model['key'], 'fingerprint': fingerprint(target), 'launch': launch,
+                'native_config': self.configuration_signature(target),
                 'log_path': str(log), 'pid': int(info.get('MainPID', 0)),
                 'base_url': (ollama_endpoint() if model['backend'] == 'ollama' else llama_endpoint()) + '/v1',
                 'capabilities': {'native_direct_connection': True}}

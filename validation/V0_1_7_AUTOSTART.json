@@ -1,0 +1,33 @@
+{
+  "version": "0.1.7",
+  "at": "2026-10-07T07:29:10.112480+00:00",
+  "status": "passed",
+  "validated_uid": 1001,
+  "checks": [
+    {
+      "backend": "ollama",
+      "selected": "qwen2.5:3b",
+      "initial_status": "paused",
+      "program_sha256": "c32ffe0be8d807fc40b36dbcb033989619167ff5297b93f35f5519c1c1e15e4e",
+      "status": "passed",
+      "manager_archive_absent": true,
+      "native_autostart_after_pause": true,
+      "context": 32768,
+      "codex_stdout": "Hello. How can I assist you today?\n",
+      "diagnostic": "Reading additional input from stdin...\nOpenAI Codex v0.160.1\n--------\nworkdir: /tmp/tmpamdcknt1\nmodel: qwen2.5:3b\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a11542-e920-7841-baac-a140df782aef\n--------\nuser\nReply hello. Do not use tools.\ncodex\nHello. How can I assist you today?\ntokens used\n3,697\n"
+    },
+    {
+      "backend": "llamacpp",
+      "selected": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+      "initial_status": "paused",
+      "program_sha256": "c32ffe0be8d807fc40b36dbcb033989619167ff5297b93f35f5519c1c1e15e4e",
+      "status": "passed",
+      "manager_archive_absent": true,
+      "native_autostart_after_pause": true,
+      "context": 32768,
+      "codex_stdout": "Hello! How can I assist you today?\n",
+      "diagnostic": "Reading additional input from stdin...\nOpenAI Codex v0.160.1\n--------\nworkdir: /tmp/tmp14p_1qat\nmodel: unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a11543-5988-7770-8c37-21240cf46299\n--------\nuser\nReply hello. Do not use tools.\ncodex\nHello! How can I assist you today?\ntokens used\n3,295\n"
+    }
+  ],
+  "scope": "Native container reboot after pause with installed maa archive removed; independent real codex-local exec on each backend."
+}

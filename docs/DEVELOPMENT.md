@@ -18,11 +18,38 @@ Python 3.11+, Linux/systemd inside mas. Product has only standard-library runtim
 | cli / install | public commands, container guard and official installation |
 | bootstrap | numeric prerelease discovery and checksummed version pairing |
 
-## Verification
+## Lifecycle trigger audit (0.1.7)
+
+| Entry | Native lifecycle behavior |
+| --- | --- |
+| YOLO on/off; install/update Codex CLI | Edit/install Codex only; no backend stop, start, wake or reload; CLI, menu and product installer share this rule |
+| Configure reasoning only | Transactional profile/per-model state update using accepted context; preserve running/paused state |
+| Apply unchanged settings | No lifecycle operation |
+| Select another backend/model; change a backend key | Full stop/prepare/start/verify/commit transaction with rollback |
+| Select the current unchanged target; maa start | Reuse resident instance, wake idle model, or start verified saved units from pause |
+| Missing/changed/unverified native configuration | Full revalidation on explicit start/select; unit/preload file hashes guard saved-unit reuse |
+| Pull/create the selected Ollama public tag | No automatic switch; invalidate native-configuration reuse because native model parameters may change |
+| Update the active backend or install all components | Maintenance stop/install/start/verify, synchronize actual context; preserve previous paused state |
+| Install an inactive backend | Ownership preflight plus official installer; retain the current model |
+| Upgrade maa with --components none | Replace owned management entrypoints only; retain native instance and profile |
+| Ollama inventory on owned running Ollama | Read tags/show directly; never unload or reload |
+| Ollama model operation without a running owned Ollama | Exclusive temporary native service with previous target restored if it was running |
+| HF download/local GGUF scan | Outside control.lock; per-target download lock, then brief registration lock |
+| Native pull/create on owned running Ollama | Outside control.lock; backend download lock; an explicit pause/switch may interrupt transfer, never restore a stale selection |
+| Main-menu summary | Native read-only state/context only; skip allocations and GPU memory |
+| Full status/logs/codex-local | Read-only observations or direct native client execution; no maa-triggered reload |
+
+Ctrl+C restores the previous target/state and retains KeyboardInterrupt/130. Paused saved-unit startup failures restore the paused state. Interrupted transfer and restore failures retain accurate diagnostics. Forced termination remains outside normal rollback guarantees.
+
+GGUF records contain the entire shard set (path, file identity, SHA-256). Verify all identities before lifecycle mutation. Legacy split records without full identities require registration again. HF requests file metadata (`blobs=true`), pins the repository commit, checks size and available LFS SHA-256, and retries only damaged cached shards once. The API's file-metadata behavior is documented in the [official HfApi reference](https://huggingface.co/docs/huggingface_hub/en/package_reference/hf_api#huggingface_hub.HfApi.model_info). Cached symlinks outside the target directory are refused.
+
+Readonly option activation is handled inside Screen.choose rather than rebuilding the business menu. Model picker defaults follow the current backend/key; focus details show filename/source with wrapped text. Unavailable request counters are consolidated only in menu output; CLI null fields remain stable. Passed test output is buffered; failed diagnostics are retained. The real Codex tool fixture returns its complete details to the native JSON report and prints JSON only when run standalone.
+
+## Commands
 
 ```bash
 python3 scripts/build.py
-python3 -m unittest discover -v
+python3 -m unittest discover -v -b
 cd /tmp
 python3 -I /absolute/project/dist/maa-test.pyz --unit --product /absolute/project/dist/maa.pyz
 ```
@@ -47,6 +74,6 @@ The independent launcher must find the official ~/.local/bin/codex immediately a
 
 Build produces maa.pyz, maa-test.pyz, VERSION.json, bootstrap.py, install.sh and SHA256SUMS. Numeric version lives only in maa/__init__.py. VERSION.json pairs the test channel/version; SHA256SUMS covers the other five payloads. Test publication can add frozen validation JSON and its checksum. The repository validation manifest covers all checked-in receipts; the release validation manifest covers that version's initial local/native receipts. Public evidence is appended with a separate PUBLIC_SHA256SUMS; never overwrite a released manifest.
 
-Commit verified source/docs to main, tag v0.1.6, publish GitHub prerelease. Never replace an existing tag/release/asset. Download every asset again and verify local byte equality, manifest and the public installer. Changes after freeze require a new version unless they only record validation/documentation and do not alter frozen payloads. Stable promotion needs user acceptance.
+Commit verified source/docs to main, tag v0.1.7, publish GitHub prerelease. Never replace an existing tag/release/asset. Download every asset again and verify local byte equality, manifest and the public installer. Changes after freeze require a new version unless they only record validation/documentation and do not alter frozen payloads. Stable promotion needs user acceptance.
 
 The official upstream installers resolve their own current versions; do not claim their future releases are identical to the versions in our validation receipt. Models are pinned to HF commits or native Ollama digests after download.

@@ -188,6 +188,53 @@ def model_status_native():
     return snapshot
 
 
+def configuration_without_reload():
+    from maa.service import Controller
+    store, controller = Store(), Controller(Store())
+    selected = store.selected()
+    before = controller.unit_info()
+    command('config', 'reasoning=none')
+    command('config', 'reasoning=none')  # Unchanged apply is also inert.
+    command('yolo', 'off')
+    command('yolo', 'on')
+    command('start')  # Already resident: no restart or inference.
+    if selected['model']['backend'] == 'ollama':
+        rows = command('models', 'ollama')
+        assert any(row['key'] == selected['model']['key'] for row in rows), rows
+    after = controller.unit_info()
+    assert after['InvocationID'] == before['InvocationID'] and after['MainPID'] == before['MainPID'], (before, after)
+    command('pause', structured=False)
+    command('config', 'reasoning=default')
+    state = command('status')
+    assert not state['running'] and state['model_status']['saved_context'], state
+    assert state['model_status']['state'] == 'paused', state
+    command('start')
+    assert controller.configuration_matches(store.selected())
+    return {'resident_instance_unchanged': True, 'paused_configuration_did_not_wake': True,
+            'saved_context': state['model_status']['saved_context'], 'before': before, 'after': after}
+
+
+def ollama_start_idle_without_restart():
+    from maa.service import Controller
+    store, controller = Store(), Controller(Store())
+    selected = store.selected()
+    before = controller.unit_info()
+    runtime = read(store.path('runtime.json'))
+    manifest = catalog_metadata()
+    req = urllib.request.Request(runtime['upstream'] + '/api/generate',
+        data=json.dumps({'model': selected['model']['name'], 'keep_alive': 0}).encode(),
+        headers={'Content-Type': 'application/json'})
+    with urllib.request.urlopen(req, timeout=120) as response:
+        response.read()
+    assert command('status')['model_status']['state'] == 'idle'
+    state = command('start')
+    after = controller.unit_info()
+    assert state['model_status']['state'] == 'running', state
+    assert before['InvocationID'] == after['InvocationID'] and before['MainPID'] == after['MainPID'], (before, after)
+    assert catalog_metadata() == manifest
+    return {'native_instance_unchanged': True, 'woke_existing_model': True, 'before': before, 'after': after}
+
+
 def ollama_entry_reuse(wake=False):
     import time
     runtime = command('status')['runtime']
@@ -242,6 +289,7 @@ def main():
         check(model['backend'] + '-codex-cli', codex_exec)
         check(model['backend'] + '-manager-independent', independent)
         check(model['backend'] + '-model-status', model_status_native)
+        check(model['backend'] + '-configuration-without-reload', configuration_without_reload)
         try:
             from maa_testing.codex_ui import picker
         except ImportError:
@@ -249,6 +297,7 @@ def main():
         check(model['backend'] + '-codex-model-picker', lambda: picker(LOCAL, model['name']))
     check('ollama-resident-entry-reuses-alias', ollama_entry_reuse)
     check('ollama-expired-entry-wakes-existing-alias', lambda: ollama_entry_reuse(True))
+    check('ollama-explicit-start-wakes-without-restart', ollama_start_idle_without_restart)
     try:
         from maa_testing.codex_tool import main as tool_fixture
     except ImportError:

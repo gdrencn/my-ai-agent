@@ -97,9 +97,8 @@ def product(archive, components='all'):
     codex.yolo(True)
     if components != 'none':
         manager = Manager()
-        with manager.store.lock(), manager.maintenance():
-            component(components)
-    if store.selected():
+        manager.install(components)
+    if store.selected() and legacy is not None:
         manager = Manager(store, controller)
         manager.start()
         if not was_running:
