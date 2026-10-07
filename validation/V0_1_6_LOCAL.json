@@ -1,0 +1,70 @@
+{
+  "version": "0.1.6",
+  "at": "2026-10-07T03:00:47.860086+00:00",
+  "status": "passed",
+  "asset_sha256": {
+    "maa.pyz": "b6783dc4930e5fbfe269dd5a12f9eb86d0e02f625820dab86dd7ac4ba6ec562d",
+    "maa-test.pyz": "845c3d97c33963512e0ab53abf2a568efba66753b74b347dcfef0f4a8efe46b3",
+    "VERSION.json": "d0b2b451cf29a77218b20adef728ba52bd0dd5d5d42ae1ff935a6fb68eac0ccd",
+    "bootstrap.py": "29be87f1d96b102eead25f33edf77f37affda5bec710420c6eda11e2f4a7ed6b",
+    "install.sh": "71833da669c112156534c33feefc8f981e0bdd583cf9c0a3c55ee838bd1a45cf",
+    "SHA256SUMS": "4b7f2e30881e8b190147955640cee7e7eaf1e34af6f6de4d539e2227e29c09a5"
+  },
+  "portable": {
+    "source_tests": 45,
+    "packaged_tests_outside_checkout": 45,
+    "container_packaged_tests": 45,
+    "skipped": 0
+  },
+  "build": {
+    "reproducible": true,
+    "python_3_11_grammar": 43,
+    "shell_syntax": true,
+    "package_boundaries": true
+  },
+  "regression": {
+    "original_0_1_5_path_failure_reproduced": true,
+    "new_launcher_system_only_PATH": true,
+    "home_with_spaces": true,
+    "literal_arguments_and_exec_PID_preserved": true,
+    "no_runtime_maa_dependency": true
+  },
+  "product_changes_from_0_1_5": [
+    "maa/__init__.py",
+    "maa/codex.py"
+  ],
+  "native": {
+    "checks": 28,
+    "receipt": "V0_1_6_NATIVE.json",
+    "program_sha256": "b6783dc4930e5fbfe269dd5a12f9eb86d0e02f625820dab86dd7ac4ba6ec562d",
+    "fresh_official_install_and_test_in_one_non_login_process": true,
+    "both_backend_Codex_children_without_user_bin_in_PATH": true
+  },
+  "ci": {
+    "conclusion": "success",
+    "commit": "0f36537a595fb0602c71c4435b2eab9aa01e5fe8",
+    "run": "https://github.com/gdrencn/my-ai-agent/actions/runs/37564499409"
+  },
+  "inherited_architecture_checks": {
+    "receipt": "V0_1_5_LOCAL.json",
+    "scope": "native service/migration behavior unchanged; independent launcher receives only local PATH initialization"
+  },
+  "limitations": [
+    "No full custom/freeform apply_patch compatibility; catalog retains ordinary shell tools",
+    "No native MTP or recurrent-model inference acceptance",
+    "No qwen3.8 large-model reproduction or partial-offload performance claim",
+    "No conversation interceptor or recent token receipts",
+    "Forced termination during configuration may leave native autostart disabled; maa start revalidates saved target"
+  ],
+  "user_reported_0_1_5_failure": {
+    "check": "llamacpp-codex-cli",
+    "diagnostic": "exec: codex: not found",
+    "reason": "official user install directory absent from existing process PATH"
+  },
+  "cleanup": {
+    "invalid_test_fixture_removed": true,
+    "selected_target_paused": true,
+    "container": "maa-path-016",
+    "retained_for": "public installer verification; final deletion recorded in V0_1_6_PUBLIC.json"
+  }
+}

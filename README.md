@@ -159,4 +159,4 @@ codex-local exec --skip-git-repo-check 'Explain this directory.'
 curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/test.sh | bash
 ```
 
-入口下载同版本测试包，运行 portable/PTY 检查与Qwen3-0.6B GGUF 和 Ollama qwen2.5:3b 的原生接口、真实 Codex `/model`、驻留复用、空闲唤醒、暂停恢复及失败回滚检查，保存 JSON 报告，最后暂停模型。测试产生的坏 GGUF 与登记记录在失败时也会清理；旧测试遗留文件只在路径、内容、登记身份均符合旧测试签名且未被选中时清理，保留用户的同名真实模型。大模型、MTP 实际速度和全 GPU 装载仍需使用自己的模型验收。已核验范围见 [IMPLEMENTED.md](IMPLEMENTED.md)，开发说明见 [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)。
+入口下载同版本测试包，运行 portable/PTY 检查与Qwen3-0.6B GGUF 和 Ollama qwen2.5:3b 的原生接口、真实 Codex `/model`、驻留复用、空闲唤醒、暂停恢复及失败回滚检查，保存 JSON 报告，最后暂停模型。Codex 启动检查使用不含用户安装目录的 PATH，覆盖刚安装后尚未重开终端的情况。测试产生的坏 GGUF 与登记记录在失败时也会清理；旧测试遗留文件只在路径、内容、登记身份均符合旧测试签名且未被选中时清理，保留用户的同名真实模型。大模型、MTP 实际速度和全 GPU 装载仍需使用自己的模型验收。已核验范围见 [IMPLEMENTED.md](IMPLEMENTED.md)，开发说明见 [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)。
