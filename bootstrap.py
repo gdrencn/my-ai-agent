@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
-"""Discover immutable test release, validate paired assets, install inside mas."""
+"""Resolve an immutable channel release, verify paired assets, install in mas."""
 import argparse
 import hashlib
 import json
 from pathlib import Path
+import re
 import subprocess
 import sys
 import tempfile
 import urllib.request
+from urllib.parse import quote
 
 REPO = 'gdrencn/my-ai-agent'
 
@@ -18,25 +20,52 @@ def fetch(url):
         return response.read()
 
 
-def run():
-    parser = argparse.ArgumentParser(description='Install my-ai-agent test inside a mas container')
-    parser.add_argument('--version', help='exact numeric test version; default newest prerelease')
+def release(version=None, channel='test'):
+    base = f'https://api.github.com/repos/{REPO}/releases'
+    pattern = r'v(\d+\.\d+\.\d+)' if channel == 'test' else r'stable/(\d+\.\d+\.\d+)'
+
+    def accepted(item):
+        return (not item.get('draft') and item.get('prerelease') is (channel == 'test')
+                and re.fullmatch(pattern, item.get('tag_name', '')))
+
+    if version:
+        if not re.fullmatch(r'v?\d+\.\d+\.\d+', version):
+            raise ValueError('Version must be numeric major.minor.patch')
+        tag = ('v' if channel == 'test' else 'stable/') + version.removeprefix('v')
+        selected = json.loads(fetch(base + '/tags/' + quote(tag, safe='')))
+        if not accepted(selected) or selected['tag_name'] != tag:
+            raise ValueError('Release version/channel pairing mismatch')
+        return selected
+    if channel == 'stable':
+        selected = json.loads(fetch(base + '/latest'))
+        if not accepted(selected):
+            raise ValueError('No matching stable release exists')
+        return selected
+    candidates = []
+    for page in range(1, 101):
+        rows = json.loads(fetch(base + f'?per_page=100&page={page}'))
+        candidates.extend(item for item in rows if accepted(item))
+        if len(rows) < 100:
+            break
+    if not candidates:
+        raise ValueError('No matching test release exists')
+    return max(candidates, key=lambda item: tuple(map(int, item['tag_name'][1:].split('.'))))
+
+
+def run(argv=None):
+    parser = argparse.ArgumentParser(description='Install my-ai-agent inside a mas container')
+    parser.add_argument('--channel', choices=('test', 'stable'), default='test')
+    parser.add_argument('--version', help='exact numeric version in the selected channel')
     parser.add_argument('--test', action='store_true', help='run paired portable and native checks after installing')
     parser.add_argument('--components', choices=('all', 'none', 'ollama', 'llamacpp', 'codex'), default='all')
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     if sys.version_info < (3, 11):
         raise ValueError('Python 3.11+ is required (mas default Ubuntu 24.04 includes it)')
     if not Path('/dev/lxd/sock').exists():
         raise ValueError('Run this installer inside a mas container, not on the host')
-    releases = json.loads(fetch(f'https://api.github.com/repos/{REPO}/releases'))
-    candidates = [r for r in releases if r['prerelease'] and not r['draft'] and r['tag_name'].startswith('v')]
-    candidates = [r for r in candidates if len(r['tag_name'][1:].split('.')) == 3 and all(x.isdigit() for x in r['tag_name'][1:].split('.'))]
-    if args.version:
-        candidates = [r for r in candidates if r['tag_name'] == 'v' + args.version]
-    if not candidates:
-        raise ValueError('No matching test release exists')
-    release = max(candidates, key=lambda r: tuple(map(int, r['tag_name'][1:].split('.'))))
-    assets = {a['name']: a['browser_download_url'] for a in release['assets']}
+    selected = release(args.version, args.channel)
+    version = selected['tag_name'][1:] if args.channel == 'test' else selected['tag_name'].split('/')[-1]
+    assets = {a['name']: a['browser_download_url'] for a in selected['assets']}
     manifest = fetch(assets['SHA256SUMS']).decode()
     checks = dict((name, digest) for digest, name in (line.split() for line in manifest.splitlines()))
     with tempfile.TemporaryDirectory(prefix='maa-install-') as folder:
@@ -47,9 +76,9 @@ def run():
                 raise ValueError('Checksum mismatch: ' + name)
             (folder / name).write_bytes(blob)
         info = json.loads((folder / 'VERSION.json').read_text())
-        if info != {'version': release['tag_name'][1:], 'channel': 'test'}:
+        if info != {'version': version, 'channel': args.channel}:
             raise ValueError('Release version/channel pairing mismatch')
-        print('正在安装 my-ai-agent v' + info['version'] + ' test', flush=True)
+        print('正在安装 my-ai-agent v' + info['version'] + ' ' + args.channel, flush=True)
         subprocess.run([sys.executable, str(folder / 'maa.pyz'), '_install', '--components', args.components], check=True)
         if args.test:
             subprocess.run([sys.executable, str(folder / 'maa-test.pyz'), '--native',

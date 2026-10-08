@@ -1,4 +1,14 @@
-# my-ai-agent Requirements — 0.1.9 test
+# my-ai-agent Requirements — 0.1.9
+
+## 0.1.9 stable publication
+
+用户已验收 0.1.9 test，并授权在最终代码和文档核验没有发现阻断问题后发布 stable。
+
+1. stable 使用已经验收的 0.1.9 产品和配对测试包，逐字节与原 v0.1.9 资产核对；不修改产品代码，不覆盖原 test tag、release 或资产。
+2. stable 发布到独立 stable/0.1.9 tag，作为 GitHub latest 正式 release。根 install.sh 安装 stable；test/install.sh 和 test/test.sh 明确选择 test，测试入口语义保持不变。
+3. 共用 bootstrap 按通道分别发现正式 stable tag 或数字 prerelease；支持指定同通道版本，拒绝 draft、错误 tag、通道或版本配对错误及校验和不符。指定版本直接查询对应 tag，默认 test 发现包含分页。
+4. stable 的 VERSION.json 标明 stable 通道，产品和测试包仍报告 0.1.9。构建脚本提供通道参数，默认 test；发布元数据与分发入口更新不改变两个 zipapp 的字节。
+5. 核验源码、配对包、发布通道故障输入及实际公开入口。公开入口安装在独立 mas 临时容器内执行，完成后清理。文档说明 stable/test 区分、独立启动脚本参数、profile 内容和已核验范围，区分既有原生证据与本轮新检查。
 
 ## 0.1.9 shared command output and progress
 
@@ -53,7 +63,7 @@
 5. 保留配置默认值、KV 跟随、YOLO 两键恢复、菜单颜色与操作计时。主菜单“Codex 配置”管理 YOLO，排在“codex-local 配置”之前；后者管理本地推理与上下文配置。HF 仍保留仓库和精确文件两项。
 6. 原生状态查询分别读取底座 API 和当前原生日志，日志与启动身份由原生服务确定。删除对 maa 对话中转收据的依赖；直连后无法可靠取得的统计显示未取得并说明来源，不能伪造旧数据或引入后台监听。
 7. 从旧版本迁移时仅清理可核验属于 maa 的旧服务和入口；保留模型、每模型配置、普通 Codex 配置和 YOLO 恢复备份。迁移失败给出明确诊断，不覆盖不属于项目的文件或服务。
-8. 在独立 mas 容器验证安装、原生直连、立即切换、回滚、暂停与重启自启动、maa 运行依赖移除、独立启动脚本、终端导航和可重现打包。记录原生限制；当前另发不可变 0.1.7 test，stable 仍需用户验收。
+8. 在独立 mas 容器验证安装、原生直连、立即切换、回滚、暂停与重启自启动、maa 运行依赖移除、独立启动脚本、终端导航和可重现打包。记录原生限制；该阶段随后另发不可变 0.1.7 test，stable 授权以最新验收为准。
 
 自动压缩比例固定 90%，不添加未确认的比例修改入口。旧版本的需求与实现记录保留在 Git 历史和 validation 收据中。实现及验证见 IMPLEMENTED.md。
 
@@ -133,7 +143,7 @@ llama.cpp 固定一个本地 agent 推理槽，保证 llama.cpp 的上下文设�
 5. 核验 YOLO 两键恢复、重复开启、无关 TOML 保留、跨进程备份。
 6. 核验本地 Responses 对话、流式、工具调用及 context/90% 同步。
 7. PTY 验证导航、输入编辑、窄终端、取消和终端恢复；结构化输出无控制码。
-8. 可重现构建、校验和、包边界、安装版本；不可变 v0.1.8 GitHub prerelease，回下载比较字节。stable 等待用户验收。
+8. 可重现构建、校验和、包边界、安装版本；数字 test GitHub prerelease 与独立 stable 正式 release 均保持资产不可变，回下载比较字节。stable 发布需要用户验收授权。
 9. IMPLEMENTED.md 区分 portable/native/fault-injected/user-reported 证据，不宣称未实测的大模型/GPU/MTP 结果。
 
 ## Official references

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Deterministic self-contained zipapp and version-paired release manifest."""
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -11,7 +12,7 @@ sys.path.insert(0, str(ROOT))
 from maa import __version__
 
 
-def build():
+def build(channel='test'):
     out = ROOT / 'dist'
     out.mkdir(exist_ok=True)
     files = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT / 'maa').rglob('*.py')}
@@ -36,15 +37,18 @@ def build():
             info.compress_type = zipfile.ZIP_DEFLATED
             info.external_attr = 0o644 << 16
             archive.writestr(info, tester[name])
-    (out / 'VERSION.json').write_text(json.dumps({'version': __version__, 'channel': 'test'}, indent=2) + '\n')
-    for name in ('bootstrap.py', 'install.sh'):
-        (out / name).write_bytes((ROOT / name).read_bytes())
+    (out / 'VERSION.json').write_text(json.dumps({'version': __version__, 'channel': channel}, indent=2) + '\n')
+    (out / 'bootstrap.py').write_bytes((ROOT / 'bootstrap.py').read_bytes())
+    installer = ROOT / ('test/install.sh' if channel == 'test' else 'install.sh')
+    (out / 'install.sh').write_bytes(installer.read_bytes())
     checksums = []
     for name in ('maa.pyz', 'maa-test.pyz', 'VERSION.json', 'bootstrap.py', 'install.sh'):
         checksums.append(hashlib.sha256((out / name).read_bytes()).hexdigest() + '  ' + name)
     (out / 'SHA256SUMS').write_text('\n'.join(checksums) + '\n')
-    print('Built my-ai-agent ' + __version__)
+    print('Built my-ai-agent ' + __version__ + ' ' + channel)
 
 
 if __name__ == '__main__':
-    build()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--channel', choices=('test', 'stable'), default='test')
+    build(parser.parse_args().channel)

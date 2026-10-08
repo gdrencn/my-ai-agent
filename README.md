@@ -2,7 +2,7 @@
 
 在 **my-ai-sandbox（mas）容器内**安装并管理 Ollama、llama.cpp 和 Codex CLI。
 
-当前版本：**0.1.9 test**。两种底座可共存，通过 `maa` 选择一个当前底座和模型，并同步 `codex-local`。
+当前稳定版本：**0.1.9 stable**。两种底座可共存，通过 `maa` 选择一个当前底座和模型，并同步 `codex-local`。stable 的产品与配对测试包和已验收的 `v0.1.9` test 逐字节相同。
 
 安装、模型切换和暂停/启动共用进度反馈：静默阶段原地刷新等待时长，原生下载保留实时进度，实际诊断单独保留；不因无输出的命令增加重复提示或空行。
 
@@ -11,7 +11,7 @@
 先进入 mas 容器，在容器终端执行：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/install.sh | bash
 ```
 
 默认安装 maa，并依次运行 Ollama、llama.cpp、Codex 的官方安装程序。需要容器内 sudo 权限、网络、Python 3.11+、curl 和 systemd。mas 默认 Ubuntu 24.04 环境符合 Python 要求。官方程序安装完成后，maa 写入两种底座各自的原生 systemd 配置，只启用当前底座。maa 本身没有常驻服务。
@@ -19,10 +19,12 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/insta
 只安装管理程序，之后在菜单选择软件：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/install.sh | bash -s -- --components none
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/install.sh | bash -s -- --components none
 ```
 
 已有底座和模型时，也可用上述 `--components none` 命令升级 maa，保留已下载模型和配置。
+
+根 `install.sh` 默认选择 GitHub latest 正式 stable release；`test/install.sh` 安装最新数字 test prerelease，`test/test.sh` 安装并运行该 test 版本的配对测试。指定版本可在上述命令的 `bash -s --` 后增加 `--version 0.1.9`，只在对应通道查找；stable tag 为 `stable/0.1.9`，test tag 为 `v0.1.9`。安装器核对版本、通道和 SHA-256，不把两个通道混用。
 
 从旧版本升级时，会核验并移除项目自己的 `maa.service`，保留模型、每模型配置和 YOLO 恢复记录，然后生成原生配置并核验保存目标。原来运行的目标恢复运行，原来暂停的目标核验后恢复暂停。修改过或属于其他用户的服务会被拒绝处理；尚未选择模型时，在菜单选择模型。
 
@@ -33,7 +35,7 @@ maa
 codex-local
 ```
 
-当前终端找不到命令时，打开新终端，或使用 `~/.local/bin/maa`、`~/.local/bin/codex-local`。maa 安装时默认开启当前容器用户的 Codex 全局 YOLO；菜单可关闭并恢复原来的两项设置。
+当前终端找不到命令时，打开新终端，或使用 `~/.local/bin/maa`、`~/.local/bin/codex-local`。maa 首次安装时默认开启当前容器用户的 Codex 全局 YOLO；菜单可关闭并恢复原来的两项设置，后续更新保留用户选择。
 
 ## Models
 
@@ -124,6 +126,27 @@ exec codex --no-daemon --profile maa-local "$@"
 ```
 
 它在自身进程中补上官方用户安装目录，因此通过绝对路径运行时不要求先重开终端，也不修改父 shell 的 PATH。随后直接启动官方 Codex，不调用 maa、不检查管理状态、不改写配置、不自动启动暂停的底座。空闲模型由底座根据正常推理请求自行唤醒。删除 maa 程序后，已生成的 profile、模型目录和原生底座配置仍能使用。
+
+`--no-daemon` 让本次 Codex 不使用共享后台服务，直接运行会话并加载 `maa-local` profile；不停止已存在的共享服务，也不改变底座服务。用户参数通过 `"$@"` 原样传给官方 Codex，例如 `codex-local resume --last`、`codex-local -C /path/to/project`。不需要重复提供这两个已有选项；参数有效性和冲突仍由 Codex 处理，`--model` 或 `-c` 可以覆盖 profile 的对应设置。
+
+profile 默认在 `~/.codex/maa-local.config.toml`；设置 `CODEX_HOME` 时使用对应目录。以下为 Ollama、`qwen3.8:latest`、有效上下文 262144 的示例，目录中的 `<hash>` 为实际模型元数据的内容哈希，不是字面文件名：
+
+```toml
+# Managed by my-ai-agent. Global permissions and web_search are inherited.
+model = "qwen3.8:latest"
+model_provider = "maa_local"
+model_context_window = 262144
+model_auto_compact_token_limit = 235929
+model_catalog_json = "/home/sandbox/.codex/maa-model-catalogs/<hash>.json"
+
+[model_providers.maa_local]
+name = "my-ai-agent local"
+base_url = "http://127.0.0.1:11434/v1"
+wire_api = "responses"
+requires_openai_auth = false
+```
+
+模型名、有效上下文、压缩阈值、模型目录路径和原生地址随选择同步。llama.cpp 默认地址为 `http://127.0.0.1:8080/v1`；地址使用实际底座环境配置。推理强度为默认时不写 `model_reasoning_effort`，选择具体档位时在顶层写入对应字符串。模型目录只登记当前模型，保存 `/model` 所需元数据、支持档位及项目生成的基础提示词；它不是 Maa 服务。
 
 Ollama profile 直连其 `/v1/responses`；llama.cpp profile 直连自己的 `/v1/responses`。切换时 maa 写入对应底座的配置，随后退出。`/model`、profile 和模型目录使用原模型名称。Ollama 在原名称上应用上下文参数，并用只占清单、不复制权重的私有备份保留原模型预设；不再用不透明的运行别名。
 

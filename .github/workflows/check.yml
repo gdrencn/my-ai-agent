@@ -9,5 +9,6 @@ jobs:
         with:
           python-version: '3.12'
       - run: python scripts/build.py
+      - run: python scripts/test_bootstrap.py
       - run: python -m unittest discover -v -b
       - run: cd /tmp && python -I "$GITHUB_WORKSPACE/dist/maa-test.pyz" --unit --product "$GITHUB_WORKSPACE/dist/maa.pyz"

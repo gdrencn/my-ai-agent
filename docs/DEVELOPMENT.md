@@ -1,4 +1,4 @@
-# Development and test publication
+# Development and release publication
 
 Python 3.11+, Linux/systemd inside mas. Product has only standard-library runtime plus pinned vendored tomlkit 0.13.3, including its license and provenance. Native installers and models are external dependencies.
 
@@ -16,7 +16,7 @@ Python 3.11+, Linux/systemd inside mas. Product has only standard-library runtim
 | codex | lossless two-key global edits/recovery, dedicated local profile and immutable local model catalogs |
 | menu / text / output / i18n / ui | inline terminal controls, Chinese catalog and business menu |
 | cli / install | public commands, container guard and official installation |
-| bootstrap | numeric prerelease discovery and checksummed version pairing |
+| bootstrap | independent stable/test discovery and checksummed channel/version pairing |
 
 ## Lifecycle trigger audit (0.1.8)
 
@@ -57,6 +57,7 @@ Readonly option activation is handled inside Screen.choose rather than rebuildin
 
 ```bash
 python3 scripts/build.py
+python3 scripts/test_bootstrap.py
 python3 -m unittest discover -v -b
 cd /tmp
 python3 -I /absolute/project/dist/maa-test.pyz --unit --product /absolute/project/dist/maa.pyz
@@ -84,8 +85,10 @@ The independent launcher must find the official ~/.local/bin/codex immediately a
 
 ## Artifacts and release
 
-Build produces maa.pyz, maa-test.pyz, VERSION.json, bootstrap.py, install.sh and SHA256SUMS. Numeric version lives only in maa/__init__.py. VERSION.json pairs the test channel/version; SHA256SUMS covers the other five payloads. Test publication can add frozen validation JSON and its checksum. The repository validation manifest covers all checked-in receipts; the release validation manifest covers that version's initial local/native receipts. Public evidence is appended with a separate PUBLIC_SHA256SUMS; never overwrite a released manifest.
+Build produces maa.pyz, maa-test.pyz, VERSION.json, bootstrap.py, install.sh and SHA256SUMS. Numeric version lives only in maa/__init__.py. The default build uses the test channel; `python3 scripts/build.py --channel stable` writes stable VERSION.json. Each build copies the installer for its own channel. Channel selection does not change either zipapp. SHA256SUMS covers the other five payloads. Test publication can add frozen validation JSON and its checksum. The repository validation manifest covers all checked-in receipts; the release validation manifest covers that version's initial local/native receipts. Public evidence is appended with a separate PUBLIC_SHA256SUMS; never overwrite a released manifest.
 
-Commit verified source/docs to main, tag v0.1.9, publish GitHub prerelease. Never replace an existing tag/release/asset. Download every asset again and verify local byte equality, manifest and the public installer. Changes after freeze require a new version unless they only record validation/documentation and do not alter frozen payloads. Stable promotion needs user acceptance.
+Commit verified source/docs to main, tag v<version> and publish GitHub prerelease for test. Stable publication needs user acceptance: create the separate stable/<version> tag/release and mark it latest. Compare stable maa.pyz and maa-test.pyz with the approved numeric test release byte for byte; product changes need a new test version and acceptance. Stable may have distinct channel metadata, delivery tooling and publication documentation. Never replace an existing tag/release/asset. Download every asset again and verify local byte equality, manifests and the public installer.
+
+Root install.sh explicitly selects stable; test/install.sh and test/test.sh explicitly select test. Bootstrap defaults to test for compatibility with older shell entries. Stable default discovery validates GitHub /releases/latest; exact versions query their channel's tag directly. Test default discovery reads paginated releases and chooses the highest numeric prerelease. Refuse drafts, nonmatching tags, channel/version metadata mismatches and corrupt assets before executing an installer. Delivery-only regressions live in scripts/test_bootstrap.py and run separately in CI, so adding release checks does not modify the previously approved paired tester.
 
 The official upstream installers resolve their own current versions; do not claim their future releases are identical to the versions in our validation receipt. Models are pinned to HF commits or native Ollama digests after download.

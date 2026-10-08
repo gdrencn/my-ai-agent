@@ -1,8 +1,16 @@
-# my-ai-agent Implementation — 0.1.9 test
+# my-ai-agent Implementation — 0.1.9
+
+## 0.1.9 stable publication review
+
+The user accepted the 0.1.9 test behavior and authorized stable publication after final code/document review. Review covered shared output, Manager lifecycle and recovery, native units, downloads and identity checks, profile/YOLO ownership, menu activation and read-only status. No product-code blocker was identified. Stable preparation changes only delivery tooling and documentation, retaining both approved zipapps byte for byte.
+
+Stable and test use separate tags and explicit shell entries. Bootstrap verifies channel/version metadata and checksums; stable selects the latest formal release, test selects numeric prereleases, and explicit versions resolve their own channel tag. Ten delivery-only regressions passed, including paginated discovery, wrong channel/version/draft refusal and corruption rejection before installation. The 90 source portable/PTY checks and 90 paired checks outside the checkout passed again. Stable builds are reproducible and both zipapps match the downloaded approved test assets; Python 3.11 grammar, shell syntax, package boundaries and manifests passed.
+
+The candidate shared bootstrap installed the approved test pair and current official dependencies in a fresh ordinary-user mas container, where 90 portable/PTY and all 35 native checks passed. validation/STABLE_0_1_9_REVIEW.json and STABLE_0_1_9_NATIVE.json record this new preparation run. Publication integrity, public installation and cleanup are recorded after those checks complete. Earlier root/native autostart receipts remain prior evidence, not new root runs; small-model native checks do not establish large-model/MTP performance.
 
 ## 0.1.9 shared output verification
 
-Verified all six authorized output requirements against the implementation on 2026-10-07. All 90 source portable/PTY checks and 90 paired-package checks outside the checkout passed. Fresh ordinary-user and root mas containers each passed 90 portable/PTY and 35 native checks against the final product/test bytes. Eight additional real-terminal installed-command checks passed. Immutable 0.1.9 test is published and verified through its public entries; stable requires user acceptance.
+Verified all six authorized output requirements against the implementation on 2026-10-07. All 90 source portable/PTY checks and 90 paired-package checks outside the checkout passed. Fresh ordinary-user and root mas containers each passed 90 portable/PTY and 35 native checks against the final product/test bytes. Eight additional real-terminal installed-command checks passed. Immutable 0.1.9 test is published and verified through its public entries; the user's later acceptance authorizes the stable preparation above.
 
 | Output requirement | Implementation and evidence |
 | --- | --- |

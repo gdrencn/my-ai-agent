@@ -1,0 +1,64 @@
+{
+  "version": "0.1.9",
+  "channel": "stable",
+  "product_changes": false,
+  "approved_test_tag": "v0.1.9",
+  "approved_pair_sha256": {
+    "maa.pyz": "2dcda1dd4eba9697d4a4e1e7a47b74fd932685be19a548973d810d6c1af9b399",
+    "maa-test.pyz": "01c0dd97a4658cd59770993efbfcfa43871684c97296fc1905e81107ea52e281"
+  },
+  "stable_assets_sha256": {
+    "maa.pyz": "2dcda1dd4eba9697d4a4e1e7a47b74fd932685be19a548973d810d6c1af9b399",
+    "maa-test.pyz": "01c0dd97a4658cd59770993efbfcfa43871684c97296fc1905e81107ea52e281",
+    "VERSION.json": "5aeadd5553666049da1fb6a34d6dab0627e898c7fc024079a9958d2d96ba5b32",
+    "bootstrap.py": "12d1cf03fd7836e70d66d94f5e985f6e943697e4af663fb1559678293d035a3c",
+    "install.sh": "22c899084c179199c6fe5dbcdfa69547cb4813dd21a7fa1b3a55adfd52018d21",
+    "SHA256SUMS": "dc808d6dd31eab98fdd98087cad4c6b9c78ee903d42a9a21b01f1e71938ab801"
+  },
+  "reproducible": true,
+  "paired_portable_pty_passed": 90,
+  "delivery_checks_passed": 10,
+  "python_311_package_sources_parsed": 75,
+  "shell_syntax_passed": 3,
+  "original_assets": {
+    "bootstrap.py": "sha256:29be87f1d96b102eead25f33edf77f37affda5bec710420c6eda11e2f4a7ed6b",
+    "install.sh": "sha256:71833da669c112156534c33feefc8f981e0bdd583cf9c0a3c55ee838bd1a45cf",
+    "maa-test.pyz": "sha256:01c0dd97a4658cd59770993efbfcfa43871684c97296fc1905e81107ea52e281",
+    "maa.pyz": "sha256:2dcda1dd4eba9697d4a4e1e7a47b74fd932685be19a548973d810d6c1af9b399",
+    "PUBLIC_SHA256SUMS": "sha256:3257f95805c2e7cae59bc0f25b400193529106aa17c915bd8cc283350a70c695",
+    "SHA256SUMS": "sha256:cd2c8a8a035c47b6af74155911c415a11697cd0d9b8691c194cd38c31b5e73ff",
+    "V0_1_9_LOCAL.json": "sha256:b7babf7b5ef4f68f0821e4d08157c853473fea5d60e95aa223cb80bf486123fb",
+    "V0_1_9_NATIVE.json": "sha256:2b2e44d36a1418b19de4fcd14d9317e9439b5c518d1d632021039e7432f79d7f",
+    "V0_1_9_PUBLIC.json": "sha256:21837edc90238b0e710c8a1a100578c76c640da2487ac1c32d55bb21c703de8b",
+    "V0_1_9_ROOT_NATIVE.json": "sha256:c81331e57185983d004158c30a7f96f58059229b107b1095610febfa29d535ce",
+    "V0_1_9_TERMINAL.json": "sha256:0aa6b797adad4b1f25c7ebdfafbf170c51cc26be55e0af24f34843ec4ef9ef3a",
+    "VALIDATION_SHA256SUMS": "sha256:d61639bbb5cc82256011ac59fff455ee1a6e186819e0f7e30ccfd1a9d69d9b3e",
+    "VERSION.json": "sha256:2e415a2f23c372c9798d67354de482c70076c586d324597fe96d56243f686ed4"
+  },
+  "build_installer_matches_channel": true,
+  "review_completed_utc": "2026-10-08T04:16:56.425658+00:00",
+  "source_portable_pty_passed": 90,
+  "product_source_unchanged_since_approved_tag": true,
+  "prepublication_native_validation": {
+    "kind": "candidate bootstrap, live test channel, fresh ordinary-user mas container",
+    "portable_pty_passed": 90,
+    "native_passed": 35,
+    "container": "maa-stable-019-check",
+    "receipt": "STABLE_0_1_9_NATIVE.json",
+    "report_sha256": "50405783a61dd18075b56c62f8ba992736b03d707c318e352e8d4719e252758b"
+  },
+  "review_scope": [
+    "shared terminal output and external command reuse",
+    "Manager lifecycle and rollback",
+    "native unit ownership and independent autostart",
+    "model download/file identity checks",
+    "Codex profile/catalog and YOLO two-key recovery",
+    "menu readonly activation and status observation",
+    "stable/test delivery and document accuracy"
+  ],
+  "limitations": [
+    "Native checks use small GGUF and Ollama models; no large-model or native MTP performance claim.",
+    "Stable public installation and cleanup are subsequent checks recorded separately.",
+    "Root/native autostart validation from prior 0.1.9 receipts remains historical evidence."
+  ]
+}
