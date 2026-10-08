@@ -1,0 +1,107 @@
+{
+  "version": "0.1.9",
+  "channel": "stable",
+  "completed_utc": "2026-10-08T04:21:32.079168+00:00",
+  "release_commit": "b3189e95d996cbb36911076e5e90ef9feca39021",
+  "public_assets": {
+    "release_url": "https://github.com/gdrencn/my-ai-agent/releases/tag/stable/0.1.9",
+    "latest_tag": "stable/0.1.9",
+    "formal_release": true,
+    "published_assets_sha256": {
+      "bootstrap.py": "12d1cf03fd7836e70d66d94f5e985f6e943697e4af663fb1559678293d035a3c",
+      "install.sh": "22c899084c179199c6fe5dbcdfa69547cb4813dd21a7fa1b3a55adfd52018d21",
+      "maa-test.pyz": "01c0dd97a4658cd59770993efbfcfa43871684c97296fc1905e81107ea52e281",
+      "maa.pyz": "2dcda1dd4eba9697d4a4e1e7a47b74fd932685be19a548973d810d6c1af9b399",
+      "SHA256SUMS": "dc808d6dd31eab98fdd98087cad4c6b9c78ee903d42a9a21b01f1e71938ab801",
+      "STABLE_0_1_9_NATIVE.json": "50405783a61dd18075b56c62f8ba992736b03d707c318e352e8d4719e252758b",
+      "STABLE_0_1_9_REVIEW.json": "b7b881c265440edcd2d3462552e4fa20f10e9384416dcdd7b00b2f2431bc0096",
+      "VALIDATION_SHA256SUMS": "fa0ae643b78a19c3bb01b2e6cbc425ee88bca2ba24e1d3d2eab906eaff9828ad",
+      "VERSION.json": "5aeadd5553666049da1fb6a34d6dab0627e898c7fc024079a9958d2d96ba5b32"
+    },
+    "all_assets_publicly_downloaded_and_identical": true,
+    "product_and_validation_manifests_verified": true,
+    "approved_test_release_and_13_assets_unchanged": true
+  },
+  "public_installation": {
+    "version": "0.1.9",
+    "checks": [
+      {
+        "entry": "install.sh",
+        "channel": "stable",
+        "exact": false,
+        "passed": true,
+        "product_hash_matches_test": true,
+        "saved_state_and_native_instance_unchanged": true,
+        "log_sha256": "dfdcf21952d292e4529b091b614cf905f3e7a0a5402fbaff7e7b39d3ee2a5a58"
+      },
+      {
+        "entry": "install.sh",
+        "channel": "stable",
+        "exact": true,
+        "passed": true,
+        "product_hash_matches_test": true,
+        "saved_state_and_native_instance_unchanged": true,
+        "log_sha256": "dfdcf21952d292e4529b091b614cf905f3e7a0a5402fbaff7e7b39d3ee2a5a58"
+      },
+      {
+        "entry": "test/install.sh",
+        "channel": "test",
+        "exact": false,
+        "passed": true,
+        "product_hash_matches_test": true,
+        "saved_state_and_native_instance_unchanged": true,
+        "log_sha256": "47f5c0a8ec3ebbc8ef170d279caed61ae8efc8a74dfeba6feb5a7149b78c7812"
+      },
+      {
+        "entry": "test/install.sh",
+        "channel": "test",
+        "exact": true,
+        "passed": true,
+        "product_hash_matches_test": true,
+        "saved_state_and_native_instance_unchanged": true,
+        "log_sha256": "47f5c0a8ec3ebbc8ef170d279caed61ae8efc8a74dfeba6feb5a7149b78c7812"
+      }
+    ],
+    "baseline": {
+      "files": {
+        "/home/sandbox/.local/state/my-ai-agent/configs/3c675f8a255333c855c7a80b.json": "97b9eb67ecf0357893b94b3d5e3ca0f58ab3178b8d8645ea25c93cf60a187766",
+        "/home/sandbox/.local/state/my-ai-agent/configs/07591f8b732c1e7241bfe575.json": "97b9eb67ecf0357893b94b3d5e3ca0f58ab3178b8d8645ea25c93cf60a187766",
+        "/home/sandbox/.local/state/my-ai-agent/selected.json": "26206d8d7cf3597b341e160f463e38d79b37ba9885c59cddbd4035225e96c8d9",
+        "/home/sandbox/.local/state/my-ai-agent/target.json": "26206d8d7cf3597b341e160f463e38d79b37ba9885c59cddbd4035225e96c8d9",
+        "/home/sandbox/.local/state/my-ai-agent/runtime.json": "c15c7aed6a65c4d03fabc0dc1fff436082a73e787e793ac8e7f9990e88193640",
+        "/home/sandbox/.local/state/my-ai-agent/models.json": "2437d34740dbd6dbeb00ecc70b6534cfb55a9b84289fd49317938074224d74d6",
+        "/home/sandbox/.local/state/my-ai-agent/ollama-originals.json": "768a9b0dbd0f40648754d7c1e18b4032714de3f63c1f6837fb9533dab6a82b7d",
+        "/home/sandbox/.codex/config.toml": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "/home/sandbox/.codex/maa-yolo-recovery.json": null,
+        "/home/sandbox/.codex/maa-local.config.toml": "50107e06e06ad8d60ee436cc0787521ec2ed2518f227ddfa44c972e149cdde48",
+        "/etc/systemd/system/ollama.service.d/50-local-model.conf": "a30515d67e2f9dad462fce8fbdf1cf4a312aa632e1d81e4e0885373740a079de",
+        "/etc/systemd/system/llama-server.service": "ffb742d9af90c35aa6d72dccd843477e5c09a8755d8bd648533d0c0c160c520d",
+        "/home/sandbox/.local/state/my-ai-agent/native/ollama-preload.json": "12fdfe2a6bf82eb8a9730eb1f98771b1588450a50813c8c00ba07edb8d74cf21"
+      },
+      "units": "ActiveState=active\nInvocationID=63e6b3b2c06041dfa4a74ff95b8cff20\nMainPID=6099\n\nActiveState=inactive\nInvocationID=\nMainPID=0\n"
+    },
+    "codex_local_version": "codex-cli 0.161.0",
+    "product_version": "0.1.9"
+  },
+  "ci": [
+    {
+      "run_id": 37726768288,
+      "ref": "main",
+      "conclusion": "success"
+    },
+    {
+      "run_id": 37726800185,
+      "ref": "stable/0.1.9",
+      "conclusion": "success"
+    }
+  ],
+  "cleanup": {
+    "container": "maa-stable-019-check",
+    "stopped_and_deleted": true,
+    "mas_list_empty": true
+  },
+  "limits": [
+    "The new native preparation run was an ordinary-user test-channel installation using the candidate bootstrap; public stable smoke checks reinstalled the identical program bytes.",
+    "No new root or large-model/MTP performance run is claimed."
+  ]
+}
