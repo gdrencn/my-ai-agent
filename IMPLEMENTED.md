@@ -1,4 +1,27 @@
-# my-ai-agent Implementation — 0.1.9
+# my-ai-agent Implementation — 0.2.1 test
+
+## 0.2.1 basic chat connectors
+
+Verified the authorized connector-only scope against the final product and paired tester on 2026-10-11. Maa remains a one-shot tool. The separately installed IM runtime handles fixed-text private-message tests; it does not invoke Codex, a local model, or the Maa manager. Stable remains the accepted 0.1.9 release.
+
+| Requirement | Implemented and verified behavior |
+| --- | --- |
+| Official transports | Telegram Bot API supports multiple bot identities; WhatsApp personal Agent Platform and Tencent iLink support one local account each. Standard-library HTTPS implements their separate authentication, polling, reply and QR flows. No OpenClaw, unofficial login framework or shared conversation proxy is installed. |
+| Shared management and UI | `maa im` and the new main-menu “聊天接入” use the same Connections, state and service operations. Values/status use shared Screen controls and colors; credential editing is masked. Existing output operations own progress and command diagnostics. Real PTYs cover masked editing, nested navigation and cancellation. |
+| Identity and account boundaries | New accounts stay closed. Telegram verifies bot identity, refuses an existing webhook without deleting it, and requires an explicitly accepted private user ID. WhatsApp filters text from its creator and persists that identity. WeChat uses the QR-authorized user and each message's reply context. Other users, groups and media do not trigger a reply. |
+| Independent runtime | A deterministic `connectors.pyz` runs under the owned `maa-connectors-<UID>.service`. Per-account threads have separate adapters, credentials, cursor, deduplication and health. Native tests remove the Maa archive and verify the service; network-isolated reboot tests restore three enabled workers without that archive. Model/Codex units and configuration remain separate. |
+| Delivery and interruption | Persist the processed message ID before sending; retain at most 2000 IDs. Ambiguous sends are counted and not blindly retried. Definite rate/service failures have bounded retries. WhatsApp preserves int64 offsets and 204 empty-poll cursors and enforces poll/send spacing. WeChat authorization expiry backs off for an hour. Cancelled requests and a supervisor acknowledgement prevent deleting a still-running account. |
+| Status and privacy | Account state, receive/send/uncertain counters, timestamps and sanitized diagnostics are visible. Credentials are omitted from status; incoming chat bodies are not saved. Private state directories use 0700 and JSON/exports use 0600. Backups intentionally contain the credentials and configured fixed reply. |
+| Closing and recovery | Selective close/delete leaves other workers running. All-off stops and disables the service. Strict versioned imports reject duplicates, excessive platform counts, invalid fields/addresses and oversized input; imported accounts remain closed. Export, delete and import retain identity/cursor/deduplication. No remote unlink, credential revocation or robot deletion is performed. |
+| Owned cleanup and updates | Modified/foreign runtime, units, service overrides and unknown state block cleanup. Uninstall stops/disables and removes owned program, unit and state. Installation rolls back its owned files on failure. Reinstalling the same product preserves enabled accounts and the running service instance. Removed state identities cannot be reused by waiting managers. |
+| Native launcher compatibility | Current official llama build 11540 defaults to port 9931. Explicit native `--host`/`--port` arguments now match Maa's configured endpoint and readiness/profile queries. Existing model state is unchanged; a regression covers the configured port. |
+| 0.1.9 recovery | A real stable → test → stable cycle preserves model/state/profile/unit hashes, Codex version, disabled YOLO and the running native instance during installation. After reboot, stable 0.1.9 and `codex-local` work and connector autostart is absent. The frozen stable tag and assets are retained. |
+
+All 111 source portable/PTY checks, 111 paired checks outside the checkout, and 111 checks in each ordinary-user/root mas container passed with no skips. Ten delivery regressions, reproducible builds, Python 3.11 grammar for 55 files, shell syntax, package boundaries and copied artifact hashes passed. The ordinary-user container passed 35 existing model/Codex native checks and nine connector native checks. Root passed nine connector native checks; this is not a new root model/Codex suite.
+
+Both users additionally passed actual systemd multi-account/close/delete/update/reboot/cleanup cycles with fictional credentials and only `lo` networking. The native dependency versions were Codex 0.162.1, Ollama 0.40.2 and llama build 11540. See `validation/V0_2_1_LOCAL.json`, `V0_2_1_NATIVE.json`, `V0_2_1_IM_NATIVE.json`, `V0_2_1_ROOT_IM_NATIVE.json`, `V0_2_1_IM_LIFECYCLE.json`, `V0_2_1_ROOT_IM_LIFECYCLE.json` and `V0_2_1_ROLLBACK.json`.
+
+No real IM account credentials were supplied. Official Telegram, WhatsApp and WeChat login/send/receive acceptance remains pending; local protocol fixtures and service tests do not establish that result. WeChat follows Tencent's public client protocol rather than a complete server contract. Small-model tests do not establish large-model/MTP performance. Account setup and acceptance are documented in [CONNECTORS.md](docs/CONNECTORS.md); fixed rollback steps are in [ROLLBACK.md](docs/ROLLBACK.md).
 
 ## 0.2 rollback baseline preparation
 
@@ -6,7 +29,7 @@ The user required continued recovery to the latest accepted 0.1.x stable during 
 
 All 11 existing stable assets were downloaded into an independent local backup, checked against their GitHub SHA-256 digests, all three published manifests and the original stable review hashes. An offline source bundle was verified and cloned into a separate temporary checkout at the exact stable commit. The frozen bootstrap selected the exact stable release; the product version and `--components none` installation contract were inspected. All three shell blocks in `docs/ROLLBACK.md` passed syntax checks, and the backup manifest passed for every saved file. Local `BASELINE.json` records these checks. No host product/backend/Codex installation was performed.
 
-`docs/ROLLBACK.md` documents fixed-version online restoration, offline product installation, source recovery and the connector cleanup/state-compatibility requirements for future 0.2 acceptance. The old shell installer fetches bootstrap from main, so the documented rollback instead pins the released bootstrap and its hash. This preparation does not claim a completed downgrade from 0.2; that implementation and its native downgrade test remain pending.
+`docs/ROLLBACK.md` documents fixed-version online restoration, offline product installation, source recovery and connector cleanup/state-compatibility requirements. The old shell installer fetches bootstrap from main, so the documented rollback pins the released bootstrap and its hash. That original baseline preparation alone did not establish downgrade acceptance; the completed 0.2.1 native cycle is recorded above.
 
 ## 0.1.9 stable publication review
 

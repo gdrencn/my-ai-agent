@@ -101,7 +101,9 @@ def llama_arguments(model, values):
     if values['mtp']:
         check_options(help_text, ['draft-mtp', '--spec-draft-type-k', '--spec-draft-type-v'])
     check_options(help_text, ['--log-verbosity'])
-    args = command + ['--model', model['path'], '--alias', model['name'],
+    endpoint = urlparse(llama_endpoint())
+    args = command + ['--host', os.environ.get('LLAMA_ARG_HOST', '127.0.0.1'), '--port', str(endpoint.port),
+                      '--model', model['path'], '--alias', model['name'],
                       '--log-verbosity', '4',
                       '--parallel', '1',  # One local-agent slot; context is per conversation.
                       '--ctx-size', str(values['context']),

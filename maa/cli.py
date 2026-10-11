@@ -55,6 +55,8 @@ def parser():
     installation.add_argument('component', choices=('ollama', 'llamacpp', 'codex', 'all'))
     product = actions.add_parser('_install')
     product.add_argument('--components', choices=('none', 'ollama', 'llamacpp', 'codex', 'all'), default='all')
+    from .im.cli import arguments
+    arguments(actions)
     return root
 
 
@@ -71,6 +73,10 @@ def run(argv=None):
                 raise Error('Interactive menu requires a terminal; use maa --help for CLI commands')
             from .ui import run as menu
             menu()
+            return 0
+        if args.action == 'im':
+            from .im.cli import execute
+            print(json.dumps(execute(args), ensure_ascii=False, indent=2))
             return 0
         manager = Manager()
         result = None

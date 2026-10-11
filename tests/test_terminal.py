@@ -85,6 +85,32 @@ class Terminal(unittest.TestCase):
         value = self.session("print('RESULT', interactive(lambda ui: ui.input('Input model')))", '模型ab'.encode() + b'\x1b[D\x7fX\r', 'Input model')
         self.assertIn('RESULT 模型Xb', value)
 
+    def test_secret_input_masks_editing_and_restores_terminal(self):
+        code = ("value=interactive(lambda ui: ui.input('Private Token', secret=True))\n"
+                "assert value=='SENSITIVE_TOKEN'\nprint('SECRET_ACCEPTED')")
+        value = self.session(code, b'SENSITIVE_TOKEN\r', 'Private Token', (12, 70))
+        self.assertIn('SECRET_ACCEPTED', value)
+        self.assertNotIn('SENSITIVE_TOKEN', value)
+        self.assertIn('********', value)
+
+    def test_im_navigation_values_and_cancel_return_to_parent(self):
+        code = ("import tempfile\nfrom pathlib import Path\nfrom maa.im.state import State\n"
+                "from maa.im.manager import Connections\nfrom maa.im.ui import main\n"
+                "from tests.test_im import FixtureController, record\n"
+                "with tempfile.TemporaryDirectory() as folder:\n"
+                " store=State(Path(folder)/'im')\n row=record('whatsapp')\n"
+                " store.save({'version':1,'connections':{row['id']:row}})\n"
+                " manager=Connections(store,FixtureController(store),lambda:None)\n"
+                " interactive(lambda ui:main(ui,manager))\nprint('IM_RETURNED')")
+        # Telegram default -> WhatsApp -> fixture account -> switch -> cancel
+        # switch -> cancel account -> cancel platform -> cancel IM menu.
+        value = self.session(code, b'\x1b[B\r\r\r' + b'\x1b[D'*4, '聊天接入', (30, 100))
+        self.assertIn('IM_RETURNED', value)
+        self.assertIn('发送成功数', value)
+        self.assertIn('固定测试回复', value)
+        self.assertIn('已设置', value)
+        self.assertNotIn('FAKE_TEST_TOKEN', value)
+
     def test_cancel_restores_terminal(self):
         operation = "try:\n print(interactive(lambda ui: ui.input('Cancel model')))\nexcept Cancelled:\n print('CANCELLED')"
         value = self.session(operation, b'\x1b', 'Cancel model', (6, 20))

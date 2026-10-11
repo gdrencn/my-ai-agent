@@ -21,6 +21,17 @@ class Service(unittest.TestCase):
     def tearDown(self):
         self.temp.cleanup()
 
+    def test_llama_native_listener_matches_configured_endpoint(self):
+        options = '--model --alias --parallel --ctx-size --cache-type-k --cache-type-v --flash-attn --fit --fit-target --sleep-idle-seconds --spec-type --log-verbosity'
+        model = {'path': '/private/model.gguf', 'name': 'native-model'}
+        values = settings({'mtp': False})
+        with patch('maa.backends.llama_command', return_value=['llama', 'serve']), \
+                patch('maa.backends.subprocess.run', return_value=subprocess.CompletedProcess([], 0, options, '')), \
+                patch.dict(os.environ, {'LLAMA_ARG_HOST': '127.0.0.1', 'LLAMA_ARG_PORT': '19931'}):
+            args = backends.llama_arguments(model, values)
+        self.assertEqual(args[args.index('--host')+1], '127.0.0.1')
+        self.assertEqual(args[args.index('--port')+1], '19931')
+
     def test_launcher_executes_codex_after_manager_is_removed(self):
         folder = self.root / 'bin'; folder.mkdir()
         fake = folder / 'codex'

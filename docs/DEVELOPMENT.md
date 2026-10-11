@@ -16,6 +16,9 @@ Python 3.11+, Linux/systemd inside mas. Product has only standard-library runtim
 | codex | lossless two-key global edits/recovery, dedicated local profile and immutable local model catalogs |
 | menu / text / output / i18n / ui | inline terminal controls, Chinese catalog and business menu |
 | cli / install | public commands, container guard and official installation |
+| im/state / im/manager / im/service | independent validated IM state, one-shot management shared by CLI/menu, owned connector unit |
+| im/transport / im/adapters / im/runtime | cancellable HTTP, platform-specific official requests, per-account supervisor |
+| im/packaging / im/cli / im/ui | deterministic independent runtime, public commands, shared Screen menus |
 | bootstrap | independent stable/test discovery and checksummed channel/version pairing |
 
 ## Lifecycle trigger audit (0.1.8)
@@ -55,6 +58,12 @@ Readonly option activation is handled inside Screen.choose rather than rebuildin
 
 ## Commands
 
+The 0.2.1 IM scope and account acceptance are in [CONNECTORS.md](CONNECTORS.md). Source/paired tests include test_im.py. The paired native runner also executes test/im_native.py against real systemd using an unmodified empty runtime and disabled fictional account; it never sends official messages. Native account acceptance is separate. The existing model/Codex state format is unchanged.
+
+The runtime reads a control request before configuration, stops changed/disabled workers and acknowledges only after reconciliation. Delete waits for that acknowledgement before removing receive state. All-account close stops/disables the unit. Retired state roots reject managers waiting on old locks. Import validates data and cannot install code, choose arbitrary API URLs or enable imported accounts.
+
+Product reinstall updates the separate runtime only when its ownership marker already exists, preserving connection switches. First product installation does not install it implicitly. Service/runtime hashes guard writes and cleanup; unfamiliar drop-ins cause refusal. The runtime includes only state/transport/adapters/supervisor and generic store, without manager, Codex or model controller dependencies. Its intentionally enabled service is separate from the one-shot model/Codex path described below.
+
 ```bash
 python3 scripts/build.py
 python3 scripts/test_bootstrap.py
@@ -73,7 +82,7 @@ Status uses separate observers: Ollama `/api/ps`, llama.cpp `/props`; never use 
 
 Direct mode has no usage recorder. Old usage.json must not influence status; unavailable token counts remain null. Real backend checks verify native allocations, whole-GPU observations, read-only status and unloaded/paused behavior. PTY checks cover grouped navigation, colored values, pending changes, readonly fields, YOLO recovery, narrow terminals and NO_COLOR.
 
-Native backend units run only official backend executables and native curl preload. No maa service, proxy, thread or Python process remains after a management command exits. Test removal of the installed archive while running Codex and restarting the container. Candidate validation disables autostart until acceptance; interrupted management must not boot a candidate. Normal failures restore native files, enablement, original Ollama tag, profile and previous running/paused state. A forcibly killed transaction may require maa start to revalidate the saved target.
+Native backend units run only official backend executables and native curl preload. On the model/Codex path, no Maa service, proxy, thread or Python process remains after a management command exits. The separately installed IM runtime described above is the explicit connector-only exception; it never participates in local model or Codex traffic. Test removal of the installed archive while running Codex and restarting the container. Candidate validation disables autostart until acceptance; interrupted management must not boot a candidate. Normal failures restore native files, enablement, original Ollama tag, profile and previous running/paused state. A forcibly killed transaction may require maa start to revalidate the saved target.
 
 Progress and terminal-facing command output belong on stderr. output.run owns command/output coordination: ordinary commands buffer actual diagnostics while the timer remains alive; native installers and downloads stream through a PTY when attached to a terminal and through a pipe otherwise. Explicitly captured/redirected streams keep their subprocess contract. Fully captured native help, unit-state and driver queries have no terminal output to coordinate. privileged only adds sudo and calls output.run; business callers do not add terminal gaps or suspend timers. diagnostic uses the same writer for owned notices. Actual output erases the active progress row without committing it; the writer tracks split UTF-8 and split terminal controls and adds a line ending only when necessary. Its reader finishes before the management command returns; no runtime service is added.
 
@@ -85,7 +94,7 @@ The independent launcher must find the official ~/.local/bin/codex immediately a
 
 ## Artifacts and release
 
-0.2 work must preserve the fixed 0.1.x stable rollback baseline and pass the future native downgrade acceptance described in [ROLLBACK.md](ROLLBACK.md). Connector shutdown and autostart cleanup must happen before restoring the old manager; old Maa cannot clean up unknown newer services.
+0.2 work must preserve the fixed 0.1.x stable rollback baseline and pass the native downgrade acceptance described in [ROLLBACK.md](ROLLBACK.md). Connector shutdown and autostart cleanup must happen before restoring the old manager; old Maa cannot clean up unknown newer services.
 
 Build produces maa.pyz, maa-test.pyz, VERSION.json, bootstrap.py, install.sh and SHA256SUMS. Numeric version lives only in maa/__init__.py. The default build uses the test channel; `python3 scripts/build.py --channel stable` writes stable VERSION.json. Each build copies the installer for its own channel. Channel selection does not change either zipapp. SHA256SUMS covers the other five payloads. Test publication can add frozen validation JSON and its checksum. The repository validation manifest covers all checked-in receipts; the release validation manifest covers that version's initial local/native receipts. Public evidence is appended with a separate PUBLIC_SHA256SUMS; never overwrite a released manifest.
 

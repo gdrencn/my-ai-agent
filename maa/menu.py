@@ -298,13 +298,15 @@ class Screen:
         except Cancelled:
             return False
 
-    def input(self, prompt):
+    def input(self, prompt, secret=False):
         value, cursor = '', 0
         with self.prompt():
             for line in wrapped(prompt, self.size()[0] - 1):
                 self.write(line + '\n')
             while True:
                 left, right = value[:cursor], value[cursor:]
+                if secret:
+                    left, right = '*' * len(left), '*' * len(right)
                 width = max(1, self.size()[0] - 3)
                 while cells(left) > width:
                     left = left[1:]

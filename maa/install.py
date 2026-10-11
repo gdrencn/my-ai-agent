@@ -77,6 +77,11 @@ def product(archive, components='all'):
     import shlex
     entry = bindir / 'maa'
     blob = Path(archive).read_bytes()
+    from .im.state import State as IMState
+    from .im.service import Controller as IMController
+    im_controller = (IMController(IMState()) if (IMState.default_root() / 'service.json').exists() else None)
+    if im_controller:
+        im_controller.check()
     with store.lock():
         controller.ensure()
         legacy = controller.legacy_path()
@@ -123,4 +128,7 @@ def product(archive, components='all'):
         manager.start()
         if not was_running:
             manager.pause()
+    if im_controller:
+        with operation('更新已安装的聊天连接器'), im_controller.store.lock():
+            im_controller.install()
     print(f'my-ai-agent 已安装：{executable}\n运行 {bindir / "maa"} 打开菜单。', flush=True)

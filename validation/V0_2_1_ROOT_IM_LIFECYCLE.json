@@ -1,0 +1,28 @@
+{
+  "kind": "native IM with fictional credentials, no network",
+  "phases": {
+    "prepare": {
+      "selective_close_delete": true,
+      "other_workers_running": true,
+      "reinstall_kept_switches_and_instance": true,
+      "archive_removed_for_boot": true,
+      "before_boot": "ActiveState=active\nInvocationID=0f13add77b7a4a6e9ee7353fd187d6da\nMainPID=587\n"
+    },
+    "after-boot": {
+      "autostart_without_manager": true,
+      "configured_workers": 3,
+      "native_unit": "ActiveState=active\nInvocationID=0e976e89cc324ef9bda6439dd39df763\nMainPID=177\n"
+    },
+    "clean": {
+      "off_disabled_autostart": true,
+      "unit_program_and_state_removed": true,
+      "backup_mode": "0o600"
+    }
+  },
+  "at": "2026-10-11T06:11:05.744311+00:00",
+  "version": "0.2.1",
+  "status": "passed",
+  "network_interfaces_during_fixture": [
+    "lo"
+  ]
+}

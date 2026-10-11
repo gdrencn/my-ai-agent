@@ -284,7 +284,7 @@ def local_models(ui, manager):
 
 def main(ui):
     manager, focused = Manager(), 'models_menu'
-    actions = ('models_menu', 'codex_global', 'codex_config', 'install', 'about', 'exit')
+    actions = ('models_menu', 'codex_global', 'codex_config', 'im_menu', 'install', 'about', 'exit')
     while True:
         try:
             status = manager.model_status(include_gpu=False, include_allocations=False)
@@ -308,6 +308,10 @@ def main(ui):
                 configure(ui, manager, codex_only=True)
             elif focused == 'codex_global':
                 global_settings(ui)
+                continue
+            elif focused == 'im_menu':
+                from .im.ui import main as connections_menu
+                connections_menu(ui)
                 continue
             elif focused == 'about':
                 say('my-ai-agent / maa ' + __version__)

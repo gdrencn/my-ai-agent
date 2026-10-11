@@ -4,6 +4,16 @@
 
 当前稳定版本：**0.1.9 stable**。两种底座可共存，通过 `maa` 选择一个当前底座和模型，并同步 `codex-local`。stable 的产品与配对测试包和已验收的 `v0.1.9` test 逐字节相同。
 
+当前测试版本：**0.2.1 test**，新增 Telegram / WhatsApp / 微信的基础聊天接入，暂不连接 Codex。Telegram 支持多个机器人，WhatsApp 和微信各一个。原有模型与 Codex 功能保留，stable 仍为 0.1.9。
+
+已有环境只升级测试版管理工具：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/install.sh | bash -s -- --components none
+```
+
+进入 `maa → 聊天接入` 配置账号；默认不安装或开启连接器。接入步骤、关闭/恢复/删除与真实账号验收范围见 [docs/CONNECTORS.md](docs/CONNECTORS.md)。固定版本回退见 [docs/ROLLBACK.md](docs/ROLLBACK.md)。
+
 安装、模型切换和暂停/启动共用进度反馈：静默阶段原地刷新等待时长，原生下载保留实时进度，实际诊断单独保留；不因无输出的命令增加重复提示或空行。
 
 ## Install
@@ -68,6 +78,7 @@ HF 下载和本地文件扫描不占用全局管理锁，可在另一个终端�
 | 本地模型管理 | 设置本地模型、安装 / 登记新模型、模型配置、当前模型状态、暂停、启动、返回 |
 | Codex 配置 | YOLO 模式及当前状态、返回；进入 YOLO 后选择开启或关闭（恢复原设置） |
 | codex-local 配置 | 推理强度、跟随模型的只读上下文大小、固定 90% 的只读压缩阈值、应用修改、返回 |
+| 聊天接入（0.2.1 test） | Telegram / WhatsApp / 微信接入、安装/更新、状态刷新、全部开关、导入/导出、卸载、返回 |
 | 安装底座 / Codex CLI | 全部安装或单独安装 Ollama、llama.cpp、Codex CLI |
 | 关于 my-ai-agent | 当前 maa 版本 |
 | 退出 | 结束菜单 |
@@ -183,6 +194,8 @@ codex-local exec --skip-git-repo-check 'Explain this directory.'
 数据默认在 `~/.local/state/my-ai-agent`（支持 `MAA_HOME` / `XDG_STATE_HOME`），程序在 `~/.local/share/my-ai-agent`。原生模型存储仍分别属于各底座。日志通过 `maa logs` 查看。
 
 ## Test
+
+0.2.1 配对测试额外验证连接器的本地协议模拟、独立 systemd 程序、关闭、私有备份、删除、导入保持关闭及卸载。连接器原生测试要求没有已有账号或已安装模块；使用虚构且关闭的凭证，不向官方账号发消息，不替代真实账号验收。测试保存独立的 `maa-im-native-*.json` 报告，并清理自身安装的连接器模块。
 
 完整安装及小模型验证会修改当前选择，并显式开关 YOLO 验证工具执行与恢复；测试结束保持 YOLO 开启。请在**新建的专用临时 mas 容器**运行：
 

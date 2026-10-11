@@ -8,11 +8,21 @@ The [formal release](https://github.com/gdrencn/my-ai-agent/releases/tag/stable/
 
 This baseline preserves Maa source and installable release artifacts. It is not a snapshot of a user's container, model weights, credentials, Codex sessions or independently installed software.
 
-During the connector-only phase, preserve the 0.1.x state format and native backend/Codex behavior. Connector credentials, configuration, receive state and autostart resources must have independent ownership and cleanup. Before installing the old product, use the newer manager to stop the connectors and disable their autostart. Downgrading the Maa archive alone cannot remove future connector services that 0.1.9 does not know about. Do not use guessed service names or broad file deletion as a substitute for owned cleanup.
+During the connector-only phase, preserve the 0.1.x state format and native backend/Codex behavior. Connector credentials, configuration, receive state and autostart resources have independent ownership and cleanup. Before installing the old product, use the newer manager to export any accounts to retain, then stop and uninstall its connector module. Downgrading the Maa archive alone cannot remove connector services that 0.1.9 does not know about. Do not use guessed service names or broad file deletion as a substitute for owned cleanup.
+
+For an installed 0.2.1 connector module, run as its original installation user. Choose your own absolute backup path; the backup contains credentials and must be retained privately:
+
+```bash
+maa im export "$HOME/maa-connectors-backup.json"
+maa im off
+maa im uninstall --yes
+```
+
+If no connector module or accounts were installed, skip that cleanup. After returning to 0.2.1 test, `maa im import /absolute/path/to/maa-connectors-backup.json` restores saved accounts in the closed state; enable them explicitly. Remote expired/revoked credentials still require renewal.
 
 Use `--components none` to restore Maa without invoking upstream installers. This does not downgrade Ollama, llama.cpp or Codex CLI. Keep those independently installed components unchanged during this phase unless a separate restoration plan is approved.
 
-Before publishing a 0.2 test, verify a real upgrade/downgrade cycle in an owned disposable mas container: connector shutdown, old product installation, version, retained model/configuration/YOLO setting, native backend and `codex-local` operation, and container reboot with connectors still stopped. The artifact checks below do not establish that future acceptance test.
+Before publishing a 0.2 test, verify a real upgrade/downgrade cycle in an owned disposable mas container: connector shutdown, old product installation, version, retained model/configuration/YOLO setting, native backend and `codex-local` operation, and container reboot with connectors still stopped. The completed 0.2.1 cycle is recorded below; asset checks alone do not establish this acceptance.
 
 ## Online installation of the fixed baseline
 
@@ -70,4 +80,4 @@ The tag checkout is detached. Create a new branch there if needed; do not move t
 
 The baseline preparation downloaded all existing stable release assets, verified GitHub asset digests, all three published checksum manifests and the original stable review hashes, checked the numeric version/channel, compared the remote tag with the preserved source commit, and verified recovery into a separate source checkout. The online/offline commands were checked against the frozen installer contract without installing anything on the host.
 
-The 0.1.9 native installation evidence remains in `validation/STABLE_0_1_9_NATIVE.json` and `validation/STABLE_0_1_9_PUBLIC.json`. A downgrade from an implemented 0.2 version has not yet been tested because that implementation does not yet exist.
+The original 0.1.9 installation evidence remains in `validation/STABLE_0_1_9_NATIVE.json` and `validation/STABLE_0_1_9_PUBLIC.json`. On 2026-10-11, an owned ordinary-user mas container completed stable 0.1.9 → test 0.2.1 → frozen stable 0.1.9 with `--components none`. Both installations preserved the model/state/profile/native-unit hashes, Codex version, disabled YOLO and native PID/InvocationID. Connector close/uninstall removed its unit, program and state before downgrade. After reboot the old manager reported 0.1.9, the accepted backend reached active, `codex-local` returned a local-model reply, and the connector service remained absent/disabled. See [V0_2_1_ROLLBACK.json](../validation/V0_2_1_ROLLBACK.json) and [V0_2_1_IM_LIFECYCLE.json](../validation/V0_2_1_IM_LIFECYCLE.json). These service checks used fictional credentials without external networking, not real IM accounts.

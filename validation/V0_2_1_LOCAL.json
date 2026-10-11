@@ -1,0 +1,72 @@
+{
+  "version": "0.2.1",
+  "channel": "test",
+  "status": "passed",
+  "at": "2026-10-11T06:12:22.972588+00:00",
+  "asset_sha256": {
+    "maa.pyz": "424ea75bcfcacd5cf803b03c3aea6835d98982feb19cb8a1f40da3c645d50700",
+    "maa-test.pyz": "1e48a9e390ece7447a281ad776d48aa859586d1a938627de04904145d053f0e7",
+    "VERSION.json": "ed59b0da9558d26116b89e3ac791a48864bf53a6bb3117b32e3bac2ad295db47",
+    "bootstrap.py": "12d1cf03fd7836e70d66d94f5e985f6e943697e4af663fb1559678293d035a3c",
+    "install.sh": "c5f446b02ece8ec9c365d66687fab19ff671c8408b176c65b8434437447c2d4e",
+    "SHA256SUMS": "26a43588010ee1e3d9c3f5df7865c183a6f2066dd73824803b18177bfe9e117a"
+  },
+  "portable": {
+    "source": 111,
+    "paired_outside_checkout": 111,
+    "ordinary_user_container": 111,
+    "root_container": 111,
+    "skipped": 0
+  },
+  "delivery_regressions": 10,
+  "build": {
+    "reproducible": true,
+    "python_3_11_grammar_files": 55,
+    "shell_syntax": true,
+    "package_boundaries": true
+  },
+  "native": {
+    "ordinary_user_model_codex_checks": 35,
+    "ordinary_user_connector_checks": 9,
+    "root_connector_checks": 9,
+    "copied_installed_bytes_verified": true,
+    "fresh_official_dependencies": true,
+    "versions": {
+      "python": "3.14.4",
+      "uid": 1001,
+      "versions": {
+        "codex": {
+          "returncode": 0,
+          "stdout": "codex-cli 0.162.1\n",
+          "stderr": ""
+        },
+        "ollama": {
+          "returncode": 0,
+          "stdout": "Warning: could not connect to a running Ollama instance\nWarning: client version is 0.40.2\n",
+          "stderr": ""
+        },
+        "llama": {
+          "returncode": 0,
+          "stdout": "version: 0.6.0-dev (build 11540, commit 1e6f04a75)\nbuilt with Clang 19.1.7 for Linux x86_64\n",
+          "stderr": ""
+        }
+      }
+    }
+  },
+  "connector_fixtures": {
+    "telegram_multiple_accounts": true,
+    "whatsapp_int64_offset_empty_poll_and_rate_limits": true,
+    "wechat_qr_context_and_authorization_expiry": true,
+    "ownership_and_user_filtering": true,
+    "cancellation": true,
+    "ambiguous_send_not_retried": true,
+    "backup_import_closed_and_validation": true,
+    "independent_runtime_and_cleanup": true
+  },
+  "limitations": [
+    "No real Telegram, WhatsApp or WeChat account credentials were supplied; official account login/send/receive acceptance remains pending.",
+    "WeChat follows Tencent public client protocol; independent implementation is not a complete official server contract.",
+    "Root native validation covers connectors and portable tests, not a new root model/Codex suite.",
+    "Native model/Codex checks use small models; they do not establish large-model/MTP performance."
+  ]
+}
