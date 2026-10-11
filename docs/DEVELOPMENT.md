@@ -85,6 +85,8 @@ The independent launcher must find the official ~/.local/bin/codex immediately a
 
 ## Artifacts and release
 
+0.2 work must preserve the fixed 0.1.x stable rollback baseline and pass the future native downgrade acceptance described in [ROLLBACK.md](ROLLBACK.md). Connector shutdown and autostart cleanup must happen before restoring the old manager; old Maa cannot clean up unknown newer services.
+
 Build produces maa.pyz, maa-test.pyz, VERSION.json, bootstrap.py, install.sh and SHA256SUMS. Numeric version lives only in maa/__init__.py. The default build uses the test channel; `python3 scripts/build.py --channel stable` writes stable VERSION.json. Each build copies the installer for its own channel. Channel selection does not change either zipapp. SHA256SUMS covers the other five payloads. Test publication can add frozen validation JSON and its checksum. The repository validation manifest covers all checked-in receipts; the release validation manifest covers that version's initial local/native receipts. Public evidence is appended with a separate PUBLIC_SHA256SUMS; never overwrite a released manifest.
 
 Commit verified source/docs to main, tag v<version> and publish GitHub prerelease for test. Stable publication needs user acceptance: create the separate stable/<version> tag/release and mark it latest. Compare stable maa.pyz and maa-test.pyz with the approved numeric test release byte for byte; product changes need a new test version and acceptance. Stable may have distinct channel metadata, delivery tooling and publication documentation. Never replace an existing tag/release/asset. Download every asset again and verify local byte equality, manifests and the public installer.

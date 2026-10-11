@@ -1,5 +1,13 @@
 # my-ai-agent Implementation — 0.1.9
 
+## 0.2 rollback baseline preparation
+
+The user required continued recovery to the latest accepted 0.1.x stable during 0.2 work. The fixed baseline is 0.1.9 (`stable/0.1.9`, source commit `b3189e95d996cbb36911076e5e90ef9feca39021`). The remote annotated tag and commit were checked; no tag, release asset or product code was changed.
+
+All 11 existing stable assets were downloaded into an independent local backup, checked against their GitHub SHA-256 digests, all three published manifests and the original stable review hashes. An offline source bundle was verified and cloned into a separate temporary checkout at the exact stable commit. The frozen bootstrap selected the exact stable release; the product version and `--components none` installation contract were inspected. All three shell blocks in `docs/ROLLBACK.md` passed syntax checks, and the backup manifest passed for every saved file. Local `BASELINE.json` records these checks. No host product/backend/Codex installation was performed.
+
+`docs/ROLLBACK.md` documents fixed-version online restoration, offline product installation, source recovery and the connector cleanup/state-compatibility requirements for future 0.2 acceptance. The old shell installer fetches bootstrap from main, so the documented rollback instead pins the released bootstrap and its hash. This preparation does not claim a completed downgrade from 0.2; that implementation and its native downgrade test remain pending.
+
 ## 0.1.9 stable publication review
 
 The user accepted the 0.1.9 test behavior and authorized stable publication after final code/document review. Review covered shared output, Manager lifecycle and recovery, native units, downloads and identity checks, profile/YOLO ownership, menu activation and read-only status. No product-code blocker was identified. Stable preparation changes only delivery tooling and documentation, retaining both approved zipapps byte for byte.
