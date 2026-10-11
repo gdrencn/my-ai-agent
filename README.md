@@ -6,11 +6,16 @@
 
 当前测试版本：**0.2.1 test**，新增 Telegram / WhatsApp / 微信的基础聊天接入，暂不连接 Codex。Telegram 支持多个机器人，WhatsApp 和微信各一个。原有模型与 Codex 功能保留，stable 仍为 0.1.9。
 
-
 已有环境只升级测试版管理工具：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/install.sh | bash -s -- --components none
+```
+
+已有底座和 Codex 的独立测试容器可运行本轮完整自动检查：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/test.sh | bash -s -- --version 0.2.1 --components none
 ```
 
 进入 `maa → 聊天接入` 配置账号；默认不安装或开启连接器。接入步骤、关闭/恢复/删除与真实账号验收范围见 [docs/CONNECTORS.md](docs/CONNECTORS.md)。固定版本回退见 [docs/ROLLBACK.md](docs/ROLLBACK.md)。
