@@ -1,9 +1,8 @@
 {
   "status": "passed",
-  "published": false,
   "at": "2026-10-11T06:23:07.545795+00:00",
   "code_commit": "ddc3b1d6be7ca0cec0d7fef0b9fdf5ecb1b104da",
-  "version_decision": "pending user approval; do not replace 0.2.1 assets",
+  "version_decision": "Included in 0.2.1 test; user confirmed that fixes within this iteration retain its version and may replace its test assets. Accepted 0.1.9 stable remains unchanged.",
   "source_checks": 111,
   "paired_checks": 111,
   "directory_replacement_cycles": 200,
@@ -291,5 +290,6 @@
     ],
     "status": "passed",
     "finished": "2026-10-11T06:21:03.807058+00:00"
-  }
+  },
+  "release_version": "0.2.1"
 }

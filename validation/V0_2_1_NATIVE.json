@@ -1564,5 +1564,6 @@
       "selected_target_paused": true
     }
   ],
-  "finished": "2026-10-11T06:10:56.141419+00:00"
+  "finished": "2026-10-11T06:10:56.141419+00:00",
+  "iteration_evidence": "Initial 0.2.1 attempt before the directory identity correction. Original hashes and results retained; corrected-byte checks are recorded in IM_DIRECTORY_IDENTITY_FIX.json and final public verification."
 }

@@ -143,5 +143,6 @@
   "status": "passed",
   "version": "0.2.1",
   "stable_tag": "stable/0.1.9",
-  "stable_product_sha256": "2dcda1dd4eba9697d4a4e1e7a47b74fd932685be19a548973d810d6c1af9b399"
+  "stable_product_sha256": "2dcda1dd4eba9697d4a4e1e7a47b74fd932685be19a548973d810d6c1af9b399",
+  "iteration_evidence": "Initial 0.2.1 attempt before the directory identity correction. Original hashes and results retained; corrected-byte checks are recorded in IM_DIRECTORY_IDENTITY_FIX.json and final public verification."
 }

@@ -219,5 +219,6 @@
     "regression": "test_cleanup_refuses_unknown_data_and_retires_old_manager",
     "cause": "Directory inode immediately reused after removal on the GitHub runner filesystem"
   },
-  "limitation": "Original published 0.2.1 is frozen and has a documented directory-identity limitation. A corrected version requires a new release; official IM accounts remain untested."
+  "limitation": "Original CI exposed inode reuse. That issue is corrected and verified in IM_DIRECTORY_IDENTITY_FIX.json; these original downloads did not include the correction.",
+  "iteration_evidence": "Initial 0.2.1 upload, before the directory identity correction. Kept as historical evidence until corrected public verification replaces this receipt. The unfinished test iteration is authorized to update 0.2.1; 0.1.9 stable remains immutable."
 }

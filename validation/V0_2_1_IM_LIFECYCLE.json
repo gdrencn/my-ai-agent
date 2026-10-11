@@ -24,5 +24,6 @@
   "status": "passed",
   "network_interfaces_during_fixture": [
     "lo"
-  ]
+  ],
+  "iteration_evidence": "Initial 0.2.1 attempt before the directory identity correction. Original hashes and results retained; corrected-byte checks are recorded in IM_DIRECTORY_IDENTITY_FIX.json and final public verification."
 }

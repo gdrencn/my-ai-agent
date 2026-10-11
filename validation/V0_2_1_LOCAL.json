@@ -68,5 +68,6 @@
     "WeChat follows Tencent public client protocol; independent implementation is not a complete official server contract.",
     "Root native validation covers connectors and portable tests, not a new root model/Codex suite.",
     "Native model/Codex checks use small models; they do not establish large-model/MTP performance."
-  ]
+  ],
+  "iteration_evidence": "Initial 0.2.1 attempt before the directory identity correction. Original hashes and results retained; corrected-byte checks are recorded in IM_DIRECTORY_IDENTITY_FIX.json and final public verification."
 }

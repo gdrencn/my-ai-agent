@@ -2,7 +2,7 @@
 
 ## Connector directory identity correction
 
-发布后的 GitHub CI 发现文件系统可在卸载后立即复用目录 inode。修正已有的清理隔离要求：只要旧管理对象仍存在，它就不能接受卸载后新建的安装目录，即使文件系统会复用 inode。目录身份保护不得在删除后遗留文件，不得泄漏文件描述符。保留已发布的 0.2.1 tag 和资产；修正版版本号待用户确认，不能覆盖原资产。
+本轮 GitHub CI 发现文件系统可在卸载后立即复用目录 inode。修正已有的清理隔离要求：只要旧管理对象仍存在，它就不能接受卸载后新建的安装目录，即使文件系统会复用 inode。目录身份保护不得在删除后遗留文件，不得泄漏文件描述符。用户明确本轮开发、自检和修复均归入 0.2.1 test，可更新该 test 的 tag、配对包、元数据及校验清单；完成后提供测试命令，不另发 0.2.2。已验收的 0.1.9 stable tag 和资产保持不变。
 
 ## 0.2.1 basic chat connectors
 
@@ -177,7 +177,7 @@ llama.cpp 固定一个本地 agent 推理槽，保证 llama.cpp 的上下文设�
 5. 核验 YOLO 两键恢复、重复开启、无关 TOML 保留、跨进程备份。
 6. 核验本地 Responses 对话、流式、工具调用及 context/90% 同步。
 7. PTY 验证导航、输入编辑、窄终端、取消和终端恢复；结构化输出无控制码。
-8. 可重现构建、校验和、包边界、安装版本；数字 test GitHub prerelease 与独立 stable 正式 release 均保持资产不可变，回下载比较字节。stable 发布需要用户验收授权。
+8. 可重现构建、校验和、包边界、安装版本；数字 test GitHub prerelease 与独立 stable 正式 release 分开管理，回下载比较字节。已验收 stable 的 tag 和资产不可变；本轮未交付验收的 test 修复沿用本轮版本，配对更新资产及校验清单。stable 发布需要用户验收授权。
 9. IMPLEMENTED.md 区分 portable/native/fault-injected/user-reported 证据，不宣称未实测的大模型/GPU/MTP 结果。
 
 ## Official references
