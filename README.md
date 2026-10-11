@@ -6,6 +6,8 @@
 
 当前测试版本：**0.2.1 test**，新增 Telegram / WhatsApp / 微信的基础聊天接入，暂不连接 Codex。Telegram 支持多个机器人，WhatsApp 和微信各一个。原有模型与 Codex 功能保留，stable 仍为 0.1.9。
 
+**0.2.1 已知问题：** 发布后的 GitHub CI 发现卸载并立即重建目录时可能复用 inode，导致旧管理对象误认新目录。原发布资产保持冻结；源码修复已通过本地、容器及 CI 验证，修正版版本号待确认。详情见 [IMPLEMENTED.md](IMPLEMENTED.md)。
+
 已有环境只升级测试版管理工具：
 
 ```bash
