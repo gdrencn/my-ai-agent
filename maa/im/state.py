@@ -4,6 +4,7 @@ from contextlib import contextmanager
 from pathlib import Path
 import re
 import time
+import weakref
 from urllib.parse import urlsplit
 from ..store import Error, Store, read, write
 
@@ -128,7 +129,12 @@ class State(Store):
         if self.root.stat().st_uid != os.getuid():
             raise Error('Connector state belongs to another user')
         os.chmod(self.root, 0o700)
-        stat = self.root.stat()
+        # Keep the directory inode alive for this manager's lifetime. A dev/ino
+        # pair alone can match an unrelated directory recreated after uninstall
+        # when the filesystem immediately reuses the released inode.
+        descriptor = os.open(self.root, os.O_RDONLY | os.O_DIRECTORY | os.O_CLOEXEC | os.O_NOFOLLOW)
+        self._directory_guard = weakref.finalize(self, os.close, descriptor)
+        stat = os.fstat(descriptor)
         self.root_identity = (stat.st_dev, stat.st_ino)
 
     @contextmanager

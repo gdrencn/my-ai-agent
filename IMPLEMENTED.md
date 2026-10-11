@@ -1,5 +1,11 @@
 # my-ai-agent Implementation — 0.2.1 test
 
+## Post-publication directory identity correction — unreleased
+
+Both GitHub CI runs for original commit `40794f3f207c006ecd42a79708c6933010d619a2` failed `test_cleanup_refuses_unknown_data_and_retires_old_manager`: the runner immediately reused the deleted directory inode. The local and container passes below did not expose that filesystem behavior. The original 0.2.1 assets are frozen and its release notes identify the known issue; its CI is not claimed to pass.
+
+The correction holds a non-inherited directory descriptor for the State object's lifetime, preventing its inode from being reused while that manager exists. A weak-reference finalizer releases the descriptor. The existing regression, all 111 source checks and 111 paired checks pass locally. An additional 200 real directory replacement cycles refused the retired manager without a descriptor leak. Publication of a corrected version remains pending the version decision and final native/CI checks.
+
 ## 0.2.1 basic chat connectors
 
 Verified the authorized connector-only scope against the final product and paired tester on 2026-10-11. Maa remains a one-shot tool. The separately installed IM runtime handles fixed-text private-message tests; it does not invoke Codex, a local model, or the Maa manager. Stable remains the accepted 0.1.9 release.
@@ -13,7 +19,7 @@ Verified the authorized connector-only scope against the final product and paire
 | Delivery and interruption | Persist the processed message ID before sending; retain at most 2000 IDs. Ambiguous sends are counted and not blindly retried. Definite rate/service failures have bounded retries. WhatsApp preserves int64 offsets and 204 empty-poll cursors and enforces poll/send spacing. WeChat authorization expiry backs off for an hour. Cancelled requests and a supervisor acknowledgement prevent deleting a still-running account. |
 | Status and privacy | Account state, receive/send/uncertain counters, timestamps and sanitized diagnostics are visible. Credentials are omitted from status; incoming chat bodies are not saved. Private state directories use 0700 and JSON/exports use 0600. Backups intentionally contain the credentials and configured fixed reply. |
 | Closing and recovery | Selective close/delete leaves other workers running. All-off stops and disables the service. Strict versioned imports reject duplicates, excessive platform counts, invalid fields/addresses and oversized input; imported accounts remain closed. Export, delete and import retain identity/cursor/deduplication. No remote unlink, credential revocation or robot deletion is performed. |
-| Owned cleanup and updates | Modified/foreign runtime, units, service overrides and unknown state block cleanup. Uninstall stops/disables and removes owned program, unit and state. Installation rolls back its owned files on failure. Reinstalling the same product preserves enabled accounts and the running service instance. Removed state identities cannot be reused by waiting managers. |
+| Owned cleanup and updates | Modified/foreign runtime, units, service overrides and unknown state block cleanup. Uninstall stops/disables and removes owned program, unit and state. Installation rolls back its owned files on failure. Reinstalling the same product preserves enabled accounts and the running service instance. The original directory-identity guard has the post-publication limitation recorded above. |
 | Native launcher compatibility | Current official llama build 11540 defaults to port 9931. Explicit native `--host`/`--port` arguments now match Maa's configured endpoint and readiness/profile queries. Existing model state is unchanged; a regression covers the configured port. |
 | 0.1.9 recovery | A real stable → test → stable cycle preserves model/state/profile/unit hashes, Codex version, disabled YOLO and the running native instance during installation. After reboot, stable 0.1.9 and `codex-local` work and connector autostart is absent. The frozen stable tag and assets are retained. |
 

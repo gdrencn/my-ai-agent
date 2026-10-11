@@ -1,5 +1,9 @@
 # my-ai-agent Requirements — 0.2.1 test
 
+## Connector directory identity correction
+
+发布后的 GitHub CI 发现文件系统可在卸载后立即复用目录 inode。修正已有的清理隔离要求：只要旧管理对象仍存在，它就不能接受卸载后新建的安装目录，即使文件系统会复用 inode。目录身份保护不得在删除后遗留文件，不得泄漏文件描述符。保留已发布的 0.2.1 tag 和资产；修正版版本号待用户确认，不能覆盖原资产。
+
 ## 0.2.1 basic chat connectors
 
 用户授权开发并发布 0.2.1 test。本阶段只实现三个平台连接器的基础接入，不接入 Codex，不实现会话映射、AI 回复、聊天命令解释或媒体处理。
