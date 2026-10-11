@@ -1,0 +1,295 @@
+{
+  "status": "passed",
+  "published": false,
+  "at": "2026-10-11T06:23:07.545795+00:00",
+  "code_commit": "ddc3b1d6be7ca0cec0d7fef0b9fdf5ecb1b104da",
+  "version_decision": "pending user approval; do not replace 0.2.1 assets",
+  "source_checks": 111,
+  "paired_checks": 111,
+  "directory_replacement_cycles": 200,
+  "descriptor_leak": false,
+  "ci": {
+    "conclusion": "success",
+    "jobs": [
+      {
+        "completedAt": "2026-10-11T06:21:37Z",
+        "conclusion": "success",
+        "databaseId": 114406024956,
+        "name": "check",
+        "startedAt": "2026-10-11T06:21:05Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-11T06:21:07Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-11T06:21:06Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-11T06:21:08Z",
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "startedAt": "2026-10-11T06:21:07Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-11T06:21:08Z",
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "startedAt": "2026-10-11T06:21:08Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-11T06:21:08Z",
+            "conclusion": "success",
+            "name": "Run python scripts/build.py",
+            "number": 4,
+            "startedAt": "2026-10-11T06:21:08Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-11T06:21:08Z",
+            "conclusion": "success",
+            "name": "Run python scripts/test_bootstrap.py",
+            "number": 5,
+            "startedAt": "2026-10-11T06:21:08Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-11T06:21:20Z",
+            "conclusion": "success",
+            "name": "Run python -m unittest discover -v -b",
+            "number": 6,
+            "startedAt": "2026-10-11T06:21:08Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-11T06:21:34Z",
+            "conclusion": "success",
+            "name": "Run cd /tmp && python -I \"$GITHUB_WORKSPACE/dist/maa-test.pyz\" --unit --product \"$GITHUB_WORKSPACE/dist/maa.pyz\"",
+            "number": 7,
+            "startedAt": "2026-10-11T06:21:20Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-11T06:21:34Z",
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 13,
+            "startedAt": "2026-10-11T06:21:34Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-11T06:21:34Z",
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 14,
+            "startedAt": "2026-10-11T06:21:34Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-11T06:21:34Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 15,
+            "startedAt": "2026-10-11T06:21:34Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/gdrencn/my-ai-agent/actions/runs/38117770220/job/114406024956"
+      }
+    ],
+    "status": "completed",
+    "url": "https://github.com/gdrencn/my-ai-agent/actions/runs/38117770220"
+  },
+  "candidate_sha256": {
+    "maa.pyz": "1143814ea077611e4015c3bd3935c0ae9b8038d8b82e01b4a904b3b3c60dcd45",
+    "maa-test.pyz": "28db530f9b943da217bf2002e0f00b31741f8842c028de72b0a10a6104578f8a"
+  },
+  "ordinary_user_native": {
+    "version": "0.2.1",
+    "uid": 1001,
+    "kind": "native connector lifecycle, no official accounts",
+    "product_sha256": "1143814ea077611e4015c3bd3935c0ae9b8038d8b82e01b4a904b3b3c60dcd45",
+    "checks": [
+      {
+        "name": "im-native-install",
+        "status": "passed",
+        "detail": {
+          "ok": true
+        }
+      },
+      {
+        "name": "im-native-independent-unit",
+        "status": "passed",
+        "detail": {
+          "independent_runtime": true,
+          "initially_closed": true,
+          "unit": "maa-connectors-1001.service"
+        }
+      },
+      {
+        "name": "im-native-manager-independent",
+        "status": "passed",
+        "detail": {
+          "manager_archive_absent": true,
+          "empty_runtime_active": true,
+          "network_requests": 0
+        }
+      },
+      {
+        "name": "im-native-close-all",
+        "status": "passed",
+        "detail": {
+          "ok": true
+        }
+      },
+      {
+        "name": "im-native-disabled-account",
+        "status": "passed",
+        "detail": {
+          "id": "0e1884abeb584e8b94fb6d3a51156f29",
+          "platform": "whatsapp",
+          "name": "native fixture",
+          "owner_id": "",
+          "platform_id": "",
+          "api_base": "https://api.whatsapp.com",
+          "enabled": false,
+          "created_at": 1791699662.7733576,
+          "reply": "my-ai-agent：消息收发测试成功。",
+          "credential_set": true
+        }
+      },
+      {
+        "name": "im-native-private-export",
+        "status": "passed",
+        "detail": {
+          "path": "/tmp/maa-im-native-8a5goug9/backup.json",
+          "connections": 1,
+          "contains_credentials": true
+        }
+      },
+      {
+        "name": "im-native-delete",
+        "status": "passed",
+        "detail": {
+          "deleted": "0e1884abeb584e8b94fb6d3a51156f29",
+          "remote_changed": false
+        }
+      },
+      {
+        "name": "im-native-import-closed",
+        "status": "passed",
+        "detail": {
+          "imported": 1,
+          "enabled": false
+        }
+      },
+      {
+        "name": "im-native-uninstall",
+        "status": "passed",
+        "detail": {
+          "deleted": "connector-module",
+          "remote_changed": false
+        }
+      }
+    ],
+    "status": "passed",
+    "finished": "2026-10-11T06:21:03.895698+00:00"
+  },
+  "root_native": {
+    "version": "0.2.1",
+    "uid": 0,
+    "kind": "native connector lifecycle, no official accounts",
+    "product_sha256": "1143814ea077611e4015c3bd3935c0ae9b8038d8b82e01b4a904b3b3c60dcd45",
+    "checks": [
+      {
+        "name": "im-native-install",
+        "status": "passed",
+        "detail": {
+          "ok": true
+        }
+      },
+      {
+        "name": "im-native-independent-unit",
+        "status": "passed",
+        "detail": {
+          "independent_runtime": true,
+          "initially_closed": true,
+          "unit": "maa-connectors-0.service"
+        }
+      },
+      {
+        "name": "im-native-manager-independent",
+        "status": "passed",
+        "detail": {
+          "manager_archive_absent": true,
+          "empty_runtime_active": true,
+          "network_requests": 0
+        }
+      },
+      {
+        "name": "im-native-close-all",
+        "status": "passed",
+        "detail": {
+          "ok": true
+        }
+      },
+      {
+        "name": "im-native-disabled-account",
+        "status": "passed",
+        "detail": {
+          "id": "e0ec171312c2456fae2c37430c961a6a",
+          "platform": "whatsapp",
+          "name": "native fixture",
+          "owner_id": "",
+          "platform_id": "",
+          "api_base": "https://api.whatsapp.com",
+          "enabled": false,
+          "created_at": 1791699662.7404854,
+          "reply": "my-ai-agent：消息收发测试成功。",
+          "credential_set": true
+        }
+      },
+      {
+        "name": "im-native-private-export",
+        "status": "passed",
+        "detail": {
+          "path": "/tmp/maa-im-native-_ymt1o75/backup.json",
+          "connections": 1,
+          "contains_credentials": true
+        }
+      },
+      {
+        "name": "im-native-delete",
+        "status": "passed",
+        "detail": {
+          "deleted": "e0ec171312c2456fae2c37430c961a6a",
+          "remote_changed": false
+        }
+      },
+      {
+        "name": "im-native-import-closed",
+        "status": "passed",
+        "detail": {
+          "imported": 1,
+          "enabled": false
+        }
+      },
+      {
+        "name": "im-native-uninstall",
+        "status": "passed",
+        "detail": {
+          "deleted": "connector-module",
+          "remote_changed": false
+        }
+      }
+    ],
+    "status": "passed",
+    "finished": "2026-10-11T06:21:03.807058+00:00"
+  }
+}
