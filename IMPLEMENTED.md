@@ -16,6 +16,8 @@ All 118 source checks, 118 paired checks outside the checkout, and 118 paired ch
 
 The latest product SHA-256 is `2712368be31562cbcb36131e64147cd87d860f089de3375da41f3f8bf229e370`. Evidence is in `validation/V0_2_1_MENU.json`; public installer and download evidence is recorded separately in `validation/V0_2_1_MENU_PUBLIC.json`. Earlier 0.2.1 receipts below retain their original program hashes and describe prior iteration builds. This menu-only stage does not claim a fresh model/Codex native suite or real IM account login/send/receive acceptance.
 
+Published from `e40380bd4eaaccd1872a62802f69e08cbee78128` after main and tag CI runs 38545543010 and 38545909423 passed. All 18 initial assets downloaded byte-identically and all three manifests passed. The actual stable-default, test-default and exact-test public installers preserved configuration hashes and disabled YOLO; test installed the new product hash above. The additional public receipt and its checksum were also downloaded and compared, bringing this release to 19 assets. The accepted stable tag/latest status and all 11 stable asset digests are unchanged. The owned `maa-021-menu-check` container was stopped and deleted.
+
 ## 0.2.1 self-check directory identity correction
 
 GitHub CI for the initial iteration commit `40794f3f207c006ecd42a79708c6933010d619a2` failed `test_cleanup_refuses_unknown_data_and_retires_old_manager`: the runner immediately reused the deleted directory inode. Earlier local and container passes did not expose that filesystem behavior. Publishing before that CI finished was premature. The user clarified that this correction belongs to the same 0.2.1 test iteration; 0.1.9 stable remains unchanged.
