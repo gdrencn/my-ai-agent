@@ -5,6 +5,7 @@ import os
 import select
 import sys
 import termios
+import time
 
 from .i18n import t
 from .output import boundary, colored, terminal_size
@@ -122,6 +123,15 @@ class Selection:
         return [value for value, _ in self.options if value in self.checked] if self.multiple else self.options[self.index][0]
 
 
+@dataclass(frozen=True)
+class MenuView:
+    """A read-only snapshot for an inline selection that updates while waiting."""
+    title: str
+    options: list
+    description: tuple = ()
+    disabled: tuple = ()
+
+
 class Screen:
     """A small inline block, not a screen-owning UI. Input mode is scoped per prompt."""
     def __init__(self, terminal):
@@ -166,7 +176,7 @@ class Screen:
         finally:
             try:
                 if self.drawn:
-                    self.draw(self.drawn, park=False)
+                    self.draw(self.drawn, park=False, incremental=True)
             finally:
                 termios.tcsetattr(self.fd, termios.TCSANOW, original)
                 self.write('\x1b[0m\x1b[?25h')
@@ -217,12 +227,40 @@ class Screen:
         self.write('\r\x1b[0J')
         self.drawn = []
 
-    def draw(self, lines, *, park=True):
+    def draw(self, lines, *, park=True, incremental=False):
         lines = list(lines)
         width, height = self.size()
+        lines = lines[:height - 1]
+        if incremental and self.dimensions == (width, height) and self.drawn:
+            output = ''
+            if len(lines) > len(self.drawn):
+                # Reserve additional rows below the old block before moving
+                # around it; newlines scroll normally even at terminal bottom.
+                output += (f'\x1b[{len(self.drawn)}B\r' + '\n' * (len(lines) - len(self.drawn)) +
+                           f'\x1b[{len(lines)}A\r')
+            for index in range(max(len(lines), len(self.drawn))):
+                current = lines[index] if index < len(lines) else None
+                previous = self.drawn[index] if index < len(self.drawn) else None
+                if current == previous:
+                    continue
+                if index:
+                    output += f'\x1b[{index}B'
+                output += '\r\x1b[2K'
+                if current is not None:
+                    label, focused = current
+                    output += (('\x1b[7m' if focused else '') +
+                               rendered(label, width - 1, color=self.color) + '\x1b[0m')
+                if index:
+                    output += f'\x1b[{index}A'
+                output += '\r'
+            if not park and lines:
+                output += f'\x1b[{len(lines)}B\r'
+            if output:
+                self.write(output)
+            self.drawn = lines
+            return
         self.clear()
         self.dimensions = width, height
-        lines = lines[:height - 1]
         output = ''
         for label, focused in lines:
             output += ('\r\x1b[2K' + ('\x1b[7m' if focused else '') +
@@ -245,9 +283,11 @@ class Screen:
         return [(line, False) for line in lines]
 
     def choose(self, title, options, default=None, multiple=False, checked=(), radio=False,
-               cancel=None, description=(), disabled=(), details=None):
+               cancel=None, description=(), disabled=(), details=None, refresh=None, refresh_interval=1.0):
         if not options:
             raise ValueError('Menu requires at least one option')
+        if refresh is not None and refresh_interval <= 0:
+            raise ValueError('Refresh interval must be positive')
         index = next((i for i, (value, _) in enumerate(options) if value == default), 0)
         selection = Selection(options, index, multiple, set(checked))
         cancel = cancel or ('cancel' if radio or multiple else 'back')
@@ -255,12 +295,32 @@ class Screen:
         with self.prompt():
             # Context is permanent history, so it stays complete on narrow/short
             # terminals and is not repeated by selection movement or redraws.
-            for text in (title, *(['', *description] if description else [])):
-                for line in wrapped(text, self.size()[0] - 1):
-                    self.write(rendered(line, self.size()[0] - 1, color=self.color) + '\n')
-            if description:
-                self.write('\n')
+            if refresh is None:
+                for text in (title, *(['', *description] if description else [])):
+                    for line in wrapped(text, self.size()[0] - 1):
+                        self.write(rendered(line, self.size()[0] - 1, color=self.color) + '\n')
+                if description:
+                    self.write('\n')
+            next_refresh = time.monotonic() + refresh_interval
+            changed_selection = False
+
+            def update_view():
+                nonlocal title, options, description, disabled, next_refresh, changed_selection
+                view = refresh()
+                if not isinstance(view, MenuView) or not view.options:
+                    raise ValueError('Refresh requires a nonempty MenuView')
+                selected = selection.options[selection.index][0]
+                title, options, description, disabled = view.title, view.options, view.description, view.disabled
+                index = next((i for i, (value, _) in enumerate(options) if value == selected), None)
+                changed_selection = index is None
+                selection.index = index if index is not None else min(selection.index, len(options) - 1)
+                selection.options = options
+                selection.checked.intersection_update(value for value, _ in options)
+                next_refresh = time.monotonic() + refresh_interval
+
             while True:
+                if refresh is not None and time.monotonic() >= next_refresh:
+                    update_view()
                 width, height = self.size()
                 footer_lines = self.instructions(footer)
                 detail_lines = []
@@ -268,9 +328,14 @@ class Screen:
                     detail = details.get(selection.options[selection.index][0], '')
                     detail_lines = [(line, False) for line in wrapped(detail, width - 1)] if detail else []
                     detail_lines = detail_lines[:max(0, height - len(footer_lines) - 3)]
-                count = max(1, height - len(footer_lines) - len(detail_lines) - 1)
+                context = []
+                if refresh is not None:
+                    context = [(line, False) for text in (title, *description)
+                               for line in wrapped(text, width - 1)]
+                    context = context[:max(0, height - len(footer_lines) - len(detail_lines) - 2)]
+                count = max(1, height - len(context) - len(footer_lines) - len(detail_lines) - 1)
                 offset = max(0, selection.index - count + 1)
-                lines = []
+                lines = list(context)
                 for index in range(offset, min(len(options), offset + count)):
                     value, label = options[index]
                     focused = index == selection.index
@@ -279,15 +344,24 @@ class Screen:
                     row = prefix + label if isinstance(label, str) else replace(label, prefix=prefix)
                     lines.append((row, focused))
                 lines.extend(detail_lines + footer_lines)
-                self.draw(lines)
+                self.draw(lines, incremental=refresh is not None)
                 key = self.key()
                 while key == 'idle' or (key in ('activate', 'right') and selection.options[selection.index][0] in disabled):
+                    if refresh is not None and time.monotonic() >= next_refresh:
+                        key = 'idle'
+                        break
                     key = self.key()
+                if key == 'idle' or (key in ('activate', 'right') and selection.options[selection.index][0] in disabled):
+                    continue
                 if key in ('up', 'down'):
                     selection.move(-1 if key == 'up' else 1)
+                    changed_selection = False
                 elif key == ' ' and multiple:
                     selection.toggle()
                 elif key in ('activate', 'right'):
+                    if changed_selection:
+                        changed_selection = False
+                        continue
                     return selection.result()
                 elif key in ('back', 'left'):
                     raise Cancelled

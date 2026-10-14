@@ -1,0 +1,281 @@
+{
+  "version": "0.2.1",
+  "channel": "test",
+  "status": "passed",
+  "at": "2026-10-14T09:52:26.003910+00:00",
+  "scope": "Connector menu organization, shared inline automatic status and paired acceptance; same unfinished 0.2.1 test iteration.",
+  "asset_sha256": {
+    "maa.pyz": "2712368be31562cbcb36131e64147cd87d860f089de3375da41f3f8bf229e370",
+    "maa-test.pyz": "cf5ae698d46c86e12d00ca4b7e3304e8dd9a33a00b9c516a7b861d937b853d9c",
+    "VERSION.json": "ed59b0da9558d26116b89e3ac791a48864bf53a6bb3117b32e3bac2ad295db47",
+    "bootstrap.py": "12d1cf03fd7836e70d66d94f5e985f6e943697e4af663fb1559678293d035a3c",
+    "install.sh": "c5f446b02ece8ec9c365d66687fab19ff671c8408b176c65b8434437447c2d4e",
+    "SHA256SUMS": "7100e264055cfde2f38d2419a7e69be75f5ef03488e096ae9d9b6521d408a42d"
+  },
+  "build": {
+    "reproducible": true,
+    "python_3_11_grammar_files": 55,
+    "shell_syntax": true,
+    "package_boundaries": true
+  },
+  "portable": {
+    "source": 118,
+    "paired_outside_checkout": 118,
+    "ordinary_user_container": 118,
+    "root_container": 118,
+    "skipped": 0
+  },
+  "delivery_regressions": 10,
+  "new_live_pty_regressions": 7,
+  "ordinary_user_native": {
+    "version": "0.2.1",
+    "uid": 1001,
+    "kind": "native connector lifecycle, no official accounts",
+    "product_sha256": "2712368be31562cbcb36131e64147cd87d860f089de3375da41f3f8bf229e370",
+    "checks": [
+      {
+        "name": "im-native-install",
+        "status": "passed",
+        "detail": {
+          "ok": true
+        }
+      },
+      {
+        "name": "im-native-independent-unit",
+        "status": "passed",
+        "detail": {
+          "independent_runtime": true,
+          "initially_closed": true,
+          "unit": "maa-connectors-1001.service"
+        }
+      },
+      {
+        "name": "im-native-manager-independent",
+        "status": "passed",
+        "detail": {
+          "manager_archive_absent": true,
+          "empty_runtime_active": true,
+          "network_requests": 0
+        }
+      },
+      {
+        "name": "im-native-close-all",
+        "status": "passed",
+        "detail": {
+          "ok": true
+        }
+      },
+      {
+        "name": "im-native-disabled-account",
+        "status": "passed",
+        "detail": {
+          "id": "9af7ad225c344a83af09903dbae31e09",
+          "platform": "whatsapp",
+          "name": "native fixture",
+          "owner_id": "",
+          "platform_id": "",
+          "api_base": "https://api.whatsapp.com",
+          "enabled": false,
+          "created_at": 1791970848.166173,
+          "reply": "my-ai-agent：消息收发测试成功。",
+          "credential_set": true
+        }
+      },
+      {
+        "name": "im-native-private-export",
+        "status": "passed",
+        "detail": {
+          "path": "/tmp/maa-im-native-pu34s__m/backup.json",
+          "connections": 1,
+          "contains_credentials": true
+        }
+      },
+      {
+        "name": "im-native-delete",
+        "status": "passed",
+        "detail": {
+          "deleted": "9af7ad225c344a83af09903dbae31e09",
+          "remote_changed": false
+        }
+      },
+      {
+        "name": "im-native-import-closed",
+        "status": "passed",
+        "detail": {
+          "imported": 1,
+          "enabled": false
+        }
+      },
+      {
+        "name": "im-native-uninstall",
+        "status": "passed",
+        "detail": {
+          "deleted": "connector-module",
+          "remote_changed": false
+        }
+      }
+    ],
+    "status": "passed",
+    "finished": "2026-10-14T09:40:49.255165+00:00"
+  },
+  "root_native": {
+    "version": "0.2.1",
+    "uid": 0,
+    "kind": "native connector lifecycle, no official accounts",
+    "product_sha256": "2712368be31562cbcb36131e64147cd87d860f089de3375da41f3f8bf229e370",
+    "checks": [
+      {
+        "name": "im-native-install",
+        "status": "passed",
+        "detail": {
+          "ok": true
+        }
+      },
+      {
+        "name": "im-native-independent-unit",
+        "status": "passed",
+        "detail": {
+          "independent_runtime": true,
+          "initially_closed": true,
+          "unit": "maa-connectors-0.service"
+        }
+      },
+      {
+        "name": "im-native-manager-independent",
+        "status": "passed",
+        "detail": {
+          "manager_archive_absent": true,
+          "empty_runtime_active": true,
+          "network_requests": 0
+        }
+      },
+      {
+        "name": "im-native-close-all",
+        "status": "passed",
+        "detail": {
+          "ok": true
+        }
+      },
+      {
+        "name": "im-native-disabled-account",
+        "status": "passed",
+        "detail": {
+          "id": "41b15c523afc4c8f823708546c1d324f",
+          "platform": "whatsapp",
+          "name": "native fixture",
+          "owner_id": "",
+          "platform_id": "",
+          "api_base": "https://api.whatsapp.com",
+          "enabled": false,
+          "created_at": 1791970879.0627332,
+          "reply": "my-ai-agent：消息收发测试成功。",
+          "credential_set": true
+        }
+      },
+      {
+        "name": "im-native-private-export",
+        "status": "passed",
+        "detail": {
+          "path": "/tmp/maa-im-native-4tckmi0h/backup.json",
+          "connections": 1,
+          "contains_credentials": true
+        }
+      },
+      {
+        "name": "im-native-delete",
+        "status": "passed",
+        "detail": {
+          "deleted": "41b15c523afc4c8f823708546c1d324f",
+          "remote_changed": false
+        }
+      },
+      {
+        "name": "im-native-import-closed",
+        "status": "passed",
+        "detail": {
+          "imported": 1,
+          "enabled": false
+        }
+      },
+      {
+        "name": "im-native-uninstall",
+        "status": "passed",
+        "detail": {
+          "deleted": "connector-module",
+          "remote_changed": false
+        }
+      }
+    ],
+    "status": "passed",
+    "finished": "2026-10-14T09:41:20.039429+00:00"
+  },
+  "installed_ui": {
+    "status": "passed",
+    "kind": "installed Maa CLI / actual systemd / real PTY",
+    "uid": 1001,
+    "program_header_count": 1,
+    "automatic_start_stop_observation": true,
+    "readonly_activation_inert": true,
+    "running_instance_preserved": true,
+    "configuration_hashes_unchanged": true,
+    "terminal_restored": true,
+    "no_clear_screen": true,
+    "official_accounts": 0,
+    "product_sha256": "2712368be31562cbcb36131e64147cd87d860f089de3375da41f3f8bf229e370"
+  },
+  "stable_baseline": {
+    "assets": [
+      {
+        "digest": "sha256:12d1cf03fd7836e70d66d94f5e985f6e943697e4af663fb1559678293d035a3c",
+        "name": "bootstrap.py"
+      },
+      {
+        "digest": "sha256:22c899084c179199c6fe5dbcdfa69547cb4813dd21a7fa1b3a55adfd52018d21",
+        "name": "install.sh"
+      },
+      {
+        "digest": "sha256:01c0dd97a4658cd59770993efbfcfa43871684c97296fc1905e81107ea52e281",
+        "name": "maa-test.pyz"
+      },
+      {
+        "digest": "sha256:2dcda1dd4eba9697d4a4e1e7a47b74fd932685be19a548973d810d6c1af9b399",
+        "name": "maa.pyz"
+      },
+      {
+        "digest": "sha256:05f3157a3f1545bc6b28f1fea869460b2ccc6ec8c19b9278a3f8bec634700023",
+        "name": "PUBLIC_SHA256SUMS"
+      },
+      {
+        "digest": "sha256:dc808d6dd31eab98fdd98087cad4c6b9c78ee903d42a9a21b01f1e71938ab801",
+        "name": "SHA256SUMS"
+      },
+      {
+        "digest": "sha256:50405783a61dd18075b56c62f8ba992736b03d707c318e352e8d4719e252758b",
+        "name": "STABLE_0_1_9_NATIVE.json"
+      },
+      {
+        "digest": "sha256:088b88d5d7fd99102492c68e263d0e14bdbc9549c75ac16c87eb5bb8ab6482bb",
+        "name": "STABLE_0_1_9_PUBLIC.json"
+      },
+      {
+        "digest": "sha256:b7b881c265440edcd2d3462552e4fa20f10e9384416dcdd7b00b2f2431bc0096",
+        "name": "STABLE_0_1_9_REVIEW.json"
+      },
+      {
+        "digest": "sha256:fa0ae643b78a19c3bb01b2e6cbc425ee88bca2ba24e1d3d2eab906eaff9828ad",
+        "name": "VALIDATION_SHA256SUMS"
+      },
+      {
+        "digest": "sha256:5aeadd5553666049da1fb6a34d6dab0627e898c7fc024079a9958d2d96ba5b32",
+        "name": "VERSION.json"
+      }
+    ],
+    "draft": false,
+    "prerelease": false,
+    "tag": "stable/0.1.9"
+  },
+  "limitations": [
+    "No real Telegram, WhatsApp or WeChat credentials provided; official account acceptance remains pending.",
+    "No fresh model/Codex native suite in this menu-only correction; prior versioned receipts retain their actual hashes."
+  ]
+}

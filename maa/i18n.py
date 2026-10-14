@@ -1,6 +1,11 @@
 """Centralized first-release Chinese UI text; native diagnostics are retained."""
 MESSAGES = {
     'im_menu': '聊天接入', 'im_platform': '平台', 'im_name': '本地名称', 'im_identity': '平台账号',
+    'im_platforms': '平台接入', 'im_program': '连接器程序', 'im_backups': '备份与恢复',
+    'im_runtime_state': '运行状态（只读）',
+    'im_read_error': '状态读取失败，正在自动重试',
+    'im_stale': '下面的值是上次读取结果，当前状态未知。',
+    'im_removed': '此接入已被其他操作删除，请返回。',
     'im_connection_state': '连接状态', 'im_received': '接收文本数', 'im_sent': '发送成功数',
     'im_uncertain': '发送结果不确定数', 'im_last_received': '最后接收', 'im_last_sent': '最后发送',
     'im_error': '诊断', 'im_qr': '请用微信扫描二维码；也可打开下面的官方授权链接。Ctrl+C 取消。',

@@ -13,6 +13,48 @@ import fcntl
 
 
 class Terminal(unittest.TestCase):
+    def receive(self, fd, marker, seconds=4):
+        output, deadline = b'', time.monotonic() + seconds
+        while time.monotonic() < deadline:
+            if select.select([fd], [], [], .1)[0]:
+                try:
+                    output += os.read(fd, 65536)
+                except OSError:
+                    break
+                plain = re.sub(r'\x1b\[[0-9;?]*[A-Za-z]', '', output.decode(errors='replace'))
+                if marker in plain:
+                    return output
+        self.fail(f'Did not receive {marker!r}: {output.decode(errors="replace")}')
+
+    def menu_rows(self, output):
+        """Replay inline cursor moves and erasure, including committed history."""
+        rows, row, column = [[]], 0, 0
+        for token in re.findall(r'\x1b\[[0-9;?]*[A-Za-z]|[^\x1b]', output):
+            if token.startswith('\x1b'):
+                number = token[2:-1]
+                if token[-1] in ('A', 'B') and number.isdigit():
+                    row = max(0, row + (1 if token[-1] == 'B' else -1) * int(number))
+                    while len(rows) <= row:
+                        rows.append([])
+                elif token == '\x1b[2K':
+                    rows[row] = []
+                elif token == '\x1b[0J':
+                    rows[row] = rows[row][:column]
+                    del rows[row+1:]
+                continue
+            if token == '\r':
+                column = 0
+            elif token == '\n':
+                row += 1
+                if len(rows) <= row:
+                    rows.append([])
+            else:
+                while len(rows[row]) <= column:
+                    rows[row].append(' ')
+                rows[row][column] = token
+                column += 1
+        return [''.join(line) for line in rows]
+
     def visible_lines(self, output):
         """Replay the controls used by Progress; retain committed terminal rows."""
         rows, line, cursor = [], [], 0
@@ -51,7 +93,10 @@ class Terminal(unittest.TestCase):
                 if select.select([fd], [], [], .2)[0]:
                     output += os.read(fd, 65536)
             self.assertIn(marker.encode(), output)
-            os.write(fd, keys)
+            if callable(keys):
+                output += keys(fd)
+            else:
+                os.write(fd, keys)
             while time.monotonic() < deadline:
                 if select.select([fd], [], [], .2)[0]:
                     try:
@@ -102,14 +147,190 @@ class Terminal(unittest.TestCase):
                 " store.save({'version':1,'connections':{row['id']:row}})\n"
                 " manager=Connections(store,FixtureController(store),lambda:None)\n"
                 " interactive(lambda ui:main(ui,manager))\nprint('IM_RETURNED')")
-        # Telegram default -> WhatsApp -> fixture account -> switch -> cancel
-        # switch -> cancel account -> cancel platform -> cancel IM menu.
-        value = self.session(code, b'\x1b[B\r\r\r' + b'\x1b[D'*4, '聊天接入', (30, 100))
+        # Platform category -> WhatsApp -> account -> switch -> cancel, then
+        # return through account, platform, category and chat entry.
+        value = self.session(code, b'\r\x1b[B\r\r\r' + b'\x1b[D'*5, '聊天接入', (30, 100))
         self.assertIn('IM_RETURNED', value)
         self.assertIn('发送成功数', value)
         self.assertIn('固定测试回复', value)
         self.assertIn('已设置', value)
         self.assertNotIn('FAKE_TEST_TOKEN', value)
+        self.assertIn('平台接入', value)
+        self.assertIn('连接器程序', value)
+        self.assertIn('备份与恢复', value)
+        self.assertNotIn('刷新', value)
+
+    def test_live_menu_updates_only_changed_rows_and_keeps_focus(self):
+        code = ("from maa.menu import MenuView\nfrom maa.ui import value_line\n"
+                "calls=0\n"
+                "def snapshot():\n global calls\n calls+=1\n"
+                " return MenuView('LIVE_MENU',[('a','First'),('b','Second')],(value_line('COUNT',calls),))\n"
+                "def work(ui):\n"
+                " return ui.choose('LIVE_MENU',[('a','First'),('b','Second')],description=[value_line('COUNT',0)],refresh=snapshot)\n"
+                "print('LIVE_RESULT',interactive(work))")
+        def drive(fd):
+            os.write(fd, b'\x1b[B')
+            output = self.receive(fd, 'COUNT：2')
+            os.write(fd, b'\r')
+            return output
+        value = self.session(code, drive, 'LIVE_MENU', (14, 80))
+        self.assertIn('LIVE_RESULT b', value)
+        self.assertEqual(value.count('LIVE_MENU'), 1)
+        rows = self.menu_rows(value)
+        self.assertEqual(sum('LIVE_MENU' in row for row in rows), 1, rows)
+        self.assertEqual(sum('COUNT：2' in row for row in rows), 1, rows)
+        self.assertFalse(any('COUNT：0' in row or 'COUNT：1' in row for row in rows), rows)
+
+    def test_live_selection_tracks_ids_and_refuses_retargeted_confirmation(self):
+        for removed in (False, True):
+            with self.subTest(removed=removed):
+                options = [('a', 'Alpha'), ('b', 'Bravo'), ('c', 'Charlie')]
+                replacement = [('c', 'Charlie'), ('a', 'Alpha')] if removed else list(reversed(options))
+                code = ("from maa.menu import MenuView\n"
+                        f"options={options!r}\nreplacement={replacement!r}\ncalls=0\n"
+                        "def snapshot():\n global calls\n calls+=1\n"
+                        " return MenuView('IDENTITY_MENU',replacement,(f'TICK {calls}',))\n"
+                        "print('IDENTITY_RESULT',interactive(lambda ui:ui.choose('IDENTITY_MENU',options,default='b',refresh=snapshot)))")
+                def drive(fd):
+                    output = self.receive(fd, 'TICK 1')
+                    os.write(fd, b'\r')
+                    if removed:
+                        output += self.receive(fd, 'TICK 2')
+                        os.write(fd, b'\r')
+                    return output
+                value = self.session(code, drive, 'IDENTITY_MENU', (12, 80))
+                self.assertIn('IDENTITY_RESULT ' + ('a' if removed else 'b'), value)
+                self.assertEqual(value.count('IDENTITY_MENU'), 1)
+
+    def test_im_live_error_blocks_actions_and_recovers_without_reprinting(self):
+        code = ("from maa.im.ui import live\nfrom maa.menu import MenuView\nfrom maa.store import Error\n"
+                "class Manager:\n"
+                " def __init__(self):self.calls=0\n"
+                " def status(self):\n  self.calls+=1\n"
+                "  if self.calls==2:raise Error('READ_FAILED')\n"
+                "  return {'count':self.calls}\n"
+                "manager=Manager()\n"
+                "def view(status):return MenuView('ERROR_MENU',[('action','Do action'),(None,'返回')],(f'READY {status[\"count\"]}',))\n"
+                "print('ERROR_RESULT',interactive(lambda ui:live(ui,manager,'ERROR_MENU',view))[0])")
+        def drive(fd):
+            output = self.receive(fd, 'READ_FAILED')
+            os.write(fd, b'\r')
+            output += self.receive(fd, 'READY 3')
+            os.write(fd, b'\r')
+            return output
+        value = self.session(code, drive, 'ERROR_MENU', (14, 100))
+        self.assertIn('ERROR_RESULT action', value)
+        self.assertEqual(value.count('ERROR_MENU'), 1)
+        self.assertIn('当前状态未知', value)
+        rows = self.menu_rows(value)
+        self.assertTrue(any('READY 3' in row for row in rows), rows)
+        self.assertFalse(any('READ_FAILED' in row for row in rows), rows)
+
+    def test_im_account_live_updates_pause_during_input_and_confirmation(self):
+        code = ("import tempfile,threading,time\nfrom pathlib import Path\n"
+                "from maa.im.ui import account\nfrom maa.im.state import State\nfrom maa.im.manager import Connections\n"
+                "from tests.test_im import FixtureController,record\n"
+                "with tempfile.TemporaryDirectory() as folder:\n"
+                " store=State(Path(folder)/'im')\n row=record('whatsapp',name='Account')\n"
+                " store.save({'version':1,'connections':{row['id']:row}})\n"
+                " manager=Connections(store,FixtureController(store),lambda:None)\n"
+                " queries=[]\n status=manager.status\n"
+                " def observe():\n  queries.append(time.monotonic())\n  return status()\n"
+                " manager.status=observe\n"
+                " def update():\n  time.sleep(.5)\n  store.put_receive(row,{'received':9,'sent':7})\n"
+                " thread=threading.Thread(target=update)\n thread.start()\n"
+                " def work(ui):\n"
+                "  for method in ('input','confirm'):\n"
+                "   original=getattr(ui,method)\n"
+                "   def paused(*args,_original=original,**kwargs):\n"
+                "    before=len(queries)\n    result=_original(*args,**kwargs)\n"
+                "    assert len(queries)==before,'Queries continued inside edit/confirmation'\n    return result\n"
+                "   setattr(ui,method,paused)\n"
+                "  account(ui,manager,row['id'])\n"
+                " interactive(work)\n thread.join()\n"
+                " assert manager.row(row['id'])['name']=='Edited'\nprint('EDIT_RETURNED')")
+        def drive(fd):
+            output = self.receive(fd, '发送成功数：7')
+            os.write(fd, b'\x1b[B\r')
+            output += self.receive(fd, '请输入新值')
+            time.sleep(1.2)
+            os.write(fd, b'Edited\r')
+            output += self.receive(fd, '本地名称：Edited')
+            os.write(fd, b'\x1b[B'*4 + b'\r')
+            output += self.receive(fd, '删除 Edited')
+            time.sleep(1.2)
+            os.write(fd, b'\x1b[D')
+            output += self.receive(fd, '固定测试回复')
+            os.write(fd, b'\x1b[D')
+            return output
+        value = self.session(code, drive, '固定测试回复', (30, 100))
+        self.assertIn('EDIT_RETURNED', value)
+        self.assertNotIn('刷新', value)
+        self.assertNotIn('FAKE_TEST_TOKEN', value)
+
+    def test_live_resize_and_no_color_preserve_current_option(self):
+        code = ("os.environ['NO_COLOR']='1'\nfrom maa.menu import MenuView\n"
+                "from maa.ui import value_line\ncalls=0\n"
+                "def snapshot():\n global calls\n calls+=1\n"
+                " return MenuView('LIVE_RESIZE',[('a',value_line('状态','已关闭','gray')),('b',value_line('接收计数',calls))])\n"
+                "print('RESIZE_RESULT',interactive(lambda ui:ui.choose('LIVE_RESIZE',snapshot().options,default='b',refresh=snapshot)))")
+        code = 'import os\n' + code
+        def drive(fd):
+            fcntl.ioctl(fd, termios.TIOCSWINSZ, struct.pack('HHHH', 8, 24, 0, 0))
+            output = self.receive(fd, '接收计数：2')
+            os.write(fd, b'\r')
+            return output
+        value = self.session(code, drive, 'LIVE_RESIZE', (14, 80))
+        self.assertIn('RESIZE_RESULT b', value)
+        self.assertNotRegex(value, r'\x1b\[(3\d|9\d)m')
+        rows = self.menu_rows(value)
+        self.assertEqual(sum('LIVE_RESIZE' in row for row in rows), 1, rows)
+
+    def test_im_program_readonly_status_is_inert_and_updates(self):
+        code = ("import tempfile,threading,time\nfrom pathlib import Path\n"
+                "from maa.im.ui import program\nfrom maa.im.manager import Connections\nfrom maa.im.state import State\n"
+                "from tests.test_im import FixtureController\n"
+                "with tempfile.TemporaryDirectory() as folder:\n"
+                " store=State(Path(folder)/'im')\n controller=FixtureController(store)\n controller.installed=True\n"
+                " controller.active=lambda:controller.autostart\n"
+                " def refuse():raise AssertionError('Readonly page invoked a mutation')\n"
+                " manager=Connections(store,controller,refuse)\n"
+                " def update():\n  time.sleep(.5)\n  controller.autostart=True\n"
+                " thread=threading.Thread(target=update)\n thread.start()\n"
+                " interactive(lambda ui:program(ui,manager))\n thread.join()\nprint('PROGRAM_RETURNED')")
+        def drive(fd):
+            os.write(fd, b'\x1b[B\r')
+            output = self.receive(fd, '运行状态（只读）：运行中')
+            os.write(fd, b'\x1b[D')
+            return output
+        value = self.session(code, drive, '安装 / 更新连接器程序', (18, 100))
+        self.assertIn('PROGRAM_RETURNED', value)
+        self.assertNotIn('刷新', value)
+        self.assertEqual(value.count('连接器程序\x1b[0m'), 1)
+        rows = self.menu_rows(value)
+        self.assertEqual(sum('运行状态（只读）：运行中' in row for row in rows), 1, rows)
+        self.assertFalse(any('运行状态（只读）：已关闭' in row for row in rows), rows)
+
+    def test_im_account_removed_externally_leaves_only_return(self):
+        code = ("import tempfile,threading,time\nfrom pathlib import Path\n"
+                "from maa.im.ui import account\nfrom maa.im.manager import Connections\nfrom maa.im.state import State\n"
+                "from tests.test_im import FixtureController,record\n"
+                "with tempfile.TemporaryDirectory() as folder:\n"
+                " store=State(Path(folder)/'im')\n row=record('whatsapp',name='RemovedAccount')\n"
+                " store.save({'version':1,'connections':{row['id']:row}})\n"
+                " manager=Connections(store,FixtureController(store),lambda:None)\n"
+                " def remove():\n  time.sleep(.5)\n  store.save({'version':1,'connections':{}})\n"
+                " thread=threading.Thread(target=remove)\n thread.start()\n"
+                " interactive(lambda ui:account(ui,manager,row['id']))\n thread.join()\nprint('REMOVED_RETURNED')")
+        def drive(fd):
+            output = self.receive(fd, '此接入已被其他操作删除')
+            os.write(fd, b'\x1b[D')
+            return output
+        value = self.session(code, drive, '固定测试回复', (30, 100))
+        self.assertIn('REMOVED_RETURNED', value)
+        rows = self.menu_rows(value)
+        self.assertEqual(sum('此接入已被其他操作删除' in row for row in rows), 1, rows)
+        self.assertFalse(any('固定测试回复' in row or 'RemovedAccount' in row for row in rows), rows)
 
     def test_cancel_restores_terminal(self):
         operation = "try:\n print(interactive(lambda ui: ui.input('Cancel model')))\nexcept Cancelled:\n print('CANCELLED')"
