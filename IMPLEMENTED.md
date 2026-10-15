@@ -1,5 +1,15 @@
 # my-ai-agent Implementation — 0.2.1 test
 
+## 0.2.1 repeatable connector native tests
+
+The user's full test run passed 118 portable checks and 35 model/Codex native checks, then rejected an already installed connector module. The test's clean-install precondition was incorrectly applied to the invoking user. This correction remains in 0.2.1 test; the product zipapp is unchanged (`2712368be31562cbcb36131e64147cd87d860f089de3375da41f3f8bf229e370`).
+
+The paired IM runner now checks mas containment and allocates a temporary container user, private home and separate UID-based systemd unit. It copies the unchanged paired product, runs its native CLI and independent runtime, and performs all nine lifecycle checks without accessing the invoking user's connector state. Narrow temporary sudo authorization permits only the test unit and mas marker query. Cleanup removes that unit, authorization, user and home; further interrupts cannot abort the bounded cleanup. Unknown resources and cleanup failures remain explicit. Reports are private and include the invoking/test identities and cleanup result. The packaged runner passes its paired product path to this helper.
+
+Verified on 2026-10-14: 121 source checks, 121 paired checks outside the checkout, 121 root paired checks and ten delivery regressions passed without skips. Three new orchestration regressions cover preservation of existing account data, worker timeout/interruption cleanup and refusal to allocate a host test identity. Each ordinary-user/root container run passed three actual-systemd scenarios: installed empty module, repeat run and a configured closed account with its existing service active and enabled. Each scenario completed all nine IM checks, preserved existing configuration/archive/entry/Codex hashes and MainPID/InvocationID/autostart, and left no test users, authorizations or homes. Real failure, worker interruption and interruption during cleanup fixtures also passed. No official IM messages were sent.
+
+The complete ordinary-user native flow also passed 35 existing model/Codex checks against the unchanged product before the final cleanup signal protection; the current public paired flow is verified separately after publication. Reproducible builds, Python 3.11 grammar for 57 files, three shell syntax checks and package boundaries passed. The corrected tester SHA-256 is `22e48194455aea45a162db98d32bb049fb293e0ee3eaeb804216ba5d5996662c`. Evidence: `validation/V0_2_1_IM_ISOLATION.json`. Earlier receipts retain their original hashes and scope. Stable 0.1.9 remains the fixed rollback baseline.
+
 ## 0.2.1 connector menu organization and automatic status
 
 Verified the authorized menu correction on 2026-10-14, retaining version 0.2.1 test and the accepted 0.1.9 stable baseline.

@@ -19,7 +19,7 @@ def run():
         result = subprocess.check_output([sys.executable, args.product, '--version'], text=True).strip()
         if result != __version__:
             raise ValueError('Tester/product version mismatch')
-    modules = [importlib.import_module('tests.' + name) for name in ('test_core', 'test_service', 'test_status', 'test_terminal', 'test_im')]
+    modules = [importlib.import_module('tests.' + name) for name in ('test_core', 'test_service', 'test_status', 'test_terminal', 'test_im', 'test_im_native')]
     suite = unittest.TestSuite(unittest.defaultTestLoader.loadTestsFromModule(module) for module in modules)
     result = unittest.TextTestRunner(verbosity=2, buffer=True).run(suite)
     if not result.wasSuccessful() or result.skipped:
@@ -28,7 +28,7 @@ def run():
         from maa_testing.native import run as native
         native()
         from maa_testing.im_native import run as im_native
-        im_native()
+        im_native(args.product)
     return 0
 
 

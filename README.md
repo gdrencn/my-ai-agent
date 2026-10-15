@@ -18,6 +18,8 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/insta
 curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/test.sh | bash -s -- --version 0.2.1 --components none
 ```
 
+聊天连接器已经安装或配置账号时也可重复测试，无需先卸载；连接器原生检查使用临时用户和独立服务，结束后清理测试资源。
+
 进入 `maa → 聊天接入`，按“平台接入”“连接器程序”“备份与恢复”管理。状态页面每秒自动原地更新，输入和确认期间暂停；没有手动刷新选项。默认不安装或开启连接器。接入步骤、关闭/恢复/删除与真实账号验收范围见 [docs/CONNECTORS.md](docs/CONNECTORS.md)。固定版本回退见 [docs/ROLLBACK.md](docs/ROLLBACK.md)。
 
 安装、模型切换和暂停/启动共用进度反馈：静默阶段原地刷新等待时长，原生下载保留实时进度，实际诊断单独保留；不因无输出的命令增加重复提示或空行。
