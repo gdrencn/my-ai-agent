@@ -13,16 +13,16 @@ def settings(saved=None, changes=None, mtp_supported=False):
     values = {**DEFAULTS, **(saved or {}), **(changes or {})}
     unknown = set(values) - set(DEFAULTS)
     if unknown:
-        raise Error('Unknown settings: ' + ', '.join(sorted(unknown)))
+        raise Error('Unknown settings: {v0}', v0=', '.join(sorted(unknown)))
     for key in ('context', 'reserve_mib'):
         if type(values[key]) is not int or values[key] < (1 if key == 'context' else 0):
-            raise Error(f'{key} must be a {"positive" if key == "context" else "nonnegative"} integer')
+            raise Error('{v0} must be a positive integer' if key == 'context' else '{v0} must be a nonnegative integer', v0=key)
     for key in ('flash_attention', 'fit', 'mtp'):
         if type(values[key]) is not bool:
-            raise Error(f'{key} must be on or off')
+            raise Error('{v0} must be on or off', v0=key)
     for key, choices in (('kv', KV), ('mtp_kv', ('follow',) + KV), ('keep_alive', KEEP), ('reasoning', EFFORT)):
         if values[key] not in choices:
-            raise Error(f'{key}: choose from {", ".join(choices)}')
+            raise Error('{v0}: choose from {v1}', v0=key, v1=", ".join(choices))
     if not mtp_supported:
         if (changes or {}).get('mtp') is True:
             raise Error('MTP is unavailable: model metadata has no supported MTP weights')

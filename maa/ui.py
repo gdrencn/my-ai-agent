@@ -2,7 +2,7 @@
 import datetime
 import subprocess
 from pathlib import PurePosixPath
-from . import __version__, codex, menu
+from . import __version__, codex, menu, preferences
 from .i18n import t
 from .manager import Manager
 from .output import say, operation
@@ -13,7 +13,7 @@ MODEL_KEYS = BACKEND_KEYS
 
 
 def value_line(label, value, tone='cyan'):
-    return menu.Rich((menu.Cell(label + '：'), menu.Cell(str(value), tone)))
+    return menu.Rich((menu.Cell(label + t('separator')), menu.Cell(str(value), tone)))
 
 
 def state_line(state):
@@ -64,7 +64,7 @@ def model_choices(rows, current_key=None):
                 detail += '\n' + t('model_path') + row['path']
         if counts[label] > 1:
             label = full
-        options.append((key, label + ('（当前）' if key == current_key else '')))
+        options.append((key, label + (t('current_suffix') if key == current_key else '')))
         details[key] = detail
     return options, details
 
@@ -115,7 +115,7 @@ def configure(ui, manager, codex_only=False):
     if codex_only:
         observed = manager.model_status(include_gpu=False, include_allocations=False)
         context = observed['context'] or observed.get('saved_context')
-        suffix = '' if observed['context'] else '（上次核验，已保存）'
+        suffix = '' if observed['context'] else t('saved_suffix')
         readonly = [('context_readonly', value_line(t('context_readonly'), f'{context} tokens{suffix}' if context else t('unknown'))),
                     ('compact_readonly', value_line(t('compact_readonly'), f'{context * 90 // 100} tokens{suffix}' if context else t('unknown')))]
     keys = ('reasoning',) if codex_only else MODEL_KEYS
@@ -154,21 +154,21 @@ def status_lines(status):
     rows = [value_line(t('base_label'), {'ollama': 'Ollama', 'llamacpp': 'llama.cpp'}.get(status['backend'], t('unselected'))),
             value_line(t('current_model'), status['model'] or t('unselected')), state_line(status['state'])]
     if status.get('error'):
-        rows.append(value_line('诊断', status['error'], 'red'))
+        rows.append(value_line(t('im_error'), status['error'], 'red'))
     snapshot = status.get('allocations') or {}
     layers = snapshot.get('gpu_layers')
-    rows.append(value_line(t('gpu_layers'), f'{layers[0]}/{layers[1]} 层（{layers[0]*100/layers[1]:.1f}%）' if layers else t('unknown')))
+    rows.append(value_line(t('gpu_layers'), t('layers_value', loaded=layers[0], total=layers[1], percent=layers[0]*100/layers[1]) if layers else t('unknown')))
     def memory(kind, phase=None):
         found = [row for row in snapshot.get('buffers', []) if row['kind'] == kind and (phase is None or row['phase'] == phase)]
         if not found:
             return t('not_applicable') if kind == 'RS' and snapshot.get('rs_sequences') == 0 else t('unknown')
         grouped = {}
         for row in found:
-            label = ('系统内存映射' if row['backend'] == 'CPU_Mapped' else
-                     '系统内存 ' + row['backend'] if row['location'] == 'host' else 'GPU ' + row['backend'])
+            label = (t('system_mapped') if row['backend'] == 'CPU_Mapped' else
+                     t('system_memory') + row['backend'] if row['location'] == 'host' else 'GPU ' + row['backend'])
             label += ' / MTP' if row['phase'] == 'mtp' else ''
             grouped[label] = grouped.get(label, 0) + row['mib']
-        return '；'.join(f'{key} {value:.2f} MiB' for key, value in grouped.items())
+        return t('memory_separator').join(f'{key} {value:.2f} MiB' for key, value in grouped.items())
     for label, kind, phase in [('weights', 'model', 'main'), ('main_kv', 'KV', 'main'),
                                ('rs', 'RS', None), ('compute', 'compute', 'main'), ('output_buffer', 'output', None)]:
         rows.append(value_line(t(label), memory(kind, phase)))
@@ -176,37 +176,37 @@ def status_lines(status):
         mode = status['mtp']
         value = t('mtp_unavailable' if mode == 'unavailable' else 'not_enabled') if mode != 'on' else memory(kind, 'mtp')
         if mode == 'on' and kind == 'KV' and snapshot.get('mtp_shared_kv'):
-            value = t('shared') + ('；额外分配 ' + value if value != t('unknown') else '')
+            value = t('shared') + (t('extra_allocation') + value if value != t('unknown') else '')
         rows.append(value_line(t(label), value, 'gray' if mode != 'on' else 'cyan'))
     total = snapshot.get('gpu_identified_mib')
     rows.append(value_line(t('gpu_sum'), f'{total:.2f} MiB' if total is not None else t('unknown')))
     if snapshot.get('error'):
-        rows.append(value_line('分配记录', snapshot['error'], 'gray'))
+        rows.append(value_line(t('allocation_log'), snapshot['error'], 'gray'))
     rows.append(t('memory_note'))
     gpu = status.get('gpu_memory', {})
     for device in gpu.get('devices', []):
         def amount(key):
             return f'{device[key]:.0f} MiB' if device.get(key) is not None else t('unknown')
         rows.append(value_line(t('gpu_memory') + ' ' + device['index'] + ' / ' + device['name'],
-                               '总量 ' + amount('total_mib') + '；已用 ' + amount('used_mib') +
-                               '；可用 ' + amount('free_mib') + '；驱动预留 ' + amount('reserved_mib')))
+                               t('gpu_amounts', total=amount('total_mib'), used=amount('used_mib'),
+                                 free=amount('free_mib'), reserved=amount('reserved_mib'))))
     if gpu.get('error'):
-        rows.append(value_line(t('gpu_memory'), t('unknown') + '：' + gpu['error'], 'gray'))
+        rows.append(value_line(t('gpu_memory'), t('unknown') + t('separator') + gpu['error'], 'gray'))
     rows.append(t('gpu_note'))
     context, usage = status.get('context'), status.get('usage') or {}
     rows.append(value_line(t('effective_context'), f'{context} tokens' if context else t('unknown')))
     if not context and status.get('saved_context'):
-        rows.append(value_line(t('saved_context'), f"{status['saved_context']} tokens（上次核验）"))
+        rows.append(value_line(t('saved_context'), f"{status['saved_context']} tokens" + t('last_verified_suffix')))
     if usage:
         tokens = usage.get('input_tokens')
-        occupied = f'{tokens} / {context} tokens（{tokens*100/context:.1f}%）' if tokens is not None and context else t('unknown')
+        occupied = t('context_usage_value', tokens=tokens, context=context, percent=tokens*100/context) if tokens is not None and context else t('unknown')
         rows.append(value_line(t('context_input'), occupied))
         output = usage.get('output_tokens')
         rows.append(value_line(t('last_output'), f'{output} tokens' if output is not None else t('unknown')))
         when = usage.get('recorded_at')
         rows.append(value_line(t('statistics_time'), datetime.datetime.fromtimestamp(when).astimezone().isoformat(timespec='seconds') if when else t('unknown')))
     if status.get('usage_note'):
-        rows.append('直连模式：底座未提供可核验的最近请求 token 统计；未取得的字段不估算。')
+        rows.append(t('usage_note'))
     return rows
 
 
@@ -284,23 +284,30 @@ def local_models(ui, manager):
 
 def main(ui):
     manager, focused = Manager(), 'models_menu'
-    actions = ('models_menu', 'codex_global', 'codex_config', 'im_menu', 'install', 'about', 'exit')
+    actions = ('models_menu', 'codex_global', 'codex_config', 'im_menu', 'install', 'language', 'about', 'exit')
     while True:
         try:
             status = manager.model_status(include_gpu=False, include_allocations=False)
             description = [value_line(t('current_model'), status['model'] or t('unselected')), state_line(status['state'])]
             try:
-                focused = ui.choose(t('title'), [(v, t(v)) for v in actions], default=focused, cancel='exit', description=description)
+                language_name = preferences.LABELS[preferences.language()]
+                options = [(v, value_line(t(v), language_name) if v == 'language' else t(v)) for v in actions]
+                focused = ui.choose(t('title'), options, default=focused, cancel='exit', description=description)
             except menu.Cancelled:
                 return
             if focused == 'exit':
                 return
             ui.heading(t(focused))
             if focused == 'install':
-                component = choose(ui, t('install'), [('all', '全部安装'), ('ollama', 'Ollama'),
+                component = choose(ui, t('install'), [('all', t('all_install')), ('ollama', 'Ollama'),
                                                       ('llamacpp', 'llama.cpp'), ('codex', 'Codex CLI')])
                 manager.install(component)
                 say(t('done'))
+            elif focused == 'language':
+                selected = preferences.choose(ui, preferences.language())
+                preferences.set_language(selected)
+                say(t('language_saved'))
+                continue
             elif focused == 'models_menu':
                 local_models(ui, manager)
                 continue

@@ -10,9 +10,22 @@ import termios
 import time
 import unittest
 import fcntl
+import tempfile
+from unittest.mock import patch
 
 
 class Terminal(unittest.TestCase):
+    def setUp(self):
+        self.preferences = tempfile.TemporaryDirectory()
+        self.env = patch.dict(os.environ, {'XDG_CONFIG_HOME': self.preferences.name})
+        self.env.start()
+        from maa.preferences import set_language
+        set_language('zh_cn')
+
+    def tearDown(self):
+        self.env.stop()
+        self.preferences.cleanup()
+
     def receive(self, fd, marker, seconds=4):
         output, deadline = b'', time.monotonic() + seconds
         while time.monotonic() < deadline:
@@ -125,6 +138,55 @@ class Terminal(unittest.TestCase):
     def test_arrow_wrap_and_enter_in_real_pty(self):
         value = self.session("print('RESULT', interactive(lambda ui: ui.choose('Select model', [('a','模型甲'),('b','模型乙')])))", b'\x1b[A\r', 'Select model')
         self.assertIn('RESULT b', value)
+
+    def test_language_first_selection_works_with_piped_stdin(self):
+        code = ("from maa import preferences\npreferences.path().unlink()\n"
+                "read,write=os.pipe();os.close(write);os.dup2(read,0);os.close(read)\n"
+                "print('CHOSEN',preferences.installation_language())\n"
+                "assert not preferences.path().exists()")
+        value = self.session('import os\n' + code, b'\x1b[B\r', 'Select interface language', size=(12, 80))
+        self.assertIn('CHOSEN en_us', value)
+
+    def test_language_main_menu_switches_immediately_without_backend_calls(self):
+        code = ("from maa import preferences,ui\npreferences.set_language('en_us')\n"
+                "class Manager:\n"
+                " def model_status(self,**kw):return {'model':None,'state':'unselected'}\n"
+                " def __getattr__(self,name):raise AssertionError('Unexpected backend call '+name)\n"
+                "ui.Manager=Manager\ninteractive(ui.main)\n"
+                "print('LANGUAGE_FINAL',preferences.load()['language'])")
+        def keys(fd):
+            os.write(fd, b'\x1b[B'*5 + b'\r')
+            output = self.receive(fd, 'Select interface language')
+            os.write(fd, b'\x1b[A\r')
+            output += self.receive(fd, '语言：简体中文 (zh_cn)')
+            os.write(fd, b'\x1b')
+            return output
+        value = self.session(code, keys, 'Local model management', size=(18, 100))
+        self.assertIn('语言已保存。', value)
+        self.assertIn('LANGUAGE_FINAL zh_cn', value)
+
+    def test_language_selection_cancel_keeps_preferences(self):
+        code = ("from maa import preferences\npreferences.set_language('en_us')\n"
+                "before=preferences.path().read_bytes()\n"
+                "try:interactive(lambda screen:preferences.choose(screen,'en_us'))\n"
+                "except Cancelled:pass\n"
+                "assert preferences.path().read_bytes()==before\nprint('CANCELLED_LANGUAGE en_us')")
+        value = self.session(code, b'\x1b', 'Select interface language', size=(12, 80))
+        self.assertIn('CANCELLED_LANGUAGE en_us', value)
+
+    def test_english_configuration_values_and_progress_in_real_terminal(self):
+        code = ("from maa import preferences,ui\nfrom maa.settings import settings\n"
+                "from maa.output import operation,stage\npreferences.set_language('en_us')\n"
+                "model={'mtp_supported':False}\n"
+                "try:interactive(lambda screen:ui.edit_settings(screen,model,settings()))\n"
+                "except Cancelled:pass\n"
+                "with operation('应用配置'):\n stage('等待原生底座和模型加载；原生日志：maa logs')\n"
+                "print('ENGLISH_DONE')")
+        value = self.session(code, b'\x1b', 'Model configuration', size=(18, 100))
+        self.assertIn('Model configuration', value)
+        self.assertIn('[Success]', value)
+        self.assertIn('Apply configuration', value)
+        self.assertNotIn('主模型 KV 格式', value)
 
     def test_utf8_input_cursor_editing_in_real_pty(self):
         value = self.session("print('RESULT', interactive(lambda ui: ui.input('Input model')))", '模型ab'.encode() + b'\x1b[D\x7fX\r', 'Input model')

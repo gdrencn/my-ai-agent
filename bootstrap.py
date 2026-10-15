@@ -58,6 +58,7 @@ def run(argv=None):
     parser.add_argument('--version', help='exact numeric version in the selected channel')
     parser.add_argument('--test', action='store_true', help='run paired portable and native checks after installing')
     parser.add_argument('--components', choices=('all', 'none', 'ollama', 'llamacpp', 'codex'), default='all')
+    parser.add_argument('--language', choices=('zh_cn', 'en_us'), help='interface language; otherwise reuse the saved selection or ask')
     args = parser.parse_args(argv)
     if sys.version_info < (3, 11):
         raise ValueError('Python 3.11+ is required (mas default Ubuntu 24.04 includes it)')
@@ -78,8 +79,16 @@ def run(argv=None):
         info = json.loads((folder / 'VERSION.json').read_text())
         if info != {'version': version, 'channel': args.channel}:
             raise ValueError('Release version/channel pairing mismatch')
-        print('正在安装 my-ai-agent v' + info['version'] + ' ' + args.channel, flush=True)
-        subprocess.run([sys.executable, str(folder / 'maa.pyz'), '_install', '--components', args.components], check=True)
+        language_support = tuple(map(int, version.split('.'))) >= (0, 2, 2)
+        command = [sys.executable, str(folder / 'maa.pyz'), '_install', '--components', args.components]
+        if language_support:
+            if args.language:
+                command += ['--language', args.language]
+        else:
+            if args.language:
+                raise ValueError('This release does not support --language; use 0.2.2 or newer')
+            print('正在安装 my-ai-agent v' + info['version'] + ' ' + args.channel, flush=True)
+        subprocess.run(command, check=True)
         if args.test:
             subprocess.run([sys.executable, str(folder / 'maa-test.pyz'), '--native',
                             '--product', str(folder / 'maa.pyz')], check=True)
@@ -88,6 +97,13 @@ def run(argv=None):
 if __name__ == '__main__':
     try:
         run()
+    except KeyboardInterrupt:
+        raise SystemExit(130)
+    except subprocess.CalledProcessError as exc:
+        if exc.returncode in (130, -2):
+            raise SystemExit(130)
+        print('my-ai-agent install: ' + str(exc), file=sys.stderr)
+        raise SystemExit(1)
     except (ValueError, OSError, KeyError, subprocess.SubprocessError) as exc:
         print('my-ai-agent install: ' + str(exc), file=sys.stderr)
         raise SystemExit(1)

@@ -1,0 +1,1896 @@
+{
+  "version": "0.2.2",
+  "channel": "test",
+  "status": "passed",
+  "at": "2026-10-15T01:06:56.369117+00:00",
+  "build": {
+    "status": "passed",
+    "sha256": {
+      "maa.pyz": "e1eea520681c37a4cb25720413c0a5e4b8d42daa70543ce4159c9a064d639eaf",
+      "maa-test.pyz": "41cac495c4a9d3c924e31062e81b6c7a06e399fbb2e6f45e8e0b4d1446539d1a",
+      "VERSION.json": "9e14b12ec63afb42c75f63b3516346805c79e79f0b69fe0a0803169cd297a495",
+      "bootstrap.py": "9fa1248a42b8028ccb26c89f7d4468fb49fcd583b450102f1bf21056d21e82fc",
+      "install.sh": "c5f446b02ece8ec9c365d66687fab19ff671c8408b176c65b8434437447c2d4e",
+      "SHA256SUMS": "e559fb8969a4f60fe0481b9d0bf57950dbdcc9ee1a642b6a3480dec3320e5315"
+    },
+    "reproducible": true,
+    "python_3_11_files": 62,
+    "shell_syntax_files": 3,
+    "package_boundaries": "passed"
+  },
+  "portable": {
+    "source": 134,
+    "outside_checkout_pair": 134,
+    "ordinary_user_pair": 134,
+    "root_pair": 134,
+    "skipped": 0
+  },
+  "delivery_regressions": 12,
+  "new_language_regressions": {
+    "core": 9,
+    "pty": 4,
+    "native_per_backend": 2
+  },
+  "model_codex_native": {
+    "version": "0.2.2",
+    "started": "2026-10-15T01:01:41.799113+00:00",
+    "checks": [
+      {
+        "name": "installed-version",
+        "status": "passed",
+        "detail": "0.2.2"
+      },
+      {
+        "name": "explicit-yolo-test-baseline",
+        "status": "passed",
+        "detail": {
+          "initial_state": {
+            "enabled": true,
+            "managed": true
+          },
+          "test_baseline": {
+            "enabled": true,
+            "managed": true
+          },
+          "explicit_test_operation": true
+        }
+      },
+      {
+        "name": "hf-exact-download",
+        "status": "passed",
+        "detail": {
+          "key": "07591f8b732c1e7241bfe575",
+          "backend": "llamacpp",
+          "name": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+          "path": "/home/sandbox/.local/state/my-ai-agent/models/66204dcd0d42165045cefdeb/Qwen3-0.6B-Q4_K_M.gguf",
+          "file_identity": [
+            2112,
+            260850,
+            396705472,
+            1792025839662524450
+          ],
+          "sha256": "ac2d97712095a558e31573f62f466a3f9d93990898b0ec79d7c974c1780d524a",
+          "files": [
+            {
+              "path": "/home/sandbox/.local/state/my-ai-agent/models/66204dcd0d42165045cefdeb/Qwen3-0.6B-Q4_K_M.gguf",
+              "file_identity": [
+                2112,
+                260850,
+                396705472,
+                1792025839662524450
+              ],
+              "sha256": "ac2d97712095a558e31573f62f466a3f9d93990898b0ec79d7c974c1780d524a"
+            }
+          ],
+          "metadata": {
+            "general.architecture": "qwen3",
+            "general.type": "model",
+            "general.name": "Qwen3-0.6B",
+            "general.basename": "Qwen3-0.6B",
+            "general.quantized_by": "Unsloth",
+            "general.size_label": "0.6B",
+            "general.repo_url": "https://huggingface.co/unsloth",
+            "qwen3.block_count": 28,
+            "qwen3.context_length": 40960,
+            "qwen3.embedding_length": 1024,
+            "qwen3.feed_forward_length": 3072,
+            "qwen3.attention.head_count": 16,
+            "qwen3.attention.head_count_kv": 8,
+            "qwen3.rope.freq_base": 1000000.0,
+            "qwen3.attention.layer_norm_rms_epsilon": 9.999999974752427e-07,
+            "qwen3.attention.key_length": 128,
+            "qwen3.attention.value_length": 128,
+            "tokenizer.ggml.model": "gpt2",
+            "tokenizer.ggml.pre": "qwen2",
+            "tokenizer.ggml.eos_token_id": 151645,
+            "tokenizer.ggml.padding_token_id": 151654,
+            "tokenizer.ggml.add_bos_token": false,
+            "tokenizer.chat_template": "{%- if tools %}\n    {{- '<|im_start|>system\\n' }}\n    {%- if messages[0].role == 'system' %}\n        {{- messages[0].content + '\\n\\n' }}\n    {%- endif %}\n    {{- \"# Tools\\n\\nYou may call one or more functions to assist with the user query.\\n\\nYou are provided with function signatures within <tools></tools> XML tags:\\n<tools>\" }}\n    {%- for tool in tools %}\n        {{- \"\\n\" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- \"\\n</tools>\\n\\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\\n<tool_call>\\n{\\\"name\\\": <function-name>, \\\"arguments\\\": <args-json-object>}\\n</tool_call><|im_end|>\\n\" }}\n{%- else %}\n    {%- if messages[0].role == 'system' %}\n        {{- '<|im_start|>system\\n' + messages[0].content + '<|im_end|>\\n' }}\n    {%- endif %}\n{%- endif %}\n{%- set ns = namespace(multi_step_tool=true, last_query_index=messages|length - 1) %}\n{%- for forward_message in messages %}\n    {%- set index = (messages|length - 1) - loop.index0 %}\n    {%- set message = messages[index] %}\n    {%- set current_content = message.content if message.content is defined and message.content is not none else '' %}\n    {%- set tool_start = '<tool_response>' %}\n    {%- set tool_start_length = tool_start|length %}\n    {%- set start_of_message = current_content[:tool_start_length] %}\n    {%- set tool_end = '</tool_response>' %}\n    {%- set tool_end_length = tool_end|length %}\n    {%- set start_pos = (current_content|length) - tool_end_length %}\n    {%- if start_pos < 0 %}\n        {%- set start_pos = 0 %}\n    {%- endif %}\n    {%- set end_of_message = current_content[start_pos:] %}\n    {%- if ns.multi_step_tool and message.role == \"user\" and not(start_of_message == tool_start and end_of_message == tool_end) %}\n        {%- set ns.multi_step_tool = false %}\n        {%- set ns.last_query_index = index %}\n    {%- endif %}\n{%- endfor %}\n{%- for message in messages %}\n    {%- if (message.role == \"user\") or (message.role == \"system\" and not loop.first) %}\n        {{- '<|im_start|>' + message.role + '\\n' + message.content + '<|im_end|>' + '\\n' }}\n    {%- elif message.role == \"assistant\" %}\n        {%- set m_content = message.content if message.content is defined and message.content is not none else '' %}\n        {%- set content = m_content %}\n        {%- set reasoning_content = '' %}\n        {%- if message.reasoning_content is defined and message.reasoning_content is not none %}\n            {%- set reasoning_content = message.reasoning_content %}\n        {%- else %}\n            {%- if '</think>' in m_content %}\n                {%- set content = (m_content.split('</think>')|last).lstrip('\\n') %}\n                {%- set reasoning_content = (m_content.split('</think>')|first).rstrip('\\n') %}\n                {%- set reasoning_content = (reasoning_content.split('<think>')|last).lstrip('\\n') %}\n            {%- endif %}\n        {%- endif %}\n        {%- if loop.index0 > ns.last_query_index %}\n            {%- if loop.last or (not loop.last and (not reasoning_content.strip() == '')) %}\n                {{- '<|im_start|>' + message.role + '\\n<think>\\n' + reasoning_content.strip('\\n') + '\\n</think>\\n\\n' + content.lstrip('\\n') }}\n            {%- else %}\n                {{- '<|im_start|>' + message.role + '\\n' + content }}\n            {%- endif %}\n        {%- else %}\n            {{- '<|im_start|>' + message.role + '\\n' + content }}\n        {%- endif %}\n        {%- if message.tool_calls %}\n            {%- for tool_call in message.tool_calls %}\n                {%- if (loop.first and content) or (not loop.first) %}\n                    {{- '\\n' }}\n                {%- endif %}\n                {%- if tool_call.function %}\n                    {%- set tool_call = tool_call.function %}\n                {%- endif %}\n                {{- '<tool_call>\\n{\"name\": \"' }}\n                {{- tool_call.name }}\n                {{- '\", \"arguments\": ' }}\n                {%- if tool_call.arguments is string %}\n                    {{- tool_call.arguments }}\n                {%- else %}\n                    {{- tool_call.arguments | tojson }}\n                {%- endif %}\n                {{- '}\\n</tool_call>' }}\n            {%- endfor %}\n        {%- endif %}\n        {{- '<|im_end|>\\n' }}\n    {%- elif message.role == \"tool\" %}\n        {%- if loop.first or (messages[loop.index0 - 1].role != \"tool\") %}\n            {{- '<|im_start|>user' }}\n        {%- endif %}\n        {{- '\\n<tool_response>\\n' }}\n        {{- message.content }}\n        {{- '\\n</tool_response>' }}\n        {%- if loop.last or (messages[loop.index0 + 1].role != \"tool\") %}\n            {{- '<|im_end|>\\n' }}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '<|im_start|>assistant\\n' }}\n    {%- if enable_thinking is defined and enable_thinking is false %}\n        {{- '<think>\\n\\n</think>\\n\\n' }}\n    {%- endif %}\n{%- endif %}",
+            "general.quantization_version": 2,
+            "general.file_type": 15,
+            "quantize.imatrix.file": "Qwen3-0.6B-GGUF/imatrix_unsloth.dat",
+            "quantize.imatrix.dataset": "unsloth_calibration_Qwen3-0.6B.txt",
+            "quantize.imatrix.entries_count": 196,
+            "quantize.imatrix.chunks_count": 688,
+            "maa.mtp_supported": false
+          },
+          "mtp_supported": false,
+          "source": "hf",
+          "repo": "unsloth/Qwen3-0.6B-GGUF",
+          "filename": "Qwen3-0.6B-Q4_K_M.gguf",
+          "revision": "50968a4468ef4233ed78cd7c3de230dd1d61a56b"
+        }
+      },
+      {
+        "name": "ollama-native-pull",
+        "status": "passed",
+        "detail": {
+          "key": "3c675f8a255333c855c7a80b",
+          "backend": "ollama",
+          "name": "qwen2.5:3b",
+          "digest": "357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b",
+          "metadata": {
+            "general.architecture": "qwen2",
+            "general.base_model.0.name": "Qwen2.5 3B",
+            "general.base_model.0.organization": "Qwen",
+            "general.base_model.0.repo_url": "https://huggingface.co/Qwen/Qwen2.5-3B",
+            "general.base_model.count": 1,
+            "general.basename": "Qwen2.5",
+            "general.file_type": 15,
+            "general.finetune": "Instruct",
+            "general.languages": [
+              "en"
+            ],
+            "general.license": "other",
+            "general.license.link": "https://huggingface.co/Qwen/Qwen2.5-3B-Instruct/blob/main/LICENSE",
+            "general.license.name": "qwen-research",
+            "general.parameter_count": 3085938688,
+            "general.quantization_version": 2,
+            "general.size_label": "3B",
+            "general.tags": [
+              "chat",
+              "text-generation"
+            ],
+            "general.type": "model",
+            "qwen2.attention.head_count": 16,
+            "qwen2.attention.head_count_kv": 2,
+            "qwen2.attention.layer_norm_rms_epsilon": 1e-06,
+            "qwen2.block_count": 36,
+            "qwen2.context_length": 32768,
+            "qwen2.embedding_length": 2048,
+            "qwen2.feed_forward_length": 11008,
+            "qwen2.rope.freq_base": 1000000,
+            "tokenizer.ggml.add_bos_token": false,
+            "tokenizer.ggml.bos_token_id": 151643,
+            "tokenizer.ggml.eos_token_id": 151645,
+            "tokenizer.ggml.merges": [],
+            "tokenizer.ggml.model": "gpt2",
+            "tokenizer.ggml.padding_token_id": 151643,
+            "tokenizer.ggml.pre": "qwen2",
+            "tokenizer.ggml.token_type": [],
+            "tokenizer.ggml.tokens": []
+          },
+          "mtp_supported": false,
+          "source": "ollama",
+          "capabilities": [
+            "completion",
+            "tools"
+          ]
+        }
+      },
+      {
+        "name": "hf-invalid-file-rejected",
+        "status": "passed",
+        "detail": "[In progress] Install / register model — waited 0.0s\n[Failed] Install / register model: Check Hugging Face repository and exact file — elapsed 0.1s\nmaa: Exact GGUF file not found: unsloth/Qwen3-0.6B-GGUF/not-present.gguf\n"
+      },
+      {
+        "name": "llamacpp-select",
+        "status": "passed",
+        "detail": {
+          "selected": {
+            "model": {
+              "key": "07591f8b732c1e7241bfe575",
+              "backend": "llamacpp",
+              "name": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+              "path": "/home/sandbox/.local/state/my-ai-agent/models/66204dcd0d42165045cefdeb/Qwen3-0.6B-Q4_K_M.gguf",
+              "file_identity": [
+                2112,
+                260850,
+                396705472,
+                1792025839662524450
+              ],
+              "sha256": "ac2d97712095a558e31573f62f466a3f9d93990898b0ec79d7c974c1780d524a",
+              "files": [
+                {
+                  "path": "/home/sandbox/.local/state/my-ai-agent/models/66204dcd0d42165045cefdeb/Qwen3-0.6B-Q4_K_M.gguf",
+                  "file_identity": [
+                    2112,
+                    260850,
+                    396705472,
+                    1792025839662524450
+                  ],
+                  "sha256": "ac2d97712095a558e31573f62f466a3f9d93990898b0ec79d7c974c1780d524a"
+                }
+              ],
+              "metadata": {
+                "general.architecture": "qwen3",
+                "general.type": "model",
+                "general.name": "Qwen3-0.6B",
+                "general.basename": "Qwen3-0.6B",
+                "general.quantized_by": "Unsloth",
+                "general.size_label": "0.6B",
+                "general.repo_url": "https://huggingface.co/unsloth",
+                "qwen3.block_count": 28,
+                "qwen3.context_length": 40960,
+                "qwen3.embedding_length": 1024,
+                "qwen3.feed_forward_length": 3072,
+                "qwen3.attention.head_count": 16,
+                "qwen3.attention.head_count_kv": 8,
+                "qwen3.rope.freq_base": 1000000.0,
+                "qwen3.attention.layer_norm_rms_epsilon": 9.999999974752427e-07,
+                "qwen3.attention.key_length": 128,
+                "qwen3.attention.value_length": 128,
+                "tokenizer.ggml.model": "gpt2",
+                "tokenizer.ggml.pre": "qwen2",
+                "tokenizer.ggml.eos_token_id": 151645,
+                "tokenizer.ggml.padding_token_id": 151654,
+                "tokenizer.ggml.add_bos_token": false,
+                "tokenizer.chat_template": "{%- if tools %}\n    {{- '<|im_start|>system\\n' }}\n    {%- if messages[0].role == 'system' %}\n        {{- messages[0].content + '\\n\\n' }}\n    {%- endif %}\n    {{- \"# Tools\\n\\nYou may call one or more functions to assist with the user query.\\n\\nYou are provided with function signatures within <tools></tools> XML tags:\\n<tools>\" }}\n    {%- for tool in tools %}\n        {{- \"\\n\" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- \"\\n</tools>\\n\\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\\n<tool_call>\\n{\\\"name\\\": <function-name>, \\\"arguments\\\": <args-json-object>}\\n</tool_call><|im_end|>\\n\" }}\n{%- else %}\n    {%- if messages[0].role == 'system' %}\n        {{- '<|im_start|>system\\n' + messages[0].content + '<|im_end|>\\n' }}\n    {%- endif %}\n{%- endif %}\n{%- set ns = namespace(multi_step_tool=true, last_query_index=messages|length - 1) %}\n{%- for forward_message in messages %}\n    {%- set index = (messages|length - 1) - loop.index0 %}\n    {%- set message = messages[index] %}\n    {%- set current_content = message.content if message.content is defined and message.content is not none else '' %}\n    {%- set tool_start = '<tool_response>' %}\n    {%- set tool_start_length = tool_start|length %}\n    {%- set start_of_message = current_content[:tool_start_length] %}\n    {%- set tool_end = '</tool_response>' %}\n    {%- set tool_end_length = tool_end|length %}\n    {%- set start_pos = (current_content|length) - tool_end_length %}\n    {%- if start_pos < 0 %}\n        {%- set start_pos = 0 %}\n    {%- endif %}\n    {%- set end_of_message = current_content[start_pos:] %}\n    {%- if ns.multi_step_tool and message.role == \"user\" and not(start_of_message == tool_start and end_of_message == tool_end) %}\n        {%- set ns.multi_step_tool = false %}\n        {%- set ns.last_query_index = index %}\n    {%- endif %}\n{%- endfor %}\n{%- for message in messages %}\n    {%- if (message.role == \"user\") or (message.role == \"system\" and not loop.first) %}\n        {{- '<|im_start|>' + message.role + '\\n' + message.content + '<|im_end|>' + '\\n' }}\n    {%- elif message.role == \"assistant\" %}\n        {%- set m_content = message.content if message.content is defined and message.content is not none else '' %}\n        {%- set content = m_content %}\n        {%- set reasoning_content = '' %}\n        {%- if message.reasoning_content is defined and message.reasoning_content is not none %}\n            {%- set reasoning_content = message.reasoning_content %}\n        {%- else %}\n            {%- if '</think>' in m_content %}\n                {%- set content = (m_content.split('</think>')|last).lstrip('\\n') %}\n                {%- set reasoning_content = (m_content.split('</think>')|first).rstrip('\\n') %}\n                {%- set reasoning_content = (reasoning_content.split('<think>')|last).lstrip('\\n') %}\n            {%- endif %}\n        {%- endif %}\n        {%- if loop.index0 > ns.last_query_index %}\n            {%- if loop.last or (not loop.last and (not reasoning_content.strip() == '')) %}\n                {{- '<|im_start|>' + message.role + '\\n<think>\\n' + reasoning_content.strip('\\n') + '\\n</think>\\n\\n' + content.lstrip('\\n') }}\n            {%- else %}\n                {{- '<|im_start|>' + message.role + '\\n' + content }}\n            {%- endif %}\n        {%- else %}\n            {{- '<|im_start|>' + message.role + '\\n' + content }}\n        {%- endif %}\n        {%- if message.tool_calls %}\n            {%- for tool_call in message.tool_calls %}\n                {%- if (loop.first and content) or (not loop.first) %}\n                    {{- '\\n' }}\n                {%- endif %}\n                {%- if tool_call.function %}\n                    {%- set tool_call = tool_call.function %}\n                {%- endif %}\n                {{- '<tool_call>\\n{\"name\": \"' }}\n                {{- tool_call.name }}\n                {{- '\", \"arguments\": ' }}\n                {%- if tool_call.arguments is string %}\n                    {{- tool_call.arguments }}\n                {%- else %}\n                    {{- tool_call.arguments | tojson }}\n                {%- endif %}\n                {{- '}\\n</tool_call>' }}\n            {%- endfor %}\n        {%- endif %}\n        {{- '<|im_end|>\\n' }}\n    {%- elif message.role == \"tool\" %}\n        {%- if loop.first or (messages[loop.index0 - 1].role != \"tool\") %}\n            {{- '<|im_start|>user' }}\n        {%- endif %}\n        {{- '\\n<tool_response>\\n' }}\n        {{- message.content }}\n        {{- '\\n</tool_response>' }}\n        {%- if loop.last or (messages[loop.index0 + 1].role != \"tool\") %}\n            {{- '<|im_end|>\\n' }}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '<|im_start|>assistant\\n' }}\n    {%- if enable_thinking is defined and enable_thinking is false %}\n        {{- '<think>\\n\\n</think>\\n\\n' }}\n    {%- endif %}\n{%- endif %}",
+                "general.quantization_version": 2,
+                "general.file_type": 15,
+                "quantize.imatrix.file": "Qwen3-0.6B-GGUF/imatrix_unsloth.dat",
+                "quantize.imatrix.dataset": "unsloth_calibration_Qwen3-0.6B.txt",
+                "quantize.imatrix.entries_count": 196,
+                "quantize.imatrix.chunks_count": 688,
+                "maa.mtp_supported": false
+              },
+              "mtp_supported": false,
+              "source": "hf",
+              "repo": "unsloth/Qwen3-0.6B-GGUF",
+              "filename": "Qwen3-0.6B-Q4_K_M.gguf",
+              "revision": "50968a4468ef4233ed78cd7c3de230dd1d61a56b"
+            },
+            "settings": {
+              "context": 32768,
+              "kv": "q8_0",
+              "flash_attention": true,
+              "fit": true,
+              "reserve_mib": 0,
+              "keep_alive": "5m",
+              "mtp": false,
+              "mtp_kv": "follow",
+              "reasoning": "default"
+            }
+          },
+          "running": true,
+          "runtime": {
+            "model": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+            "context": 32768,
+            "upstream": "http://127.0.0.1:8080",
+            "resources": {
+              "sleeping": false,
+              "total_slots": 1,
+              "model_path": "/home/sandbox/.local/state/my-ai-agent/models/66204dcd0d42165045cefdeb/Qwen3-0.6B-Q4_K_M.gguf"
+            },
+            "display_name": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+            "backend": "llamacpp",
+            "key": "07591f8b732c1e7241bfe575",
+            "fingerprint": "74bad3925b1b6d087f6bc4074ddba34004507b1da48a3335526a9d85dd2fd7e6",
+            "launch": {
+              "device": 2112,
+              "inode": 260885,
+              "offset": 0,
+              "service_id": "f922f2dfdd734d3287c0d66159da80b4"
+            },
+            "native_config": {
+              "/etc/systemd/system/llama-server.service": "a9fa1bed8b86cf0f1792046913970476a184e6b99fb756f49c263822c828125b"
+            },
+            "log_path": "/home/sandbox/.local/state/my-ai-agent/native/llamacpp.log",
+            "pid": 7929,
+            "base_url": "http://127.0.0.1:8080/v1",
+            "capabilities": {
+              "native_direct_connection": true
+            }
+          },
+          "yolo": {
+            "enabled": true,
+            "managed": true
+          },
+          "model_status": {
+            "backend": "llamacpp",
+            "model": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+            "state": "running",
+            "context": 32768,
+            "allocations": {
+              "load_id": "11936",
+              "gpu_layers": [
+                29,
+                29
+              ],
+              "buffers": [
+                {
+                  "phase": "main",
+                  "component": "load_tensors",
+                  "backend": "CPU_Mapped",
+                  "kind": "model",
+                  "mib": 121.71,
+                  "location": "host"
+                },
+                {
+                  "phase": "main",
+                  "component": "load_tensors",
+                  "backend": "CUDA0",
+                  "kind": "model",
+                  "mib": 372.65,
+                  "location": "gpu"
+                },
+                {
+                  "phase": "main",
+                  "component": "llama_context",
+                  "backend": "CUDA_Host",
+                  "kind": "output",
+                  "mib": 0.58,
+                  "location": "host"
+                },
+                {
+                  "phase": "main",
+                  "component": "llama_kv_cache",
+                  "backend": "CUDA0",
+                  "kind": "KV",
+                  "mib": 1904.0,
+                  "location": "gpu"
+                },
+                {
+                  "phase": "main",
+                  "component": "sched_reserve",
+                  "backend": "CUDA0",
+                  "kind": "compute",
+                  "mib": 176.09,
+                  "location": "gpu"
+                },
+                {
+                  "phase": "main",
+                  "component": "sched_reserve",
+                  "backend": "CUDA_Host",
+                  "kind": "compute",
+                  "mib": 40.1,
+                  "location": "host"
+                }
+              ],
+              "mtp_shared_kv": false,
+              "rs_sequences": 0,
+              "gpu_identified_mib": 2452.74,
+              "truncated": false,
+              "error": null
+            },
+            "usage": null,
+            "error": null,
+            "usage_note": "Native direct connection: no maa conversation interceptor or token receipt.",
+            "mtp": "unavailable",
+            "saved_context": 32768,
+            "gpu_memory": {
+              "devices": [
+                {
+                  "index": "0",
+                  "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+                  "total_mib": 24463.0,
+                  "used_mib": 3025.0,
+                  "free_mib": 21113.0,
+                  "reserved_mib": 326.0
+                }
+              ],
+              "error": null
+            },
+            "resources": {
+              "sleeping": false,
+              "total_slots": 1
+            }
+          }
+        }
+      },
+      {
+        "name": "llamacpp-catalog",
+        "status": "passed",
+        "detail": {
+          "model": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+          "display_name": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+          "context": 32768
+        }
+      },
+      {
+        "name": "llamacpp-responses",
+        "status": "passed",
+        "detail": {
+          "nonstream": {
+            "completed_at": 1792026136,
+            "created_at": 1792026136,
+            "id": "resp_QATsn2QIY38HNgFbq8b7rkAHR4wBI35T",
+            "model": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+            "object": "response",
+            "output": [
+              {
+                "content": [
+                  {
+                    "type": "output_text",
+                    "annotations": [],
+                    "logprobs": [],
+                    "text": "Hello! 😊"
+                  }
+                ],
+                "id": "msg_UojcbL0ZFmXCDilgMGTHa7cmfhD9eczf",
+                "role": "assistant",
+                "status": "completed",
+                "type": "message"
+              }
+            ],
+            "status": "completed",
+            "usage": {
+              "input_tokens": 18,
+              "output_tokens": 5,
+              "total_tokens": 23,
+              "input_tokens_details": {
+                "cached_tokens": 3
+              }
+            }
+          },
+          "stream_completed": true
+        }
+      },
+      {
+        "name": "llamacpp-native-function-call",
+        "status": "passed",
+        "detail": {
+          "call": {
+            "completed_at": 1792026137,
+            "created_at": 1792026137,
+            "id": "resp_w59kP0G7pLER2rEUshjVwXYRNN1rzFNZ",
+            "model": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+            "object": "response",
+            "output": [
+              {
+                "id": "fc_GkEdlNEqbbipk1O4WLUxBV6ACLewGq06",
+                "type": "function_call",
+                "status": "completed",
+                "arguments": "{\"city\": \"London\"}",
+                "call_id": "call_GkEdlNEqbbipk1O4WLUxBV6ACLewGq06",
+                "name": "get_weather"
+              }
+            ],
+            "status": "completed",
+            "usage": {
+              "input_tokens": 166,
+              "output_tokens": 20,
+              "total_tokens": 186,
+              "input_tokens_details": {
+                "cached_tokens": 1
+              }
+            }
+          },
+          "replay": {
+            "completed_at": 1792026137,
+            "created_at": 1792026137,
+            "id": "resp_FyUwMgM49sAAlqMbDWI5Kkz7XPPaIULp",
+            "model": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+            "object": "response",
+            "output": [
+              {
+                "content": [
+                  {
+                    "type": "output_text",
+                    "annotations": [],
+                    "logprobs": [],
+                    "text": "The weather in London is 18 degrees Celsius."
+                  }
+                ],
+                "id": "msg_pbLbW67nmoWe3TpMPr4O8aPOzIG8KbY5",
+                "role": "assistant",
+                "status": "completed",
+                "type": "message"
+              }
+            ],
+            "status": "completed",
+            "usage": {
+              "input_tokens": 203,
+              "output_tokens": 12,
+              "total_tokens": 215,
+              "input_tokens_details": {
+                "cached_tokens": 162
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "llamacpp-codex-cli",
+        "status": "passed",
+        "detail": {
+          "output": "MAA_NATIVE_OK.\n",
+          "diagnostic": "Reading additional input from stdin...\nOpenAI Codex v0.162.1\n--------\nworkdir: /tmp/maa-codex-native-t0dq8env\nmodel: unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a13d14-d2ab-79e3-8134-993a6dcb13f1\n--------\nuser\nReply with MAA_NATIVE_OK. Do not use tools.\ncodex\nMAA_NATIVE_OK.\ntokens used\n3,282\n",
+          "launcher_path_without_user_bin": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        }
+      },
+      {
+        "name": "llamacpp-manager-independent",
+        "status": "passed",
+        "detail": {
+          "archive_absent": true,
+          "codex": {
+            "output": "MAA_NATIVE_OK\n",
+            "diagnostic": "Reading additional input from stdin...\nOpenAI Codex v0.162.1\n--------\nworkdir: /tmp/maa-codex-native-ezbsauru\nmodel: unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a13d14-d62a-7852-871b-679c14ba7219\n--------\nuser\nReply with MAA_NATIVE_OK. Do not use tools.\ncodex\nMAA_NATIVE_OK\ntokens used\n216\n",
+            "launcher_path_without_user_bin": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+          }
+        }
+      },
+      {
+        "name": "llamacpp-model-status",
+        "status": "passed",
+        "detail": {
+          "backend": "llamacpp",
+          "model": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+          "state": "running",
+          "context": 32768,
+          "allocations": {
+            "load_id": "11936",
+            "gpu_layers": [
+              29,
+              29
+            ],
+            "buffers": [
+              {
+                "phase": "main",
+                "component": "load_tensors",
+                "backend": "CPU_Mapped",
+                "kind": "model",
+                "mib": 121.71,
+                "location": "host"
+              },
+              {
+                "phase": "main",
+                "component": "load_tensors",
+                "backend": "CUDA0",
+                "kind": "model",
+                "mib": 372.65,
+                "location": "gpu"
+              },
+              {
+                "phase": "main",
+                "component": "llama_context",
+                "backend": "CUDA_Host",
+                "kind": "output",
+                "mib": 0.58,
+                "location": "host"
+              },
+              {
+                "phase": "main",
+                "component": "llama_kv_cache",
+                "backend": "CUDA0",
+                "kind": "KV",
+                "mib": 1904.0,
+                "location": "gpu"
+              },
+              {
+                "phase": "main",
+                "component": "sched_reserve",
+                "backend": "CUDA0",
+                "kind": "compute",
+                "mib": 176.09,
+                "location": "gpu"
+              },
+              {
+                "phase": "main",
+                "component": "sched_reserve",
+                "backend": "CUDA_Host",
+                "kind": "compute",
+                "mib": 40.1,
+                "location": "host"
+              }
+            ],
+            "mtp_shared_kv": false,
+            "rs_sequences": 0,
+            "gpu_identified_mib": 2452.74,
+            "truncated": false,
+            "error": null
+          },
+          "usage": null,
+          "error": null,
+          "usage_note": "Native direct connection: no maa conversation interceptor or token receipt.",
+          "mtp": "unavailable",
+          "saved_context": 32768,
+          "gpu_memory": {
+            "devices": [
+              {
+                "index": "0",
+                "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+                "total_mib": 24463.0,
+                "used_mib": 3033.0,
+                "free_mib": 21105.0,
+                "reserved_mib": 326.0
+              }
+            ],
+            "error": null
+          },
+          "resources": {
+            "sleeping": false,
+            "total_slots": 1
+          }
+        }
+      },
+      {
+        "name": "llamacpp-configuration-without-reload",
+        "status": "passed",
+        "detail": {
+          "resident_instance_unchanged": true,
+          "paused_configuration_did_not_wake": true,
+          "saved_context": 32768,
+          "before": {
+            "ActiveState": "active",
+            "SubState": "running",
+            "InvocationID": "f922f2dfdd734d3287c0d66159da80b4",
+            "MainPID": "7929",
+            "Result": "success"
+          },
+          "after": {
+            "ActiveState": "active",
+            "SubState": "running",
+            "InvocationID": "f922f2dfdd734d3287c0d66159da80b4",
+            "MainPID": "7929",
+            "Result": "success"
+          }
+        }
+      },
+      {
+        "name": "llamacpp-language-without-reload",
+        "status": "passed",
+        "detail": {
+          "native_instance_and_configuration_preserved": true,
+          "original_language_restored": "en_us",
+          "before": {
+            "ActiveState": "active",
+            "SubState": "running",
+            "InvocationID": "9685d6a7b4e044ec91d200ed6b04348e",
+            "MainPID": "8425",
+            "Result": "success"
+          },
+          "after": {
+            "ActiveState": "active",
+            "SubState": "running",
+            "InvocationID": "9685d6a7b4e044ec91d200ed6b04348e",
+            "MainPID": "8425",
+            "Result": "success"
+          }
+        }
+      },
+      {
+        "name": "llamacpp-codex-model-picker",
+        "status": "passed",
+        "detail": {
+          "local_only": true,
+          "warnings_absent": true,
+          "elapsed_seconds": 1.677,
+          "picker": "Select Model and Effort  › 1. unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf (current)  Local model selected by my-ai-agent; native reasoning support varies.                               enter select · esc back                                                                                                                                       "
+        }
+      },
+      {
+        "name": "ollama-select",
+        "status": "passed",
+        "detail": {
+          "selected": {
+            "model": {
+              "key": "3c675f8a255333c855c7a80b",
+              "backend": "ollama",
+              "name": "qwen2.5:3b",
+              "digest": "357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b",
+              "metadata": {
+                "general.architecture": "qwen2",
+                "general.base_model.0.name": "Qwen2.5 3B",
+                "general.base_model.0.organization": "Qwen",
+                "general.base_model.0.repo_url": "https://huggingface.co/Qwen/Qwen2.5-3B",
+                "general.base_model.count": 1,
+                "general.basename": "Qwen2.5",
+                "general.file_type": 15,
+                "general.finetune": "Instruct",
+                "general.languages": [
+                  "en"
+                ],
+                "general.license": "other",
+                "general.license.link": "https://huggingface.co/Qwen/Qwen2.5-3B-Instruct/blob/main/LICENSE",
+                "general.license.name": "qwen-research",
+                "general.parameter_count": 3085938688,
+                "general.quantization_version": 2,
+                "general.size_label": "3B",
+                "general.tags": [
+                  "chat",
+                  "text-generation"
+                ],
+                "general.type": "model",
+                "qwen2.attention.head_count": 16,
+                "qwen2.attention.head_count_kv": 2,
+                "qwen2.attention.layer_norm_rms_epsilon": 1e-06,
+                "qwen2.block_count": 36,
+                "qwen2.context_length": 32768,
+                "qwen2.embedding_length": 2048,
+                "qwen2.feed_forward_length": 11008,
+                "qwen2.rope.freq_base": 1000000,
+                "tokenizer.ggml.add_bos_token": false,
+                "tokenizer.ggml.bos_token_id": 151643,
+                "tokenizer.ggml.eos_token_id": 151645,
+                "tokenizer.ggml.merges": [],
+                "tokenizer.ggml.model": "gpt2",
+                "tokenizer.ggml.padding_token_id": 151643,
+                "tokenizer.ggml.pre": "qwen2",
+                "tokenizer.ggml.token_type": [],
+                "tokenizer.ggml.tokens": []
+              },
+              "mtp_supported": false,
+              "source": "ollama",
+              "capabilities": [
+                "completion",
+                "tools"
+              ]
+            },
+            "settings": {
+              "context": 32768,
+              "kv": "q8_0",
+              "flash_attention": true,
+              "fit": true,
+              "reserve_mib": 0,
+              "keep_alive": "5m",
+              "mtp": false,
+              "mtp_kv": "follow",
+              "reasoning": "default"
+            }
+          },
+          "running": true,
+          "runtime": {
+            "model": "qwen2.5:3b",
+            "context": 32768,
+            "upstream": "http://127.0.0.1:11434",
+            "native_digest": "a96df318559b174027c68ae3819270b3da4d36403bcc43547995938ac81df25e",
+            "resources": {
+              "size": 2801763614,
+              "size_vram": 2801763614,
+              "expires_at": "2026-10-15T01:07:32.1256702Z"
+            },
+            "display_name": "qwen2.5:3b",
+            "backend": "ollama",
+            "key": "3c675f8a255333c855c7a80b",
+            "fingerprint": "6f38353d06d90ba8a2f30ef0d839e37db2d1c04eeff3dcb49c7c4163cc2cb0a6",
+            "launch": {
+              "device": 2112,
+              "inode": 260769,
+              "offset": 0,
+              "service_id": "ee605e27b38d466bb026ad78c7b426fe"
+            },
+            "native_config": {
+              "/etc/systemd/system/ollama.service.d/50-local-model.conf": "a30515d67e2f9dad462fce8fbdf1cf4a312aa632e1d81e4e0885373740a079de",
+              "/home/sandbox/.local/state/my-ai-agent/native/ollama-preload.json": "12fdfe2a6bf82eb8a9730eb1f98771b1588450a50813c8c00ba07edb8d74cf21"
+            },
+            "log_path": "/home/sandbox/.local/state/my-ai-agent/native/ollama.log",
+            "pid": 9067,
+            "base_url": "http://127.0.0.1:11434/v1",
+            "capabilities": {
+              "native_direct_connection": true
+            }
+          },
+          "yolo": {
+            "enabled": true,
+            "managed": true
+          },
+          "model_status": {
+            "backend": "ollama",
+            "model": "qwen2.5:3b",
+            "state": "running",
+            "context": 32768,
+            "allocations": {
+              "load_id": "14628",
+              "gpu_layers": [
+                37,
+                37
+              ],
+              "buffers": [
+                {
+                  "phase": "main",
+                  "component": "load_tensors",
+                  "backend": "CPU_Mapped",
+                  "kind": "model",
+                  "mib": 243.43,
+                  "location": "host"
+                },
+                {
+                  "phase": "main",
+                  "component": "load_tensors",
+                  "backend": "CUDA0",
+                  "kind": "model",
+                  "mib": 1834.83,
+                  "location": "gpu"
+                },
+                {
+                  "phase": "main",
+                  "component": "llama_context",
+                  "backend": "CUDA_Host",
+                  "kind": "output",
+                  "mib": 0.58,
+                  "location": "host"
+                },
+                {
+                  "phase": "main",
+                  "component": "llama_kv_cache",
+                  "backend": "CUDA0",
+                  "kind": "KV",
+                  "mib": 612.03,
+                  "location": "gpu"
+                },
+                {
+                  "phase": "main",
+                  "component": "sched_reserve",
+                  "backend": "CUDA0",
+                  "kind": "compute",
+                  "mib": 225.11,
+                  "location": "gpu"
+                },
+                {
+                  "phase": "main",
+                  "component": "sched_reserve",
+                  "backend": "CUDA_Host",
+                  "kind": "compute",
+                  "mib": 96.11,
+                  "location": "host"
+                }
+              ],
+              "mtp_shared_kv": false,
+              "rs_sequences": 0,
+              "gpu_identified_mib": 2671.97,
+              "truncated": false,
+              "error": null
+            },
+            "usage": null,
+            "error": null,
+            "usage_note": "Native direct connection: no maa conversation interceptor or token receipt.",
+            "mtp": "unavailable",
+            "saved_context": 32768,
+            "gpu_memory": {
+              "devices": [
+                {
+                  "index": "0",
+                  "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+                  "total_mib": 24463.0,
+                  "used_mib": 3249.0,
+                  "free_mib": 20889.0,
+                  "reserved_mib": 326.0
+                }
+              ],
+              "error": null
+            },
+            "resources": {
+              "size": 2801763614,
+              "size_vram": 2801763614,
+              "expires_at": "2026-10-15T01:07:32.1256702Z"
+            }
+          }
+        }
+      },
+      {
+        "name": "ollama-catalog",
+        "status": "passed",
+        "detail": {
+          "model": "qwen2.5:3b",
+          "display_name": "qwen2.5:3b",
+          "context": 32768
+        }
+      },
+      {
+        "name": "ollama-responses",
+        "status": "passed",
+        "detail": {
+          "nonstream": {
+            "id": "resp_908648",
+            "object": "response",
+            "created_at": 1792026152,
+            "completed_at": 1792026152,
+            "status": "completed",
+            "incomplete_details": null,
+            "model": "qwen2.5:3b",
+            "previous_response_id": null,
+            "instructions": null,
+            "output": [
+              {
+                "id": "msg_809493",
+                "type": "message",
+                "status": "completed",
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "output_text",
+                    "text": "Hello",
+                    "annotations": [],
+                    "logprobs": []
+                  }
+                ]
+              }
+            ],
+            "error": null,
+            "tools": [],
+            "tool_choice": "auto",
+            "truncation": "disabled",
+            "parallel_tool_calls": true,
+            "text": {
+              "format": {
+                "type": "text"
+              }
+            },
+            "top_p": 1,
+            "presence_penalty": 0,
+            "frequency_penalty": 0,
+            "top_logprobs": 0,
+            "temperature": 1,
+            "reasoning": {
+              "effort": "none"
+            },
+            "usage": {
+              "input_tokens": 35,
+              "output_tokens": 2,
+              "total_tokens": 37,
+              "input_tokens_details": {
+                "cached_tokens": 0
+              },
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              }
+            },
+            "max_output_tokens": 64,
+            "max_tool_calls": null,
+            "store": false,
+            "background": false,
+            "service_tier": "default",
+            "metadata": {},
+            "safety_identifier": null,
+            "prompt_cache_key": null
+          },
+          "stream_completed": true
+        }
+      },
+      {
+        "name": "ollama-native-function-call",
+        "status": "passed",
+        "detail": {
+          "call": {
+            "id": "resp_672274",
+            "object": "response",
+            "created_at": 1792026153,
+            "completed_at": 1792026153,
+            "status": "completed",
+            "incomplete_details": null,
+            "model": "qwen2.5:3b",
+            "previous_response_id": null,
+            "instructions": null,
+            "output": [
+              {
+                "id": "fc_resp_672274_0",
+                "type": "function_call",
+                "status": "completed",
+                "call_id": "call_bqzebjo2",
+                "name": "get_weather",
+                "arguments": "{\"city\":\"London\"}"
+              }
+            ],
+            "error": null,
+            "tools": [
+              {
+                "type": "function",
+                "name": "get_weather",
+                "description": "Get weather for a city.",
+                "parameters": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "city": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "city"
+                  ],
+                  "type": "object"
+                }
+              }
+            ],
+            "tool_choice": "auto",
+            "truncation": "disabled",
+            "parallel_tool_calls": true,
+            "text": {
+              "format": {
+                "type": "text"
+              }
+            },
+            "top_p": 1,
+            "presence_penalty": 0,
+            "frequency_penalty": 0,
+            "top_logprobs": 0,
+            "temperature": 1,
+            "reasoning": {
+              "effort": "none"
+            },
+            "usage": {
+              "input_tokens": 155,
+              "output_tokens": 20,
+              "total_tokens": 175,
+              "input_tokens_details": {
+                "cached_tokens": 18
+              },
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              }
+            },
+            "max_output_tokens": 128,
+            "max_tool_calls": null,
+            "store": false,
+            "background": false,
+            "service_tier": "default",
+            "metadata": {},
+            "safety_identifier": null,
+            "prompt_cache_key": null
+          },
+          "replay": {
+            "id": "resp_629349",
+            "object": "response",
+            "created_at": 1792026153,
+            "completed_at": 1792026153,
+            "status": "completed",
+            "incomplete_details": null,
+            "model": "qwen2.5:3b",
+            "previous_response_id": null,
+            "instructions": null,
+            "output": [
+              {
+                "id": "msg_465976",
+                "type": "message",
+                "status": "completed",
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "output_text",
+                    "text": "The current weather in London is 18 degrees Celsius.",
+                    "annotations": [],
+                    "logprobs": []
+                  }
+                ]
+              }
+            ],
+            "error": null,
+            "tools": [
+              {
+                "type": "function",
+                "name": "get_weather",
+                "description": "Get weather for a city.",
+                "parameters": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "city": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "city"
+                  ],
+                  "type": "object"
+                }
+              }
+            ],
+            "tool_choice": "auto",
+            "truncation": "disabled",
+            "parallel_tool_calls": true,
+            "text": {
+              "format": {
+                "type": "text"
+              }
+            },
+            "top_p": 1,
+            "presence_penalty": 0,
+            "frequency_penalty": 0,
+            "top_logprobs": 0,
+            "temperature": 1,
+            "reasoning": {
+              "effort": "none"
+            },
+            "usage": {
+              "input_tokens": 196,
+              "output_tokens": 13,
+              "total_tokens": 209,
+              "input_tokens_details": {
+                "cached_tokens": 169
+              },
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              }
+            },
+            "max_output_tokens": 128,
+            "max_tool_calls": null,
+            "store": false,
+            "background": false,
+            "service_tier": "default",
+            "metadata": {},
+            "safety_identifier": null,
+            "prompt_cache_key": null
+          }
+        }
+      },
+      {
+        "name": "ollama-codex-cli",
+        "status": "passed",
+        "detail": {
+          "output": "MAA_NATIVE_OK\n",
+          "diagnostic": "Reading additional input from stdin...\nOpenAI Codex v0.162.1\n--------\nworkdir: /tmp/maa-codex-native-u71v81x4\nmodel: qwen2.5:3b\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a13d15-1136-7270-8b75-e0c7d4645e34\n--------\nuser\nReply with MAA_NATIVE_OK. Do not use tools.\ncodex\nMAA_NATIVE_OK\ntokens used\n3,581\n",
+          "launcher_path_without_user_bin": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        }
+      },
+      {
+        "name": "ollama-manager-independent",
+        "status": "passed",
+        "detail": {
+          "archive_absent": true,
+          "codex": {
+            "output": "MAA_NATIVE_OK\n",
+            "diagnostic": "Reading additional input from stdin...\nOpenAI Codex v0.162.1\n--------\nworkdir: /tmp/maa-codex-native-9lfpwde8\nmodel: qwen2.5:3b\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a13d15-13e1-7bd2-981d-c2d709ff5f2b\n--------\nuser\nReply with MAA_NATIVE_OK. Do not use tools.\ncodex\nMAA_NATIVE_OK\ntokens used\n124\n",
+            "launcher_path_without_user_bin": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+          }
+        }
+      },
+      {
+        "name": "ollama-model-status",
+        "status": "passed",
+        "detail": {
+          "backend": "ollama",
+          "model": "qwen2.5:3b",
+          "state": "running",
+          "context": 32768,
+          "allocations": {
+            "load_id": "14628",
+            "gpu_layers": [
+              37,
+              37
+            ],
+            "buffers": [
+              {
+                "phase": "main",
+                "component": "load_tensors",
+                "backend": "CPU_Mapped",
+                "kind": "model",
+                "mib": 243.43,
+                "location": "host"
+              },
+              {
+                "phase": "main",
+                "component": "load_tensors",
+                "backend": "CUDA0",
+                "kind": "model",
+                "mib": 1834.83,
+                "location": "gpu"
+              },
+              {
+                "phase": "main",
+                "component": "llama_context",
+                "backend": "CUDA_Host",
+                "kind": "output",
+                "mib": 0.58,
+                "location": "host"
+              },
+              {
+                "phase": "main",
+                "component": "llama_kv_cache",
+                "backend": "CUDA0",
+                "kind": "KV",
+                "mib": 612.03,
+                "location": "gpu"
+              },
+              {
+                "phase": "main",
+                "component": "sched_reserve",
+                "backend": "CUDA0",
+                "kind": "compute",
+                "mib": 225.11,
+                "location": "gpu"
+              },
+              {
+                "phase": "main",
+                "component": "sched_reserve",
+                "backend": "CUDA_Host",
+                "kind": "compute",
+                "mib": 96.11,
+                "location": "host"
+              }
+            ],
+            "mtp_shared_kv": false,
+            "rs_sequences": 0,
+            "gpu_identified_mib": 2671.97,
+            "truncated": false,
+            "error": null
+          },
+          "usage": null,
+          "error": null,
+          "usage_note": "Native direct connection: no maa conversation interceptor or token receipt.",
+          "mtp": "unavailable",
+          "saved_context": 32768,
+          "gpu_memory": {
+            "devices": [
+              {
+                "index": "0",
+                "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+                "total_mib": 24463.0,
+                "used_mib": 3267.0,
+                "free_mib": 20871.0,
+                "reserved_mib": 326.0
+              }
+            ],
+            "error": null
+          },
+          "resources": {
+            "size": 2801763614,
+            "size_vram": 2801763614,
+            "expires_at": "2026-10-15T01:07:34.060948076Z"
+          }
+        }
+      },
+      {
+        "name": "ollama-configuration-without-reload",
+        "status": "passed",
+        "detail": {
+          "resident_instance_unchanged": true,
+          "paused_configuration_did_not_wake": true,
+          "saved_context": 32768,
+          "before": {
+            "ActiveState": "active",
+            "SubState": "running",
+            "InvocationID": "ee605e27b38d466bb026ad78c7b426fe",
+            "MainPID": "9067",
+            "Result": "success"
+          },
+          "after": {
+            "ActiveState": "active",
+            "SubState": "running",
+            "InvocationID": "ee605e27b38d466bb026ad78c7b426fe",
+            "MainPID": "9067",
+            "Result": "success"
+          }
+        }
+      },
+      {
+        "name": "ollama-language-without-reload",
+        "status": "passed",
+        "detail": {
+          "native_instance_and_configuration_preserved": true,
+          "original_language_restored": "en_us",
+          "before": {
+            "ActiveState": "active",
+            "SubState": "running",
+            "InvocationID": "5ffc6267450c43b38a21ef2ba74c9f05",
+            "MainPID": "9757",
+            "Result": "success"
+          },
+          "after": {
+            "ActiveState": "active",
+            "SubState": "running",
+            "InvocationID": "5ffc6267450c43b38a21ef2ba74c9f05",
+            "MainPID": "9757",
+            "Result": "success"
+          }
+        }
+      },
+      {
+        "name": "ollama-codex-model-picker",
+        "status": "passed",
+        "detail": {
+          "local_only": true,
+          "warnings_absent": true,
+          "elapsed_seconds": 1.677,
+          "picker": "Select Model and Effort  › 1. qwen2.5:3b (current)  Local model selected by my-ai-agent; native reasoning support varies.                                                                   enter select · esc back                                                                                                                                       "
+        }
+      },
+      {
+        "name": "ollama-resident-entry-reuses-alias",
+        "status": "passed",
+        "detail": {
+          "native_tag_unchanged": true,
+          "woke": false,
+          "elapsed_seconds": 0.768,
+          "diagnostic": "Reading additional input from stdin...\nOpenAI Codex v0.162.1\n--------\nworkdir: /tmp/maa-codex-native-j_e287m2\nmodel: qwen2.5:3b\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a13d15-3aa9-7140-aa36-32a4858bba17\n--------\nuser\nReply with MAA_NATIVE_OK. Do not use tools.\ncodex\nMAA_NATIVE_OK\ntokens used\n3,643\n"
+        }
+      },
+      {
+        "name": "ollama-expired-entry-wakes-existing-alias",
+        "status": "passed",
+        "detail": {
+          "native_tag_unchanged": true,
+          "woke": true,
+          "elapsed_seconds": 3.567,
+          "diagnostic": "Reading additional input from stdin...\nOpenAI Codex v0.162.1\n--------\nworkdir: /tmp/maa-codex-native-p2pxrtmd\nmodel: qwen2.5:3b\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a13d15-3fa1-71b0-98fe-5c10617906ff\n--------\nuser\nReply with MAA_NATIVE_OK. Do not use tools.\ncodex\nMAA_NATIVE_OK\ntokens used\n3,639\n"
+        }
+      },
+      {
+        "name": "ollama-explicit-start-wakes-without-restart",
+        "status": "passed",
+        "detail": {
+          "native_instance_unchanged": true,
+          "woke_existing_model": true,
+          "before": {
+            "ActiveState": "active",
+            "SubState": "running",
+            "InvocationID": "5ffc6267450c43b38a21ef2ba74c9f05",
+            "MainPID": "9757",
+            "Result": "success"
+          },
+          "after": {
+            "ActiveState": "active",
+            "SubState": "running",
+            "InvocationID": "5ffc6267450c43b38a21ef2ba74c9f05",
+            "MainPID": "9757",
+            "Result": "success"
+          }
+        }
+      },
+      {
+        "name": "ollama-unchanged-inventory-reuses-registry",
+        "status": "passed",
+        "detail": {
+          "unchanged_registry_not_written": true,
+          "native_instance_unchanged": true
+        }
+      },
+      {
+        "name": "codex-direct-shell-and-result-replay",
+        "status": "passed",
+        "detail": {
+          "status": "passed",
+          "kind": "real Codex / native Responses deterministic fixture",
+          "tool_output_replayed": true,
+          "file_created_by_codex_tool": true,
+          "declarations": [
+            [
+              "function",
+              "exec_command"
+            ],
+            [
+              "function",
+              "write_stdin"
+            ],
+            [
+              "function",
+              "request_user_input"
+            ],
+            [
+              "function",
+              "view_image"
+            ],
+            [
+              "namespace",
+              "multi_agent_v1"
+            ],
+            [
+              "function",
+              "get_goal"
+            ],
+            [
+              "function",
+              "create_goal"
+            ],
+            [
+              "function",
+              "update_goal"
+            ],
+            [
+              "web_search",
+              null
+            ]
+          ],
+          "stdout": "Done.\n",
+          "diagnostic": "Reading additional input from stdin...\nOpenAI Codex v0.162.1\n--------\nworkdir: /home/sandbox/.maa-real-codex-tool-x6s_z86i\nmodel: native_fixture\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a13d15-5da8-7bf2-8c3a-a2efe2e48de4\n--------\nuser\nUse a shell tool to print MAA_REAL_CODEX_TOOL_OK, then answer done.\nexec\n/bin/bash -lc 'printf MAA_REAL_CODEX_TOOL_OK > codex-proof.txt; cat codex-proof.txt' in /home/sandbox/.maa-real-codex-tool-x6s_z86i\n succeeded in 0ms:\nMAA_REAL_CODEX_TOOL_OK\ncodex\nDone.\ntokens used\n72\n"
+        }
+      },
+      {
+        "name": "pause-start-retains-target",
+        "status": "passed",
+        "detail": {
+          "selected": {
+            "model": {
+              "key": "3c675f8a255333c855c7a80b",
+              "backend": "ollama",
+              "name": "qwen2.5:3b",
+              "digest": "357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b",
+              "metadata": {
+                "general.architecture": "qwen2",
+                "general.base_model.0.name": "Qwen2.5 3B",
+                "general.base_model.0.organization": "Qwen",
+                "general.base_model.0.repo_url": "https://huggingface.co/Qwen/Qwen2.5-3B",
+                "general.base_model.count": 1,
+                "general.basename": "Qwen2.5",
+                "general.file_type": 15,
+                "general.finetune": "Instruct",
+                "general.languages": [
+                  "en"
+                ],
+                "general.license": "other",
+                "general.license.link": "https://huggingface.co/Qwen/Qwen2.5-3B-Instruct/blob/main/LICENSE",
+                "general.license.name": "qwen-research",
+                "general.parameter_count": 3085938688,
+                "general.quantization_version": 2,
+                "general.size_label": "3B",
+                "general.tags": [
+                  "chat",
+                  "text-generation"
+                ],
+                "general.type": "model",
+                "qwen2.attention.head_count": 16,
+                "qwen2.attention.head_count_kv": 2,
+                "qwen2.attention.layer_norm_rms_epsilon": 1e-06,
+                "qwen2.block_count": 36,
+                "qwen2.context_length": 32768,
+                "qwen2.embedding_length": 2048,
+                "qwen2.feed_forward_length": 11008,
+                "qwen2.rope.freq_base": 1000000,
+                "tokenizer.ggml.add_bos_token": false,
+                "tokenizer.ggml.bos_token_id": 151643,
+                "tokenizer.ggml.eos_token_id": 151645,
+                "tokenizer.ggml.merges": [],
+                "tokenizer.ggml.model": "gpt2",
+                "tokenizer.ggml.padding_token_id": 151643,
+                "tokenizer.ggml.pre": "qwen2",
+                "tokenizer.ggml.token_type": [],
+                "tokenizer.ggml.tokens": []
+              },
+              "mtp_supported": false,
+              "source": "ollama",
+              "capabilities": [
+                "completion",
+                "tools"
+              ]
+            },
+            "settings": {
+              "context": 32768,
+              "kv": "q8_0",
+              "flash_attention": true,
+              "fit": true,
+              "reserve_mib": 0,
+              "keep_alive": "5m",
+              "mtp": false,
+              "mtp_kv": "follow",
+              "reasoning": "default"
+            }
+          },
+          "running": true,
+          "runtime": {
+            "model": "qwen2.5:3b",
+            "context": 32768,
+            "upstream": "http://127.0.0.1:11434",
+            "native_digest": "a96df318559b174027c68ae3819270b3da4d36403bcc43547995938ac81df25e",
+            "resources": {
+              "size": 2801763614,
+              "size_vram": 2801763614,
+              "expires_at": "2026-10-15T01:07:58.221110632Z"
+            },
+            "display_name": "qwen2.5:3b",
+            "backend": "ollama",
+            "key": "3c675f8a255333c855c7a80b",
+            "fingerprint": "6f38353d06d90ba8a2f30ef0d839e37db2d1c04eeff3dcb49c7c4163cc2cb0a6",
+            "launch": {
+              "device": 2112,
+              "inode": 260769,
+              "offset": 0,
+              "service_id": "b13cb9b479014b3390374858388b230a"
+            },
+            "native_config": {
+              "/etc/systemd/system/ollama.service.d/50-local-model.conf": "a30515d67e2f9dad462fce8fbdf1cf4a312aa632e1d81e4e0885373740a079de",
+              "/home/sandbox/.local/state/my-ai-agent/native/ollama-preload.json": "12fdfe2a6bf82eb8a9730eb1f98771b1588450a50813c8c00ba07edb8d74cf21"
+            },
+            "log_path": "/home/sandbox/.local/state/my-ai-agent/native/ollama.log",
+            "pid": 11007,
+            "base_url": "http://127.0.0.1:11434/v1",
+            "capabilities": {
+              "native_direct_connection": true
+            }
+          },
+          "yolo": {
+            "enabled": true,
+            "managed": true
+          },
+          "model_status": {
+            "backend": "ollama",
+            "model": "qwen2.5:3b",
+            "state": "running",
+            "context": 32768,
+            "allocations": {
+              "load_id": "14628",
+              "gpu_layers": [
+                37,
+                37
+              ],
+              "buffers": [
+                {
+                  "phase": "main",
+                  "component": "load_tensors",
+                  "backend": "CPU_Mapped",
+                  "kind": "model",
+                  "mib": 243.43,
+                  "location": "host"
+                },
+                {
+                  "phase": "main",
+                  "component": "load_tensors",
+                  "backend": "CUDA0",
+                  "kind": "model",
+                  "mib": 1834.83,
+                  "location": "gpu"
+                },
+                {
+                  "phase": "main",
+                  "component": "llama_context",
+                  "backend": "CUDA_Host",
+                  "kind": "output",
+                  "mib": 0.58,
+                  "location": "host"
+                },
+                {
+                  "phase": "main",
+                  "component": "llama_kv_cache",
+                  "backend": "CUDA0",
+                  "kind": "KV",
+                  "mib": 612.03,
+                  "location": "gpu"
+                },
+                {
+                  "phase": "main",
+                  "component": "sched_reserve",
+                  "backend": "CUDA0",
+                  "kind": "compute",
+                  "mib": 225.11,
+                  "location": "gpu"
+                },
+                {
+                  "phase": "main",
+                  "component": "sched_reserve",
+                  "backend": "CUDA_Host",
+                  "kind": "compute",
+                  "mib": 96.11,
+                  "location": "host"
+                }
+              ],
+              "mtp_shared_kv": false,
+              "rs_sequences": 0,
+              "gpu_identified_mib": 2671.97,
+              "truncated": false,
+              "error": null
+            },
+            "usage": null,
+            "error": null,
+            "usage_note": "Native direct connection: no maa conversation interceptor or token receipt.",
+            "mtp": "unavailable",
+            "saved_context": 32768,
+            "gpu_memory": {
+              "devices": [
+                {
+                  "index": "0",
+                  "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+                  "total_mib": 24463.0,
+                  "used_mib": 3249.0,
+                  "free_mib": 20889.0,
+                  "reserved_mib": 326.0
+                }
+              ],
+              "error": null
+            },
+            "resources": {
+              "size": 2801763614,
+              "size_vram": 2801763614,
+              "expires_at": "2026-10-15T01:07:58.221110632Z"
+            }
+          }
+        }
+      },
+      {
+        "name": "interrupted-candidate-restores-accepted-native-target",
+        "status": "passed",
+        "detail": {
+          "injected_uncommitted_target": true,
+          "accepted_native_backend_restored": true,
+          "candidate_backend_not_started": true
+        }
+      },
+      {
+        "name": "native-load-failure-rollback",
+        "status": "passed",
+        "detail": "[In progress] Apply model configuration — waited 0.0s\nRemoved '/etc/systemd/system/default.target.wants/ollama.service'.\n[Failed] Apply model configuration: Wait for native backend and model loading; native logs: maa logs — elapsed 6.2s\nmaa: Switch failed: Native service failed; inspect maa logs\nPrevious service restored.\n"
+      },
+      {
+        "name": "invalid-fixture-cleaned",
+        "status": "passed",
+        "detail": {
+          "cleaned": true
+        }
+      },
+      {
+        "name": "yolo-off",
+        "status": "passed",
+        "detail": {
+          "enabled": false,
+          "managed": false
+        }
+      },
+      {
+        "name": "product-reinstall-retains-yolo-off-and-native-instance",
+        "status": "passed",
+        "detail": {
+          "global_config_and_recovery_unchanged": true,
+          "profile_and_native_instance_unchanged": true,
+          "diagnostic": "Installing my-ai-agent v0.2.2\nmy-ai-agent installed: /home/sandbox/.local/share/my-ai-agent/maa.pyz\nRun /home/sandbox/.local/bin/maa to open the menu.\n"
+        }
+      },
+      {
+        "name": "yolo-on",
+        "status": "passed",
+        "detail": {
+          "enabled": true,
+          "managed": true
+        }
+      }
+    ],
+    "cleanup": [
+      {
+        "fixture": "bad-native.gguf",
+        "key": "edac4a0f6d656cde76f46ffc",
+        "registry_removed": true,
+        "temporary_directory": true
+      },
+      {
+        "selected_target_paused": true
+      }
+    ],
+    "finished": "2026-10-15T01:03:14.404348+00:00"
+  },
+  "ordinary_user_im_native": {
+    "version": "0.2.2",
+    "invoking_uid": 1001,
+    "kind": "native connector lifecycle, no official accounts",
+    "product_sha256": "e1eea520681c37a4cb25720413c0a5e4b8d42daa70543ce4159c9a064d639eaf",
+    "status": "passed",
+    "checks": [
+      {
+        "name": "im-native-install",
+        "status": "passed",
+        "detail": {
+          "ok": true
+        }
+      },
+      {
+        "name": "im-native-independent-unit",
+        "status": "passed",
+        "detail": {
+          "independent_runtime": true,
+          "initially_closed": true,
+          "unit": "maa-connectors-997.service"
+        }
+      },
+      {
+        "name": "im-native-manager-independent",
+        "status": "passed",
+        "detail": {
+          "manager_archive_absent": true,
+          "empty_runtime_active": true,
+          "network_requests": 0
+        }
+      },
+      {
+        "name": "im-native-close-all",
+        "status": "passed",
+        "detail": {
+          "ok": true
+        }
+      },
+      {
+        "name": "im-native-disabled-account",
+        "status": "passed",
+        "detail": {
+          "id": "dbf8e998a2ad4cea87febb463091d2f7",
+          "platform": "whatsapp",
+          "name": "native fixture",
+          "owner_id": "",
+          "platform_id": "",
+          "api_base": "https://api.whatsapp.com",
+          "enabled": false,
+          "created_at": 1792026196.154144,
+          "reply": "my-ai-agent：消息收发测试成功。",
+          "credential_set": true
+        }
+      },
+      {
+        "name": "im-native-private-export",
+        "status": "passed",
+        "detail": {
+          "path": "/tmp/maa-im-native-qu1quzm6/backup.json",
+          "connections": 1,
+          "contains_credentials": true
+        }
+      },
+      {
+        "name": "im-native-delete",
+        "status": "passed",
+        "detail": {
+          "deleted": "dbf8e998a2ad4cea87febb463091d2f7",
+          "remote_changed": false
+        }
+      },
+      {
+        "name": "im-native-import-closed",
+        "status": "passed",
+        "detail": {
+          "imported": 1,
+          "enabled": false
+        }
+      },
+      {
+        "name": "im-native-uninstall",
+        "status": "passed",
+        "detail": {
+          "deleted": "connector-module",
+          "remote_changed": false
+        }
+      }
+    ],
+    "test_user": "maa-im-test-c25a43f8e292",
+    "cleanup": [
+      "connector-unit",
+      "test-sudo-authorization",
+      "test-user",
+      "test-home"
+    ],
+    "test_uid": 997,
+    "uid": 997,
+    "finished": "2026-10-15T01:03:17.408825+00:00"
+  },
+  "root_im_native": {
+    "version": "0.2.2",
+    "invoking_uid": 0,
+    "kind": "native connector lifecycle, no official accounts",
+    "product_sha256": "e1eea520681c37a4cb25720413c0a5e4b8d42daa70543ce4159c9a064d639eaf",
+    "status": "passed",
+    "checks": [
+      {
+        "name": "im-native-install",
+        "status": "passed",
+        "detail": {
+          "ok": true
+        }
+      },
+      {
+        "name": "im-native-independent-unit",
+        "status": "passed",
+        "detail": {
+          "independent_runtime": true,
+          "initially_closed": true,
+          "unit": "maa-connectors-999.service"
+        }
+      },
+      {
+        "name": "im-native-manager-independent",
+        "status": "passed",
+        "detail": {
+          "manager_archive_absent": true,
+          "empty_runtime_active": true,
+          "network_requests": 0
+        }
+      },
+      {
+        "name": "im-native-close-all",
+        "status": "passed",
+        "detail": {
+          "ok": true
+        }
+      },
+      {
+        "name": "im-native-disabled-account",
+        "status": "passed",
+        "detail": {
+          "id": "99c81a6046834a058800d502b6a4f311",
+          "platform": "whatsapp",
+          "name": "native fixture",
+          "owner_id": "",
+          "platform_id": "",
+          "api_base": "https://api.whatsapp.com",
+          "enabled": false,
+          "created_at": 1792026305.0390399,
+          "reply": "my-ai-agent：消息收发测试成功。",
+          "credential_set": true
+        }
+      },
+      {
+        "name": "im-native-private-export",
+        "status": "passed",
+        "detail": {
+          "path": "/tmp/maa-im-native-074untz6/backup.json",
+          "connections": 1,
+          "contains_credentials": true
+        }
+      },
+      {
+        "name": "im-native-delete",
+        "status": "passed",
+        "detail": {
+          "deleted": "99c81a6046834a058800d502b6a4f311",
+          "remote_changed": false
+        }
+      },
+      {
+        "name": "im-native-import-closed",
+        "status": "passed",
+        "detail": {
+          "imported": 1,
+          "enabled": false
+        }
+      },
+      {
+        "name": "im-native-uninstall",
+        "status": "passed",
+        "detail": {
+          "deleted": "connector-module",
+          "remote_changed": false
+        }
+      }
+    ],
+    "test_user": "maa-im-test-8542bda37422",
+    "cleanup": [
+      "connector-unit",
+      "test-sudo-authorization",
+      "test-user",
+      "test-home"
+    ],
+    "test_uid": 999,
+    "uid": 999,
+    "finished": "2026-10-15T01:05:06.254668+00:00"
+  },
+  "old_021_language_upgrade": {
+    "status": "passed",
+    "uid": 0,
+    "checks": [
+      {
+        "case": "noninteractive-explicit-language-required",
+        "status": "passed"
+      },
+      {
+        "case": "cancel",
+        "status": "passed",
+        "exit_code": 130,
+        "terminal_restored": true
+      },
+      {
+        "case": "interrupt",
+        "status": "passed",
+        "exit_code": 130,
+        "terminal_restored": true
+      },
+      {
+        "case": "old-021-upgrade-english-selection",
+        "status": "passed",
+        "existing_yolo_and_connector_data_preserved": true,
+        "terminal_restored": true
+      },
+      {
+        "case": "noninteractive-update-reuses-language",
+        "status": "passed"
+      }
+    ],
+    "before": {
+      "/root/.codex/config.toml": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/root/.local/state/my-ai-agent-im/connections.json": "787e102d2ec6c5da436fa58880753550d8c7e2175ae1a9eb8aca31fcd070362d"
+    },
+    "after": {
+      "/root/.codex/config.toml": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/root/.local/state/my-ai-agent-im/connections.json": "787e102d2ec6c5da436fa58880753550d8c7e2175ae1a9eb8aca31fcd070362d"
+    },
+    "selected_language": "en_us",
+    "old_version": "0.2.1",
+    "new_version": "0.2.2"
+  },
+  "current_rule": "new fixes after delivery increment the version; v0.2.1 and stable/0.1.9 remain frozen",
+  "official_im_accounts_tested": false,
+  "scope_limits": [
+    "Native models are small test models; no large-model/MTP performance claim.",
+    "Root checks cover language installation, portable and IM lifecycle; no root model/Codex native suite."
+  ],
+  "public_verification": "separate receipt after publication"
+}

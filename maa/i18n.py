@@ -1,88 +1,80 @@
-"""Centralized first-release Chinese UI text; native diagnostics are retained."""
-MESSAGES = {
-    'im_menu': '聊天接入', 'im_platform': '平台', 'im_name': '本地名称', 'im_identity': '平台账号',
-    'im_platforms': '平台接入', 'im_program': '连接器程序', 'im_backups': '备份与恢复',
-    'im_runtime_state': '运行状态（只读）',
-    'im_read_error': '状态读取失败，正在自动重试',
-    'im_stale': '下面的值是上次读取结果，当前状态未知。',
-    'im_removed': '此接入已被其他操作删除，请返回。',
-    'im_connection_state': '连接状态', 'im_received': '接收文本数', 'im_sent': '发送成功数',
-    'im_uncertain': '发送结果不确定数', 'im_last_received': '最后接收', 'im_last_sent': '最后发送',
-    'im_error': '诊断', 'im_qr': '请用微信扫描二维码；也可打开下面的官方授权链接。Ctrl+C 取消。',
-    'im_backup_path': '导出文件的绝对路径（包含凭证，请妥善保存）：',
-    'im_overwrite': '文件 {path} 已存在，是否覆盖？', 'im_exported': '接入备份已导出：{path}',
-    'im_name_input': '本地名称（留空使用平台名称）：', 'im_token': 'Token / API key（隐藏输入）：',
-    'im_owner_input': 'Telegram 用户 ID（正整数；添加时可留空，稍后绑定）：', 'im_verify': '请输入微信显示的配对码：',
-    'im_added': '已添加，当前保持关闭。绑定用户后开启，发送私聊文本即可收到固定测试回复。',
-    'im_switch': '接入开关', 'im_reply': '固定测试回复', 'im_credential': '接入凭证', 'im_credential_set': '已设置',
-    'im_owner': '允许测试的用户', 'im_unbound': '未绑定', 'im_export': '导出此接入', 'im_delete': '删除本地接入',
-    'im_edit': '请输入新值（留空保留 {value}）：', 'im_close_to_bind': '请先关闭此接入，再绑定测试用户。',
-    'im_owner_manual': '输入用户 ID', 'im_owner_receive': '接收私聊消息并确认用户',
-    'im_send_private': '请向这个 Telegram 机器人发送一条私聊文本；接收后会让你确认用户 ID。',
-    'im_wait_private': '等待 Telegram 私聊测试消息', 'im_confirm_owner': '确认允许用户 {owner} 测试此机器人？',
-    'im_confirm_delete': '删除 {name} 的本地凭证、配置和接收状态？远端账号保留。',
-    'im_add': '添加接入', 'im_module_switch': '全部接入开关', 'im_connections': ' 个接入',
-    'im_install': '安装 / 更新连接器程序', 'im_installed': '已安装', 'im_not_installed': '未安装',
-    'im_export_all': '导出全部接入', 'im_import': '导入接入备份', 'im_import_path': '接入备份文件的绝对路径：',
-    'im_imported': '接入已导入，全部保持关闭；凭证失效时请重新授权。',
-    'im_uninstall': '卸载聊天连接器', 'im_closed': '已关闭',
-    'im_test_only': '基础收发测试：只回复固定文本，尚未接入 Codex。',
-    'im_confirm_uninstall': '卸载连接器并删除全部本地接入数据？远端账号、本地模型和 Codex 保留。',
-    'menu_keys': '↑/↓ 选择 · Enter/→ 确定 · Esc/← {action}',
-    'menu_multi_keys': '↑/↓ 选择 · Space 勾选 · Enter 确定 · Esc {action}',
-    'menu_cancel': '取消', 'menu_back': '返回', 'menu_exit': '退出',
-    'input_keys': '←/→ 编辑 · Enter 提交 · Esc 取消',
-    'choice_no': '否', 'choice_yes': '是',
-    'title': 'my-ai-agent', 'install': '安装底座 / Codex CLI',
-    'add': '安装 / 登记新模型', 'select': '设置本地模型（立即切换）',
-    'configure': '模型配置', 'pause': '暂停当前模型，释放资源',
-    'start': '启动当前模型', 'yolo': 'YOLO 模式',
-    'models_menu': '本地模型管理', 'codex_config': 'codex-local 配置', 'codex_global': 'Codex 配置',
-    'model_status': '当前模型状态', 'refresh': '刷新', 'off_restore': '关闭（恢复原设置）',
-    'current_model': '当前模型', 'run_state': '运行状态', 'base_label': '底座',
-    'dirty': '存在未应用修改；选择“应用修改”后才生效。返回取消本次编辑。',
-    'applied': '修改后选择“应用修改”生效；返回取消本次编辑。',
-    'status': '当前状态与配置', 'about': '关于 my-ai-agent',
-    'back': '返回', 'exit': '退出', 'cancelled': '已取消。',
-    'done': '操作完成。', 'empty': '没有本地可选模型，请先安装 / 登记新模型。',
-    'backend': '请选择底座', 'source': '请选择模型来源',
-    'official': 'Ollama 官方模型', 'hf': 'Hugging Face GGUF', 'local': '本地 GGUF 文件',
-    'model_name': 'Ollama 模型名称（例如 qwen3:0.6b）：',
-    'repo': 'HF 仓库（publisher/repository）：',
-    'filename': '精确 GGUF 相对路径（包含 .gguf，不含网址）：',
-    'path': '已有 GGUF 文件的绝对路径：',
-    'model_file': '模型：', 'model_source': '来源：', 'model_revision': 'Revision：', 'model_path': '路径：',
-    'context': '上下文大小', 'kv': '主模型 KV 格式',
-    'flash_attention': 'Flash Attention', 'fit': '自动适配显存',
-    'reserve_mib': '显存预留（MiB）', 'keep_alive': '模型空闲驻留时间',
-    'mtp': 'MTP', 'mtp_kv': 'MTP KV 格式', 'reasoning': 'Codex 推理强度',
-    'on': '开启', 'off': '关闭', 'follow': '跟随主模型', 'default': '默认（不显式覆盖）',
-    'apply': '应用修改（底座参数改变后重新加载）', 'apply_codex': '应用修改',
-    'unchanged': '配置未变化，已保留当前运行状态。',
-    'codex_saved': 'codex-local 配置已保存，下次启动 Codex 时使用；底座运行状态保持不变。',
-    'model_applied': '模型配置已应用。', 'unavailable': '不可用：模型没有可核验的 MTP 权重',
-    'integer': '{label}：请输入{constraint}整数；留空保留 {value}。',
-    'positive': '正', 'nonnegative': '非负',
-    'no_target': '尚未选择模型。', 'running': '运行中', 'stopped': '已暂停',
-    'idle': '空闲卸载', 'paused': '已暂停', 'loading': '加载中', 'stopping': '停止中', 'unselected': '未选择',
-    'state_error': '状态读取失败', 'unknown': '未取得', 'not_applicable': '不适用', 'not_enabled': '未启用',
-    'mtp_unavailable': '不可用', 'shared': '共享（不重复计入）',
-    'context_readonly': '上下文大小（跟随模型，只读）', 'compact_readonly': '自动压缩阈值（90%，只读）',
-    'gpu_layers': '模型层 GPU 装载', 'weights': '模型权重', 'main_kv': '主模型 KV',
-    'rs': '循环状态缓冲区 RS', 'compute': '计算缓冲区', 'output_buffer': '输出缓冲区',
-    'mtp_kv_status': 'MTP KV', 'mtp_compute': 'MTP 计算缓冲区',
-    'gpu_sum': '已识别显存分配合计', 'gpu_memory': '整卡显存',
-    'effective_context': '有效上下文', 'context_input': '上下文占用（最近一次输入）',
-    'saved_context': '已保存上下文',
-    'last_output': '最近一次生成', 'statistics_time': '统计时间',
-    'memory_note': '缓冲区数值为当前加载的原生分配记录；CPU_Mapped 为映射量，不是实际 RSS。',
-    'gpu_note': '整卡显存包含其他程序及驱动占用，与已识别分配合计分别统计。',
-    'current': '当前目标：{backend} / {model} / {status}',
-    'model_title': '请选择 llama.cpp 已下载或登记的本地 GGUF 模型。',
-    'ollama_model_title': '请选择 Ollama 本地模型；运行中的托管 Ollama 清单直接读取。',
-    'result': '结果', 'error': '错误：{error}',
-}
+"""Shared human catalogs; raw native diagnostics and machine data stay intact."""
+import argparse
+from functools import lru_cache
+from importlib import import_module
+import sys
+import threading
+from . import preferences
+from .store import Error
+
+@lru_cache(maxsize=2)
+def catalog(locale):
+    return import_module('.locales.' + locale, __package__)
+
+def error_text(value, *, locale=None):
+    if isinstance(value, Error):
+        return text(value.template, locale=locale,
+                    **{key: error_text(item, locale=locale) if isinstance(item, Error) else item for key, item in value.values.items()})
+    return str(value)
+
+def t(key, *, locale=None, **values):
+    locale = locale or preferences.language()
+    return catalog(locale).MESSAGES[key].format(**{key: error_text(value, locale=locale) if isinstance(value, Error) else value for key, value in values.items()})
+
+def text(source, *, locale=None, **values):
+    locale = locale or preferences.language()
+    template = catalog(locale).TEXT.get(source, source)
+    return template.format(**values) if values else template
+
+class Subparsers(argparse._SubParsersAction):
+    def add_parser(self, name, **kwargs):
+        if kwargs.get('help'):
+            kwargs['help'] = text(kwargs['help'])
+        return super().add_parser(name, **kwargs)
 
 
-def t(key, **values):
-    return MESSAGES[key].format(**values)
+parser_lock = threading.RLock()
+
+
+class Parser(argparse.ArgumentParser):
+    """Translate parser presentation without changing commands or parsed values."""
+    def __init__(self, *args, **kwargs):
+        if kwargs.get('description'):
+            kwargs['description'] = text(kwargs['description'])
+        super().__init__(*args, **kwargs)
+        self._positionals.title = text('positional arguments')
+        self._optionals.title = text('options')
+        self.register('action', 'parsers', Subparsers)
+        for action in self._actions:
+            if action.help:
+                action.help = text(action.help)
+
+    def add_argument(self, *args, **kwargs):
+        if kwargs.get('help'):
+            kwargs['help'] = text(kwargs['help'])
+        return super().add_argument(*args, **kwargs)
+
+    def add_subparsers(self, **kwargs):
+        kwargs.setdefault('parser_class', Parser)
+        return super().add_subparsers(**kwargs)
+
+    def parse_known_args(self, *args, **kwargs):
+        # argparse calls gettext while parsing dynamic validation messages. Scope
+        # that hook to parsing, including recursive subparsers, then restore it.
+        with parser_lock:
+            original = argparse._
+            argparse._ = text
+            try:
+                return super().parse_known_args(*args, **kwargs)
+            finally:
+                argparse._ = original
+
+    def format_usage(self):
+        return super().format_usage().replace('usage: ', text('usage: '), 1)
+
+    def format_help(self):
+        return super().format_help().replace('usage: ', text('usage: '), 1)
+
+    def error(self, message):
+        self.print_usage(sys.stderr)
+        self.exit(2, text('{v0}: error: {v1}\n', v0=self.prog, v1=message))

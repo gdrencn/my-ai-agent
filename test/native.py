@@ -214,6 +214,30 @@ def configuration_without_reload():
             'saved_context': state['model_status']['saved_context'], 'before': before, 'after': after}
 
 
+def language_without_reload():
+    from maa import codex
+    from maa.service import Controller
+    store = Store()
+    controller = Controller(store)
+    paths = [store.path(name) for name in ('selected.json', 'target.json', 'runtime.json', 'models.json')]
+    paths += list(controller.config_paths()) + [codex.home() / 'config.toml',
+             codex.home() / 'maa-local.config.toml', codex.home() / 'maa-yolo-recovery.json', Path(LOCAL)]
+    def files():
+        return {str(path): path.read_bytes() if path.exists() else None for path in paths}
+    original = command('language')['language']
+    saved, before = files(), controller.unit_info()
+    try:
+        for value in ('zh_cn', 'en_us'):
+            assert command('language', value) == {'language': value}
+            assert files() == saved
+            after = controller.unit_info()
+            assert after['MainPID'] == before['MainPID'] and after['InvocationID'] == before['InvocationID']
+    finally:
+        command('language', original)
+    return {'native_instance_and_configuration_preserved': True, 'original_language_restored': original,
+            'before': before, 'after': after}
+
+
 def ollama_start_idle_without_restart():
     from maa.service import Controller
     store, controller = Store(), Controller(Store())
@@ -298,6 +322,7 @@ def main():
         check(model['backend'] + '-manager-independent', independent)
         check(model['backend'] + '-model-status', model_status_native)
         check(model['backend'] + '-configuration-without-reload', configuration_without_reload)
+        check(model['backend'] + '-language-without-reload', language_without_reload)
         try:
             from maa_testing.codex_ui import picker
         except ImportError:

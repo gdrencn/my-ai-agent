@@ -4,7 +4,7 @@
 
 当前稳定版本：**0.1.9 stable**。两种底座可共存，通过 `maa` 选择一个当前底座和模型，并同步 `codex-local`。stable 的产品与配对测试包和已验收的 `v0.1.9` test 逐字节相同。
 
-当前测试版本：**0.2.1 test**，新增 Telegram / WhatsApp / 微信的基础聊天接入，暂不连接 Codex。Telegram 支持多个机器人，WhatsApp 和微信各一个。原有模型与 Codex 功能保留，stable 仍为 0.1.9。
+当前测试版本：**0.2.2 test**，补齐简体中文 / English 语言选择，保留 Telegram / WhatsApp / 微信的基础聊天接入，暂不连接 Codex。Telegram 支持多个机器人，WhatsApp 和微信各一个。原有模型与 Codex 功能保留，stable 仍为 0.1.9。
 
 已有环境只升级测试版管理工具：
 
@@ -15,10 +15,18 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/insta
 已有底座和 Codex 的独立测试容器可运行本轮完整自动检查：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/test.sh | bash -s -- --version 0.2.1 --components none
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/test.sh | bash -s -- --version 0.2.2 --components none
 ```
 
 聊天连接器已经安装或配置账号时也可重复测试，无需先卸载；连接器原生检查使用临时用户和独立服务，结束后清理测试资源。
+
+0.2.2 首次安装或旧环境没有语言配置时会先选择“简体中文 / English”；更新沿用已有选择。管道安装通过控制终端选择，取消或中断结束安装。无交互终端且没有已保存选择时，请指定语言：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/install.sh | bash -s -- --language en_us --components none
+```
+
+主菜单“语言：当前语言”可即时切换；CLI 使用 `maa language` 查询、`maa language zh_cn` 或 `maa language en_us` 设置。配置在 `${XDG_CONFIG_HOME:-~/.config}/my-ai-agent/config.json`。切换只改变 maa 界面文案，保留底座运行状态、模型/Codex/YOLO 配置、聊天账号和收发数据。JSON 字段与标识符、用户的模型名称和固定回复、官方程序原始输出保留原文。旧版 stable 0.1.9 的语言功能保持原样；该新流程从 0.2.2 test 提供。
 
 进入 `maa → 聊天接入`，按“平台接入”“连接器程序”“备份与恢复”管理。状态页面每秒自动原地更新，输入和确认期间暂停；没有手动刷新选项。默认不安装或开启连接器。接入步骤、关闭/恢复/删除与真实账号验收范围见 [docs/CONNECTORS.md](docs/CONNECTORS.md)。固定版本回退见 [docs/ROLLBACK.md](docs/ROLLBACK.md)。
 

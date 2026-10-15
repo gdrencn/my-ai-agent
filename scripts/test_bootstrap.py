@@ -60,10 +60,10 @@ class Delivery(unittest.TestCase):
             with self.assertRaises(ValueError):
                 bootstrap.release()
 
-    def fixture(self, channel, info=None, corrupt=None):
-        row = item('v0.1.9' if channel == 'test' else 'stable/0.1.9', channel == 'test')
+    def fixture(self, channel, info=None, corrupt=None, version='0.1.9'):
+        row = item(('v' if channel == 'test' else 'stable/') + version, channel == 'test')
         payloads = {'maa.pyz': b'approved-product', 'maa-test.pyz': b'approved-paired-tester',
-                    'VERSION.json': json.dumps(info or {'version': '0.1.9', 'channel': channel}).encode()}
+                    'VERSION.json': json.dumps(info or {'version': version, 'channel': channel}).encode()}
         payloads['SHA256SUMS'] = ''.join(hashlib.sha256(blob).hexdigest() + '  ' + name + '\n'
                                         for name, blob in payloads.items()).encode()
         if corrupt:
@@ -118,6 +118,20 @@ class Delivery(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, 'pairing mismatch'):
                     bootstrap.run(['--channel', 'stable'])
                 command.assert_not_called()
+
+    def test_new_release_forwards_language_only_after_asset_verification(self):
+        with patch.object(bootstrap, 'fetch', side_effect=self.fixture('test', version='0.2.2')), \
+                patch.object(bootstrap.Path, 'exists', return_value=True), patch.object(bootstrap.subprocess, 'run') as command:
+            bootstrap.run(['--components', 'none', '--language', 'en_us'])
+        self.assertEqual(command.call_count, 1)
+        self.assertEqual(command.call_args.args[0][-2:], ['--language', 'en_us'])
+
+    def test_frozen_release_does_not_receive_unsupported_language_flag(self):
+        with patch.object(bootstrap, 'fetch', side_effect=self.fixture('stable')), \
+                patch.object(bootstrap.Path, 'exists', return_value=True), patch.object(bootstrap.subprocess, 'run') as command:
+            with self.assertRaisesRegex(ValueError, 'does not support --language'):
+                bootstrap.run(['--channel', 'stable', '--components', 'none', '--language', 'en_us'])
+        command.assert_not_called()
 
 
 if __name__ == '__main__':

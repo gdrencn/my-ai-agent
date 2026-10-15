@@ -8,8 +8,8 @@ from ..store import Error
 
 
 class Failure(Error):
-    def __init__(self, message, *, status=0, uncertain=False, retry_after=0):
-        super().__init__(message)
+    def __init__(self, message, *, status=0, uncertain=False, retry_after=0, **values):
+        super().__init__(message, **values)
         self.status, self.uncertain, self.retry_after = status, uncertain, retry_after
 
 
@@ -60,7 +60,7 @@ class Client:
                     delay = int(response.getheader('Retry-After'))
                 delay = min(3600, max(0, delay)) if type(delay) is int else 0
                 # WhatsApp 503/131016 is documented as definitely not accepted.
-                raise Failure('Platform HTTP ' + str(response.status), status=response.status,
+                raise Failure('Platform HTTP {v0}', v0=response.status, status=response.status,
                               uncertain=sending and response.status >= 500 and response.status != 503,
                               retry_after=delay)
             if not isinstance(value, dict):

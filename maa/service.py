@@ -59,7 +59,7 @@ class Controller:
         for backend in UNITS:
             path = self.unit_path(backend)
             if path.exists() and not self.owned(backend):
-                raise Error(f'Native configuration is not owned by this installation: {path}')
+                raise Error('Native configuration is not owned by this installation: {v0}', v0=path)
 
     def legacy_path(self):
         path = Path('/etc/systemd/system/maa.service')
@@ -302,4 +302,4 @@ class Controller:
                 if self.unit_info(target).get('ActiveState') == 'failed':
                     raise Error(last)
             time.sleep(.2)
-        raise Error('Native backend readiness timed out: ' + last)
+        raise Error('Native backend readiness timed out: {v0}', v0=last)

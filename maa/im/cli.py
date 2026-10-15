@@ -4,6 +4,7 @@ from pathlib import Path
 import sys
 from ..store import Error
 from .manager import Connections
+from ..i18n import t
 
 
 def arguments(actions):
@@ -24,7 +25,7 @@ def arguments(actions):
     add.add_argument('--token-file', help='private credential file; otherwise prompt without echo')
     add.add_argument('--owner-id', default='', help='Telegram allowed numeric user ID')
     login = commands.add_parser('wechat', help='official QR login; add or renew existing connection')
-    login.add_argument('--name', default='微信')
+    login.add_argument('--name', default=t('wechat_label'))
     login.add_argument('--id', help='renew an existing WeChat connection')
     bind = commands.add_parser('bind', help='receive one Telegram private message and display candidate user ID')
     bind.add_argument('id')
@@ -50,7 +51,7 @@ def credential(path=None):
             return source.read(8193).strip()
     if not sys.stdin.isatty():
         raise Error('Use --token-file in noninteractive mode')
-    return getpass.getpass('Token / API key（不回显）：').strip()
+    return getpass.getpass(t('credential_prompt')).strip()
 
 
 def execute(args):
@@ -90,5 +91,5 @@ def execute(args):
         if not sys.stdin.isatty():
             raise Error('Run WeChat QR authorization in an interactive terminal')
         from .ui import display_qr
-        return manager.wechat_login(display_qr, lambda: getpass.getpass('微信配对码：'), args.name, args.id)
+        return manager.wechat_login(display_qr, lambda: getpass.getpass(t('wechat_pairing_prompt')), args.name, args.id)
     return {'ok': True}

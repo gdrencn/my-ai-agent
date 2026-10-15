@@ -1,4 +1,16 @@
-# my-ai-agent Implementation — 0.2.1 test
+# my-ai-agent Implementation — 0.2.2 test
+
+## 0.2.2 language selection and delivery boundary
+
+Implemented the user-confirmed language and version correction. New fixes after a test command has been delivered now increment the version; this delivery is 0.2.2 test. Existing v0.2.1 and stable/0.1.9 tags/releases/assets remain frozen.
+
+Simplified Chinese (`zh_cn`) and English (`en_us`) use shared catalogs and independent project preferences at `${XDG_CONFIG_HOME:-~/.config}/my-ai-agent/config.json`. First installation, including an upgrade with no saved language, selects through the existing controlling-terminal radio menu before product/configuration mutation. Pipe stdin is supported. A noninteractive installation without a saved selection requires `--language`; valid saved settings are reused. Explicit language selection can update that preference. Cancellation/interruption returns 130 and preserves the installation. Corrupt/invalid/symlink preferences are refused rather than overwritten; unknown preference fields are preserved. Language persistence participates in the existing owned-file installation rollback.
+
+The main menu shows the current language with the common value styling and immediately changes after selection. `maa language` queries or sets the same preference without instantiating model/connector management. Menus, input prompts, statuses, owned CLI help/errors, installation notices and the shared progress row use the selected language. Progress keeps one locale through nested stages and timer refresh even if another action changes the preference. Business exceptions retain their raw diagnostics plus formatting metadata; native output and machine JSON identifiers/values stay unchanged. User model names, credentials, fixed replies, model/Codex/YOLO configuration and receive state are retained. The independent IM runtime does not import preferences/catalogs or gain a Maa dependency.
+
+Final verification passed 134 source checks, 134 paired checks outside the checkout, 134 ordinary-user paired checks, 134 root paired checks and 12 delivery regressions with no skips. Thirteen language regressions cover persistence, missing language, update reuse, cancellation/interruption, damaged settings, shared CLI/presentation and four real PTYs. The ordinary-user native pair passed 37 model/Codex checks, including both backends preserving config hashes/MainPID/InvocationID across language changes, plus nine isolated IM checks. Root passed nine isolated IM checks and five installed-CLI/real-PTY scenarios against a 0.2.1 baseline: noninteractive refusal, cancel, interrupt, English upgrade and update reuse. Original disabled YOLO and configured closed connector data were preserved. Root did not run a model/Codex native suite.
+
+Both paired zipapps are reproducible; Python 3.11 grammar for 62 files, three shell syntax checks, package boundaries and checksums passed. Product SHA-256: `e1eea520681c37a4cb25720413c0a5e4b8d42daa70543ce4159c9a064d639eaf`; tester: `41cac495c4a9d3c924e31062e81b6c7a06e399fbb2e6f45e8e0b4d1446539d1a`. Evidence: `validation/V0_2_2_LOCAL.json`. Public installation/download verification is recorded separately after publication. Real IM account login/send/receive and large-model/MTP performance remain outside this verification.
 
 ## 0.2.1 repeatable connector native tests
 

@@ -11,6 +11,8 @@ from . import codex
 from .service import Controller, privileged
 from .store import Error, Store, atomic, write
 from .output import operation, stage, run, diagnostic
+from . import preferences
+from .i18n import t, text
 
 URLS = {'ollama': 'https://ollama.com/install.sh',
         'llamacpp': 'https://llama.app/install.sh',
@@ -50,15 +52,15 @@ def _component(name):
     require_container()
     names = list(URLS) if name == 'all' else [name]
     for item in names:
-        stage(f'下载安装程序：{item}')
+        stage('下载安装程序：{v0}', v0=item)
         with tempfile.NamedTemporaryFile(suffix='.sh') as source:
             # Use the official command's curl behavior (redirects and TLS). Some
             # official CDN frontends reject Python's default HTTP user agent.
             run(['curl', '-fsSL', URLS[item], '-o', source.name], check=True)
             env = dict(os.environ, CODEX_NON_INTERACTIVE='true')
             try:
-                stage(f'官方安装：{item}')
-                diagnostic(f'官方安装：{item} — {URLS[item]}\n')
+                stage('官方安装：{v0}', v0=item)
+                diagnostic(text('官方安装：{v0} — {v1}\n', v0=item, v1=URLS[item]))
                 run(['sh', source.name], native=True, env=env, cwd=Path.home(), check=True)
             finally:
                 if item == 'ollama' and Path('/etc/systemd/system/ollama.service').exists():
@@ -66,8 +68,16 @@ def _component(name):
                     privileged(['systemctl', 'disable', '--now', 'ollama.service'])
 
 
-def product(archive, components='all'):
+def product(archive, components='all', *, language=None):
     require_container()
+    selected_language = preferences.installation_language(language)
+    with preferences.using(selected_language):
+        return _product(archive, components, selected_language)
+
+
+def _product(archive, components, selected_language):
+    from . import __version__
+    print(t('installing', version=__version__), flush=True)
     from .manager import Manager
     store = Store()
     controller = Controller(store)
@@ -92,7 +102,7 @@ def product(archive, components='all'):
         first = not any(path.exists() for path in (executable, entry, codex.launcher_path(), marker,
                         store.path('selected.json'), store.path('models.json'), codex.home() / 'maa-yolo-recovery.json')) and legacy is None
         paths = (executable, entry, codex.launcher_path(), marker,
-                 codex.home() / 'config.toml', codex.home() / 'maa-yolo-recovery.json')
+                 codex.home() / 'config.toml', codex.home() / 'maa-yolo-recovery.json', preferences.path())
         backup = {path: (path.read_bytes(), path.stat().st_mode & 0o777) if path.exists() else None for path in paths}
         try:
             atomic(executable, blob, 0o755)
@@ -103,6 +113,7 @@ def product(archive, components='all'):
             if first:
                 codex.yolo(True)
             write(marker, {'version': 1})
+            preferences.set_language(selected_language)
         except BaseException as primary:
             try:
                 for path, saved in backup.items():
@@ -114,7 +125,7 @@ def product(archive, components='all'):
                 detail = f'Installation rollback failed: {secondary}'
                 if isinstance(primary, KeyboardInterrupt):
                     raise KeyboardInterrupt(detail) from primary
-                raise Error(f'{primary}\n{detail}') from primary
+                raise Error('{v0}\n{v1}', v0=primary, v1=detail) from primary
             raise
         # Rejected inputs and failed entrypoint writes never migrate services.
         was_running = (run(['systemctl', 'is-active', '--quiet', 'maa.service']).returncode == 0
@@ -131,4 +142,4 @@ def product(archive, components='all'):
     if im_controller:
         with operation('更新已安装的聊天连接器'), im_controller.store.lock():
             im_controller.install()
-    print(f'my-ai-agent 已安装：{executable}\n运行 {bindir / "maa"} 打开菜单。', flush=True)
+    print(t('installed', executable=executable, entry=bindir / 'maa'), flush=True)

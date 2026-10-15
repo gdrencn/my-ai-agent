@@ -31,7 +31,7 @@ class Controller:
             if path.is_symlink():
                 raise Error('Refusing symlink in connector installation')
             if path.exists() and (not saved or hashlib.sha256(path.read_bytes()).hexdigest() != saved.get(key)):
-                raise Error('Connector installation was modified or is not owned: ' + str(path))
+                raise Error('Connector installation was modified or is not owned: {v0}', v0=str(path))
         return saved
 
     def active(self):

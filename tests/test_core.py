@@ -86,8 +86,11 @@ class Core(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.root = Path(self.temp.name)
-        self.env = patch.dict(os.environ, {'MAA_HOME': str(self.root / 'state'), 'CODEX_HOME': str(self.root / 'codex')})
+        self.env = patch.dict(os.environ, {'MAA_HOME': str(self.root / 'state'), 'CODEX_HOME': str(self.root / 'codex'),
+                                          'XDG_CONFIG_HOME': str(self.root / 'preferences')})
         self.env.start()
+        from maa.preferences import set_language
+        set_language('zh_cn')
         self.entry = patch("maa.codex.launcher_path", return_value=self.root / "bin/codex-local")
         self.entry.start()
         self.store = Store()

@@ -4,17 +4,25 @@ from pathlib import Path
 import shutil
 import subprocess
 from .. import menu
-from ..i18n import t
+from ..i18n import t, error_text
 from ..output import say, run, diagnostic
 from ..store import Error
 from ..ui import choose, value_line
 from .manager import Connections
 from .state import PLATFORMS
 
-LABELS = {'telegram': 'Telegram', 'whatsapp': 'WhatsApp', 'wechat': '微信'}
-STATES = {'connected': ('已连接', 'green'), 'connecting': ('连接中', 'cyan'),
-          'stopped': ('已关闭', 'gray'), 'error': ('连接异常', 'red')}
+STATES = {'connected': ('im_connected', 'green'), 'connecting': ('im_connecting', 'cyan'),
+          'stopped': ('im_closed', 'gray'), 'error': ('im_connection_error', 'red')}
 READ_ERRORS = (Error, OSError, ValueError, subprocess.SubprocessError)
+
+
+def platform_label(platform):
+    return t('wechat_label') if platform == 'wechat' else {'telegram': 'Telegram', 'whatsapp': 'WhatsApp'}[platform]
+
+
+def connection_state(state):
+    label, tone = STATES[state]
+    return t(label), tone
 
 
 def live(ui, manager, title, render, default=None):
@@ -31,7 +39,7 @@ def live(ui, manager, title, render, default=None):
         except READ_ERRORS as exc:
             status = None
             return menu.MenuView(previous.title, previous.options,
-                                 (value_line(t('im_read_error'), str(exc), 'red'),
+                                 (value_line(t('im_read_error'), error_text(exc), 'red'),
                                   t('im_stale') if any(key is not None for key, _ in previous.options) else t('unknown')),
                                  tuple(key for key, _ in previous.options if key is not None))
 
@@ -58,9 +66,9 @@ def stamp(value):
 
 
 def details(row):
-    label, tone = STATES[row['state']]
+    label, tone = connection_state(row['state'])
     diagnostics = [value_line(t('im_error'), row['error'], 'red')] if row['error'] else []
-    return diagnostics + [value_line(t('im_platform'), LABELS[row['platform']]),
+    return diagnostics + [value_line(t('im_platform'), platform_label(row['platform'])),
             value_line(t('im_identity'), row['platform_id'] or t('unknown')),
             value_line(t('im_connection_state'), label, tone),
             value_line(t('im_received'), row['received']), value_line(t('im_sent'), row['sent']),
@@ -78,7 +86,7 @@ def export(ui, manager, key=None):
 
 
 def add(ui, manager, platform):
-    name = ui.input(t('im_name_input')) or LABELS[platform]
+    name = ui.input(t('im_name_input')) or platform_label(platform)
     if platform == 'wechat':
         manager.wechat_login(display_qr, lambda: ui.input(t('im_verify'), secret=True), name)
     else:
@@ -156,14 +164,14 @@ def platform_menu(ui, manager, platform):
 
     def view(status):
         rows = [row for row in status['connections'] if row['platform'] == platform]
-        options = [(row['id'], value_line(row['name'], *STATES[row['state']])) for row in rows]
+        options = [(row['id'], value_line(row['name'], *connection_state(row['state']))) for row in rows]
         if platform == 'telegram' or not rows:
             options.append(('add', t('im_add')))
-        return menu.MenuView(LABELS[platform], options + [(None, t('back'))])
+        return menu.MenuView(platform_label(platform), options + [(None, t('back'))])
 
     while True:
         try:
-            action, _ = live(ui, manager, LABELS[platform], view, focused)
+            action, _ = live(ui, manager, platform_label(platform), view, focused)
         except menu.Cancelled:
             return
         focused = action
@@ -183,7 +191,7 @@ def platforms(ui, manager):
 
     def view(status):
         counts = {p: sum(row['platform'] == p for row in status['connections']) for p in PLATFORMS}
-        options = [(p, value_line(LABELS[p], str(counts[p]) + t('im_connections'))) for p in PLATFORMS]
+        options = [(p, value_line(platform_label(p), str(counts[p]) + t('im_connections'))) for p in PLATFORMS]
         return menu.MenuView(t('im_platforms'), options + [(None, t('back'))])
 
     while True:

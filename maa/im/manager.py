@@ -280,7 +280,8 @@ class Connections:
                                 value['ilink_bot_id'], wechat_base(value.get('baseurl', client.row['api_base'])))
             if state == 'need_verifycode':
                 with native_output() as writer:
-                    writer.write('微信需要配对码。\n')
+                    from ..i18n import text
+                    writer.write(text('微信需要配对码。\n'))
                     verify = verification()
             elif state in ('expired', 'verify_code_blocked'):
                 raise Error('WeChat QR expired or blocked; generate a new QR')

@@ -18,7 +18,7 @@ FIELDS = {'id', 'platform', 'name', 'token', 'owner_id', 'platform_id', 'api_bas
 
 def text(value, label, limit=256, empty=False):
     if not isinstance(value, str) or (not value and not empty) or len(value) > limit or any(ord(c) < 32 or ord(c) == 127 for c in value):
-        raise Error('Invalid connector ' + label)
+        raise Error('Invalid connector {v0}', v0=label)
     return value
 
 
@@ -80,7 +80,7 @@ def validate_config(value):
         raise Error('Connection ID mismatch')
     for platform in ('whatsapp', 'wechat'):
         if sum(row['platform'] == platform for row in checked.values()) > 1:
-            raise Error(platform + ': only one connection is supported')
+            raise Error('{v0}: only one connection is supported', v0=platform)
     identities = [(row['platform'], row['platform_id'] or row['token']) for row in checked.values()]
     tokens = [(row['platform'], row['token']) for row in checked.values()]
     if len(identities) != len(set(identities)) or len(tokens) != len(set(tokens)):
