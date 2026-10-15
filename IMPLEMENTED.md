@@ -10,6 +10,8 @@ Verified on 2026-10-14: 121 source checks, 121 paired checks outside the checkou
 
 The complete ordinary-user native flow also passed 35 existing model/Codex checks against the unchanged product before the final cleanup signal protection; the current public paired flow is verified separately after publication. Reproducible builds, Python 3.11 grammar for 57 files, three shell syntax checks and package boundaries passed. The corrected tester SHA-256 is `22e48194455aea45a162db98d32bb049fb293e0ee3eaeb804216ba5d5996662c`. Evidence: `validation/V0_2_1_IM_ISOLATION.json`. Earlier receipts retain their original hashes and scope. Stable 0.1.9 remains the fixed rollback baseline.
 
+Published from `2e309da63a83b4a386dfb199ea97ca9983e5bacb` after main/tag CI 38659257261 and 38659383436 passed. The actual public `test/test.sh --components none` flow passed all 121 portable, 35 model/Codex and nine isolated IM checks with an existing configured, active and enabled connector. Existing IM configuration/cursor/runtime bytes, MainPID, InvocationID and autostart were preserved. All 20 initial assets downloaded byte-identically and all three manifests passed; after appending the separate public receipt, all final 21 assets were downloaded and verified again with all manifests. The stable tag, latest-release selection, release metadata and all 11 stable assets remain unchanged. Final temporary-resource checks passed and the owned validation container was stopped and deleted. Evidence: `validation/V0_2_1_IM_ISOLATION_PUBLIC.json`.
+
 ## 0.2.1 connector menu organization and automatic status
 
 Verified the authorized menu correction on 2026-10-14, retaining version 0.2.1 test and the accepted 0.1.9 stable baseline.
