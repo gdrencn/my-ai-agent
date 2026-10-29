@@ -1,0 +1,74 @@
+{
+  "version": "0.1.12",
+  "channel": "test",
+  "baseline": "stable/0.1.9",
+  "audit": {
+    "grammar_files": 59,
+    "reproducible": true,
+    "package_boundaries": true,
+    "runtime_coupling_absent": true,
+    "sha256": {
+      "maa.pyz": "2f7a526d322cd214244e24337abc5c4eeea67ac3add2d91118c6ed85a9cc8c4d",
+      "maa-test.pyz": "369582effb643ec9a171673e9e58b89c63dd5b5128d1cf3b2abccf064172e3c2",
+      "VERSION.json": "aaf5d36291cb9e7dcc188da4c5a1234b1a6b5c44ce24d27f646b06c6e726e189",
+      "bootstrap.py": "485573d1c435f22e2a285984ca23cac5a09000f6bbb033ef034ffb5da77add5f",
+      "install.sh": "f596dc1af63f3e143ed6cc4a6643e7d6c2ce10010c3b4b5fee1baa30bb2e0343",
+      "SHA256SUMS": "4110aa23a2e6d9ee68fd7026b8de44f8a9851801b257ebf4c7603bacffd6a3fa"
+    }
+  },
+  "acceptance": {
+    "source_portable": 119,
+    "outside_checkout_paired": 119,
+    "delivery": 13,
+    "ordinary_user": {
+      "paired": 119,
+      "native": 42,
+      "baseline_retained": 35,
+      "missing": [],
+      "actual_written_profile_and_catalog": true,
+      "private_off_and_real_home_reinstall": true,
+      "yolo_off_retained": true,
+      "gpu_assertions": "both backends passed"
+    },
+    "root": {
+      "paired": 119,
+      "native": 42,
+      "baseline_retained": 35,
+      "missing": [],
+      "actual_written_profile_and_catalog": true,
+      "private_off_and_real_home_reinstall": true,
+      "gpu_assertions": "both backends passed"
+    },
+    "cpu": {
+      "backend": "llamacpp",
+      "actual_host_model_KV_compute_buffers": true,
+      "gpu": "unavailable; not verified",
+      "setup": "After test hardware change and reboot, waited for DNS then reran the official native installer with a CPU probe."
+    },
+    "autostart": {
+      "manager_archive_absent": true,
+      "native_model_autostarted": true,
+      "launcher_version": "codex-cli 0.165.0",
+      "archive_restored": true
+    },
+    "upstream": {
+      "codex": "0.165.0",
+      "llama": "b11941",
+      "ollama": "0.40.12"
+    },
+    "yolo_method": "Real enable/disable/restore with native config/read, private CODEX_HOME; no confirmation or execution probe",
+    "tool_protocol": "Real Codex fixed shell and result replay retained"
+  },
+  "comparison": {
+    "portable": "90 -> 119",
+    "delivery": "10 -> 13",
+    "native": "35 -> 42",
+    "missing": [],
+    "all_0_1_10_and_0_1_11_portable_ids_retained": true
+  },
+  "limits": [
+    "Public default entry acceptance pending at this receipt.",
+    "External-machine user acceptance pending.",
+    "Non-apt native distributions, large-model and MTP performance not established."
+  ]
+}

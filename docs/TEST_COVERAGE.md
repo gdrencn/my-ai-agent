@@ -1,21 +1,21 @@
-# 0.1.11 coverage compared with 0.1.9
+# 0.1.12 coverage compared with 0.1.9
 
 Every baseline functional check is present in the default paired test entry. Version 0.1.10 additions remain. Test identities and permission writes are isolated; no environment-origin requirement is restored.
 
-| Suite | 0.1.9 | 0.1.11 | Missing |
+| Suite | 0.1.9 | 0.1.12 | Missing |
 | --- | ---: | ---: | ---: |
-| Portable / real PTY | 90 | 118 | 0 |
+| Portable / real PTY | 90 | 119 | 0 |
 | Delivery | 10 | 13 | 0 |
 | Installed functional acceptance | 35 | 42 | 0 |
 
-The machine-readable correspondence is [V0_1_11_COVERAGE.json](../validation/V0_1_11_COVERAGE.json). The runtime report requires each native ID to pass, not merely exist in source. Local and public execution receipts establish execution; the inventory alone does not.
+The machine-readable correspondence is [V0_1_12_COVERAGE.json](../validation/V0_1_12_COVERAGE.json). The runtime report requires each native ID to pass, not merely exist in source. Local and public execution receipts establish execution; the inventory alone does not.
 
 ## Original native checks
 
 | # | Original ID retained | Verification |
 | --- | --- | --- |
 | 1 | `installed-version` | Installed archive SHA-256, installed command and paired product version must match. |
-| 2 | `explicit-yolo-test-baseline` | Actual enable/disable/reinstall; Agent `config/read`, private `CODEX_HOME`, restore original fields. |
+| 2 | `explicit-yolo-test-baseline` | Actual enable/disable/reinstall; Agent `config/read`, private off-state checks plus real-home reinstall, restore original fields. |
 | 3 | `hf-exact-download` | Register/download the exact HF repository and GGUF file; validate the managed artifact. |
 | 4 | `ollama-native-pull` | Use the actual Ollama pull and register the resulting native model. |
 | 5 | `hf-invalid-file-rejected` | Reject a missing exact HF filename instead of accepting a model. |
@@ -46,9 +46,9 @@ The machine-readable correspondence is [V0_1_11_COVERAGE.json](../validation/V0_
 | 30 | `interrupted-candidate-restores-accepted-native-target` | Inject uncommitted target/pending state; actual start restores the accepted target, clears pending state and keeps the candidate inactive. |
 | 31 | `native-load-failure-rollback` | A real weightless GGUF reaches native loading, fails and rolls back to the accepted running Ollama model. |
 | 32 | `invalid-fixture-cleaned` | The failed-load model is removed from the registry/configuration and its temporary directory is cleaned. |
-| 33 | `yolo-off` | Actual enable/disable/reinstall; Agent `config/read`, private `CODEX_HOME`, restore original fields. |
-| 34 | `product-reinstall-retains-yolo-off-and-native-instance` | Actual enable/disable/reinstall; Agent `config/read`, private `CODEX_HOME`, restore original fields. |
-| 35 | `yolo-on` | Actual enable/disable/reinstall; Agent `config/read`, private `CODEX_HOME`, restore original fields. |
+| 33 | `yolo-off` | Actual enable/disable/reinstall; Agent `config/read`, private off-state checks plus real-home reinstall, restore original fields. |
+| 34 | `product-reinstall-retains-yolo-off-and-native-instance` | Actual enable/disable/reinstall; Agent `config/read`, private off-state checks plus real-home reinstall, restore original fields. |
+| 35 | `yolo-on` | Actual enable/disable/reinstall; Agent `config/read`, private off-state checks plus real-home reinstall, restore original fields. |
 
 ## Added native checks
 
@@ -60,8 +60,8 @@ YOLO is not inferred from shell success or a confirmation prompt. On/off and rec
 
 ## Portable and delivery additions
 
-The 0.1.10 language, environment, independence and options-menu checks remain. Five new regressions protect discovery of every baseline/previous portable ID, Agent-state disagreement, enable/restore semantics through state reads, interrupted cleanup and rejection of incomplete native coverage. The delivery version-pin fixture now reads the actual product version rather than hardcoding a previous version.
+The 0.1.10 language, environment, independence and options-menu checks remain. Six new regressions protect discovery of every baseline/previous portable ID, Agent-state disagreement, enable/restore semantics through state reads, interrupted cleanup and rejection of incomplete native coverage, and exact reuse of the written profile/catalog without regeneration. The delivery version-pin fixture now reads the actual product version rather than hardcoding a previous version.
 
 The former deployment-identity gate is not restored. Actual Linux/systemd/dependency checks replace it, as explicitly requested; model and Codex functional acceptance does not depend on where Linux was created. No GPU/MTP hardware claim is derived from a portable fixture.
 
-Both frozen-payload root acceptance and the actual public ordinary-user entry passed all 42 native checks, including all 35 baseline IDs. The public entry additionally preserved an off YOLO choice. See the linked execution receipts.
+Execution evidence for this version is added after validation. Version 0.1.11 evidence remains historical; the current clients additionally exercise the exact written profile/catalog.

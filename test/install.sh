@@ -69,4 +69,4 @@ maa_find_python || { echo 'Python 3.11+ is required; install a supported Python 
 maa_tmp=$(mktemp -d)
 trap 'rm -rf "$maa_tmp"' EXIT HUP INT TERM
 curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/bootstrap.py -o "$maa_tmp/bootstrap.py"
-"$maa_python" "$maa_tmp/bootstrap.py" --channel test --version 0.1.11 "$@"
+"$maa_python" "$maa_tmp/bootstrap.py" --channel test --version 0.1.12 "$@"

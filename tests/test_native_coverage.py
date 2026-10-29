@@ -17,6 +17,26 @@ def module(name):
 
 
 class NativeCoverage(unittest.TestCase):
+    def test_client_uses_written_profile_and_catalog_without_regeneration(self):
+        native = module('native')
+        with tempfile.TemporaryDirectory() as folder:
+            home = Path(folder)
+            with patch.dict(os.environ, {'CODEX_HOME': str(home / 'actual-codex')}), \
+                 patch('pathlib.Path.home', return_value=home):
+                codex.profile({'model': 'written-model', 'context': 32768,
+                               'base_url': 'http://127.0.0.1:19234/v1'}, {'reasoning': 'none'})
+                original = codex.profile_path().read_bytes()
+                catalog = codex.parse(original.decode())['model_catalog_json']
+                (codex.home() / 'config.toml').write_text('# PRIVATE_USER_INSTRUCTION\n')
+                with patch.object(native, 'Store', side_effect=AssertionError('Do not regenerate from state')):
+                    with native.client() as private:
+                        self.assertEqual(codex.profile_path().read_bytes(), original)
+                        self.assertEqual(codex.parse(codex.profile_path().read_text())['model_catalog_json'], catalog)
+                        self.assertTrue(Path(catalog).is_file())
+                        self.assertNotIn('PRIVATE_USER_INSTRUCTION', (codex.home() / 'config.toml').read_text())
+                self.assertFalse(private.exists())
+                self.assertEqual(codex.profile_path().read_bytes(), original)
+
     def test_every_original_and_previous_portable_test_remains_discoverable(self):
         inventory = module('coverage')
         expected = set(inventory.PORTABLE_BASELINE + inventory.PORTABLE_0_1_10)

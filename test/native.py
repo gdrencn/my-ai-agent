@@ -73,13 +73,16 @@ def permission_profile():
 @contextmanager
 def client():
     from maa import codex
+    # Exercise the profile actually committed by the configuration transaction.
+    # Regenerating here would hide a wrong URL/provider/catalog in that file.
+    profile = codex.profile_path().read_bytes()
     with tempfile.TemporaryDirectory(prefix='.maa-native-client-', dir=Path.home()) as folder:
         folder = Path(folder)
         with codex_home(folder / 'codex'):
             codex.home().mkdir(mode=0o700)
             # This is a private integration client, not a permission-state probe.
             (codex.home() / 'config.toml').write_text('approval_policy="never"\nsandbox_mode="danger-full-access"\n')
-            codex.profile(read(Store().path('runtime.json')), Store().selected()['settings'])
+            (codex.home() / 'maa-local.config.toml').write_bytes(profile)
             yield folder
 
 
@@ -442,12 +445,19 @@ def main():
                  PERMISSIONS / 'maa-local.config.toml', actual_profile]
         saved = {path: path.read_bytes() if path.exists() else None for path in paths}
         result = permission_command('_install', '--components', 'none', structured=False)
+        # Also exercise reinstallation in the real configured home. The private
+        # off-state check must not replace this original profile-preservation path.
+        real_paths = [codex.home() / name for name in ('config.toml', 'maa-yolo-recovery.json')]
+        real_saved = {path: path.read_bytes() if path.exists() else None for path in real_paths}
+        result += command('_install', '--components', 'none', structured=False)
+        assert real_saved == {path: path.read_bytes() if path.exists() else None for path in real_paths}
         after = controller.unit_info()
         assert saved == {path: path.read_bytes() if path.exists() else None for path in paths}
         assert not permission_command('status')['yolo']['managed']
         permission_state()
         assert before['MainPID'] == after['MainPID'] and before['InvocationID'] == after['InvocationID']
         return {'global_config_and_recovery_unchanged': True, 'profile_and_native_instance_unchanged': True,
+                'real_home_and_private_off_reinstall_both_executed': True,
                 'diagnostic': result}
     check('product-reinstall-retains-yolo-off-and-native-instance', upgrade_yolo)
     check('yolo-on', lambda: permission_change(True))
