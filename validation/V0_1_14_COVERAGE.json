@@ -1,0 +1,667 @@
+{
+  "baseline": "stable/0.1.9",
+  "previous": "v0.1.10",
+  "status": "passed",
+  "portable": {
+    "baseline_count": 90,
+    "previous_count": 113,
+    "current_count": 137,
+    "missing": [],
+    "mapping": [
+      {
+        "baseline": "tests/test_core.py:Core.test_yolo_restore_existing_and_absent_keys",
+        "current": "tests/test_core.py:Core.test_yolo_restore_existing_and_absent_keys"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_yolo_recovery_cross_process",
+        "current": "tests/test_core.py:Core.test_yolo_recovery_cross_process"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_invalid_toml_is_not_overwritten",
+        "current": "tests/test_core.py:Core.test_invalid_toml_is_not_overwritten"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_profile_has_no_global_permissions_or_websearch",
+        "current": "tests/test_core.py:Core.test_profile_has_no_global_permissions_or_websearch"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_kv_follow_override_and_restore",
+        "current": "tests/test_core.py:Core.test_kv_follow_override_and_restore"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_bad_settings_and_unavailable_mtp",
+        "current": "tests/test_core.py:Core.test_bad_settings_and_unavailable_mtp"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_hf_exact_file_and_traversal_validation",
+        "current": "tests/test_core.py:Core.test_hf_exact_file_and_traversal_validation"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_gguf_mtp_metadata_and_corruption",
+        "current": "tests/test_core.py:Core.test_gguf_mtp_metadata_and_corruption"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_switch_syncs_actual_context_and_persists_per_model",
+        "current": "tests/test_core.py:Core.test_switch_syncs_actual_context_and_persists_per_model"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_failed_switch_restores_service_selection_and_profile",
+        "current": "tests/test_core.py:Core.test_failed_switch_restores_service_selection_and_profile"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_failed_first_switch_restores_empty_stopped_state",
+        "current": "tests/test_core.py:Core.test_failed_first_switch_restores_empty_stopped_state"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_pause_preserves_boot_target_and_start_restores",
+        "current": "tests/test_core.py:Core.test_pause_preserves_boot_target_and_start_restores"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_changed_registered_file_refused_before_service_stop",
+        "current": "tests/test_core.py:Core.test_changed_registered_file_refused_before_service_stop"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_cli_integer_and_boolean_types",
+        "current": "tests/test_core.py:Core.test_cli_integer_and_boolean_types"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_catalog_tracks_exact_alias_context_and_preserves_base_config",
+        "current": "tests/test_core.py:Core.test_catalog_tracks_exact_alias_context_and_preserves_base_config"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_redirected_progress_keeps_json_clean_without_duplicate_ticks",
+        "current": "tests/test_core.py:Core.test_redirected_progress_keeps_json_clean_without_duplicate_ticks"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_shared_commands_preserve_captured_results_and_clean_json",
+        "current": "tests/test_core.py:Core.test_shared_commands_preserve_captured_results_and_clean_json"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_shared_commands_preserve_explicit_streams_and_timeout_diagnostics",
+        "current": "tests/test_core.py:Core.test_shared_commands_preserve_explicit_streams_and_timeout_diagnostics"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_native_bad_fixture_is_removed_after_interrupted_check",
+        "current": "tests/test_core.py:Core.test_native_bad_fixture_is_removed_after_interrupted_check"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_legacy_cleanup_recognizes_exact_fixture_and_keeps_real_gguf",
+        "current": "tests/test_core.py:Core.test_legacy_cleanup_recognizes_exact_fixture_and_keeps_real_gguf"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_first_menu_selection_cancel_and_preload_configuration",
+        "current": "tests/test_core.py:Core.test_first_menu_selection_cancel_and_preload_configuration"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_reasoning_only_and_unchanged_preserve_running_and_paused",
+        "current": "tests/test_core.py:Core.test_reasoning_only_and_unchanged_preserve_running_and_paused"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_reasoning_failure_restores_profile_and_saved_state_without_service_calls",
+        "current": "tests/test_core.py:Core.test_reasoning_failure_restores_profile_and_saved_state_without_service_calls"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_configure_rejects_changed_target_during_menu_editing",
+        "current": "tests/test_core.py:Core.test_configure_rejects_changed_target_during_menu_editing"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_start_running_reuses_instance_and_paused_reuses_native_configuration",
+        "current": "tests/test_core.py:Core.test_start_running_reuses_instance_and_paused_reuses_native_configuration"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_ctrl_c_rolls_back_and_keeps_exit_code_130",
+        "current": "tests/test_core.py:Core.test_ctrl_c_rolls_back_and_keeps_exit_code_130"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_running_ollama_inventory_and_codex_install_do_not_stop_backend",
+        "current": "tests/test_core.py:Core.test_running_ollama_inventory_and_codex_install_do_not_stop_backend"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_running_ollama_download_allows_pause_without_restoring_stale_state",
+        "current": "tests/test_core.py:Core.test_running_ollama_download_allows_pause_without_restoring_stale_state"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_product_upgrade_keeps_backend_for_none_codex_and_inactive_component",
+        "current": "tests/test_core.py:Core.test_product_upgrade_keeps_backend_for_none_codex_and_inactive_component"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_saved_start_failure_returns_to_paused_state",
+        "current": "tests/test_core.py:Core.test_saved_start_failure_returns_to_paused_state"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_start_revalidates_and_repairs_crashed_candidate",
+        "current": "tests/test_core.py:Core.test_start_revalidates_and_repairs_crashed_candidate"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_pending_same_target_forces_revalidation_and_failure_keeps_pause",
+        "current": "tests/test_core.py:Core.test_pending_same_target_forces_revalidation_and_failure_keeps_pause"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_maintenance_interrupt_during_stop_restores_and_exits_130",
+        "current": "tests/test_core.py:Core.test_maintenance_interrupt_during_stop_restores_and_exits_130"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_maintenance_interrupt_and_failed_restore_keep_130",
+        "current": "tests/test_core.py:Core.test_maintenance_interrupt_and_failed_restore_keep_130"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_maintenance_restore_uses_accepted_target_and_retains_new_interrupt",
+        "current": "tests/test_core.py:Core.test_maintenance_restore_uses_accepted_target_and_retains_new_interrupt"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_maintenance_revalidates_interrupted_same_backend_and_restores_autostart",
+        "current": "tests/test_core.py:Core.test_maintenance_revalidates_interrupted_same_backend_and_restores_autostart"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_install_preflight_preserves_archive_and_service_for_foreign_commands_and_bad_toml",
+        "current": "tests/test_core.py:Core.test_install_preflight_preserves_archive_and_service_for_foreign_commands_and_bad_toml"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_entrypoint_failure_rolls_back_new_install_and_upgrade",
+        "current": "tests/test_core.py:Core.test_entrypoint_failure_rolls_back_new_install_and_upgrade"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_install_yolo_default_only_once_and_old_state_is_upgrade",
+        "current": "tests/test_core.py:Core.test_install_yolo_default_only_once_and_old_state_is_upgrade"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_first_install_failure_after_yolo_restores_original_keys_and_removes_entries",
+        "current": "tests/test_core.py:Core.test_first_install_failure_after_yolo_restores_original_keys_and_removes_entries"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_codex_official_update_preserves_disabled_yolo",
+        "current": "tests/test_core.py:Core.test_codex_official_update_preserves_disabled_yolo"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_ollama_inventory_reuses_details_and_batches_registration",
+        "current": "tests/test_core.py:Core.test_ollama_inventory_reuses_details_and_batches_registration"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_ollama_inventory_tracks_configured_digest_and_refreshes_external_replacement",
+        "current": "tests/test_core.py:Core.test_ollama_inventory_tracks_configured_digest_and_refreshes_external_replacement"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_ollama_installed_target_does_not_fetch_unrelated_details",
+        "current": "tests/test_core.py:Core.test_ollama_installed_target_does_not_fetch_unrelated_details"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_current_ollama_tag_download_invalidates_native_reuse_without_reloading",
+        "current": "tests/test_core.py:Core.test_current_ollama_tag_download_invalidates_native_reuse_without_reloading"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_all_gguf_shards_checked_before_service_stop",
+        "current": "tests/test_core.py:Core.test_all_gguf_shards_checked_before_service_stop"
+      },
+      {
+        "baseline": "tests/test_core.py:Core.test_hf_cache_repairs_only_damaged_shard_and_releases_control_lock",
+        "current": "tests/test_core.py:Core.test_hf_cache_repairs_only_damaged_shard_and_releases_control_lock"
+      },
+      {
+        "baseline": "tests/test_service.py:Service.test_launcher_executes_codex_after_manager_is_removed",
+        "current": "tests/test_service.py:Service.test_launcher_executes_codex_after_manager_is_removed"
+      },
+      {
+        "baseline": "tests/test_service.py:Service.test_launcher_finds_official_codex_without_shell_restart",
+        "current": "tests/test_service.py:Service.test_launcher_finds_official_codex_without_shell_restart"
+      },
+      {
+        "baseline": "tests/test_service.py:Service.test_native_units_execute_only_native_programs",
+        "current": "tests/test_service.py:Service.test_native_units_execute_only_native_programs"
+      },
+      {
+        "baseline": "tests/test_service.py:Service.test_foreign_native_unit_refused_before_mutation",
+        "current": "tests/test_service.py:Service.test_foreign_native_unit_refused_before_mutation"
+      },
+      {
+        "baseline": "tests/test_service.py:Service.test_ollama_preserves_original_presets_and_public_model_name",
+        "current": "tests/test_service.py:Service.test_ollama_preserves_original_presets_and_public_model_name"
+      },
+      {
+        "baseline": "tests/test_service.py:Service.test_private_original_backup_collision_is_refused",
+        "current": "tests/test_service.py:Service.test_private_original_backup_collision_is_refused"
+      },
+      {
+        "baseline": "tests/test_service.py:Service.test_candidate_does_not_enable_autostart_before_commit",
+        "current": "tests/test_service.py:Service.test_candidate_does_not_enable_autostart_before_commit"
+      },
+      {
+        "baseline": "tests/test_service.py:Service.test_crashed_candidate_is_reported_before_retry_delay",
+        "current": "tests/test_service.py:Service.test_crashed_candidate_is_reported_before_retry_delay"
+      },
+      {
+        "baseline": "tests/test_service.py:Service.test_start_uses_explicit_target_even_with_uncommitted_candidate",
+        "current": "tests/test_service.py:Service.test_start_uses_explicit_target_even_with_uncommitted_candidate"
+      },
+      {
+        "baseline": "tests/test_service.py:Service.test_ollama_readiness_waits_for_live_residency_instead_of_saved_context",
+        "current": "tests/test_service.py:Service.test_ollama_readiness_waits_for_live_residency_instead_of_saved_context"
+      },
+      {
+        "baseline": "tests/test_service.py:Service.test_resident_model_does_not_accept_activating_service",
+        "current": "tests/test_service.py:Service.test_resident_model_does_not_accept_activating_service"
+      },
+      {
+        "baseline": "tests/test_service.py:Service.test_unmanaged_llama_endpoint_refused_before_unit_write",
+        "current": "tests/test_service.py:Service.test_unmanaged_llama_endpoint_refused_before_unit_write"
+      },
+      {
+        "baseline": "tests/test_service.py:Service.test_restore_restores_exact_native_tag_and_runtime_snapshot",
+        "current": "tests/test_service.py:Service.test_restore_restores_exact_native_tag_and_runtime_snapshot"
+      },
+      {
+        "baseline": "tests/test_status.py:Status.test_actual_buffers_replace_probes_retries_and_deduplicate",
+        "current": "tests/test_status.py:Status.test_actual_buffers_replace_probes_retries_and_deduplicate"
+      },
+      {
+        "baseline": "tests/test_status.py:Status.test_mtp_rs_and_host_memory_have_distinct_allocations",
+        "current": "tests/test_status.py:Status.test_mtp_rs_and_host_memory_have_distinct_allocations"
+      },
+      {
+        "baseline": "tests/test_status.py:Status.test_current_launch_replaced_logs_and_bounded_window",
+        "current": "tests/test_status.py:Status.test_current_launch_replaced_logs_and_bounded_window"
+      },
+      {
+        "baseline": "tests/test_status.py:Status.test_ollama_and_llama_queries_are_backend_specific_and_read_only",
+        "current": "tests/test_status.py:Status.test_ollama_and_llama_queries_are_backend_specific_and_read_only"
+      },
+      {
+        "baseline": "tests/test_status.py:Status.test_status_hides_old_allocations_on_pause_idle_switch_and_failure",
+        "current": "tests/test_status.py:Status.test_status_hides_old_allocations_on_pause_idle_switch_and_failure"
+      },
+      {
+        "baseline": "tests/test_status.py:Status.test_lightweight_summary_skips_logs_and_paused_context_is_saved",
+        "current": "tests/test_status.py:Status.test_lightweight_summary_skips_logs_and_paused_context_is_saved"
+      },
+      {
+        "baseline": "tests/test_status.py:Status.test_driver_free_is_not_derived_and_unavailable_is_not_zero",
+        "current": "tests/test_status.py:Status.test_driver_free_is_not_derived_and_unavailable_is_not_zero"
+      },
+      {
+        "baseline": "tests/test_status.py:Status.test_display_preserves_units_order_unknowns_and_color_contract",
+        "current": "tests/test_status.py:Status.test_display_preserves_units_order_unknowns_and_color_contract"
+      },
+      {
+        "baseline": "tests/test_terminal.py:Terminal.test_arrow_wrap_and_enter_in_real_pty",
+        "current": "tests/test_terminal.py:Terminal.test_arrow_wrap_and_enter_in_real_pty"
+      },
+      {
+        "baseline": "tests/test_terminal.py:Terminal.test_utf8_input_cursor_editing_in_real_pty",
+        "current": "tests/test_terminal.py:Terminal.test_utf8_input_cursor_editing_in_real_pty"
+      },
+      {
+        "baseline": "tests/test_terminal.py:Terminal.test_cancel_restores_terminal",
+        "current": "tests/test_terminal.py:Terminal.test_cancel_restores_terminal"
+      },
+      {
+        "baseline": "tests/test_terminal.py:Terminal.test_wait_refreshes_one_line_and_keeps_native_output",
+        "current": "tests/test_terminal.py:Terminal.test_wait_refreshes_one_line_and_keeps_native_output"
+      },
+      {
+        "baseline": "tests/test_terminal.py:Terminal.test_failed_wait_keeps_elapsed_and_restores_prompt",
+        "current": "tests/test_terminal.py:Terminal.test_failed_wait_keeps_elapsed_and_restores_prompt"
+      },
+      {
+        "baseline": "tests/test_terminal.py:Terminal.test_grouped_menu_returns_to_main_and_preserves_focus",
+        "current": "tests/test_terminal.py:Terminal.test_grouped_menu_returns_to_main_and_preserves_focus"
+      },
+      {
+        "baseline": "tests/test_terminal.py:Terminal.test_configuration_colors_pending_values_and_cancel",
+        "current": "tests/test_terminal.py:Terminal.test_configuration_colors_pending_values_and_cancel"
+      },
+      {
+        "baseline": "tests/test_terminal.py:Terminal.test_yolo_nested_switch_restores_original_in_private_home",
+        "current": "tests/test_terminal.py:Terminal.test_yolo_nested_switch_restores_original_in_private_home"
+      },
+      {
+        "baseline": "tests/test_terminal.py:Terminal.test_no_color_retains_configuration_text",
+        "current": "tests/test_terminal.py:Terminal.test_no_color_retains_configuration_text"
+      },
+      {
+        "baseline": "tests/test_terminal.py:Terminal.test_readonly_activation_keeps_same_prompt_and_does_not_apply",
+        "current": "tests/test_terminal.py:Terminal.test_readonly_activation_keeps_same_prompt_and_does_not_apply"
+      },
+      {
+        "baseline": "tests/test_terminal.py:Terminal.test_long_model_details_and_current_default_in_narrow_terminal",
+        "current": "tests/test_terminal.py:Terminal.test_long_model_details_and_current_default_in_narrow_terminal"
+      },
+      {
+        "baseline": "tests/test_terminal.py:Terminal.test_same_basename_model_choices_show_paths_revision_and_current_focus",
+        "current": "tests/test_terminal.py:Terminal.test_same_basename_model_choices_show_paths_revision_and_current_focus"
+      },
+      {
+        "baseline": "tests/test_terminal.py:Terminal.test_local_same_basename_choices_include_full_paths",
+        "current": "tests/test_terminal.py:Terminal.test_local_same_basename_choices_include_full_paths"
+      },
+      {
+        "baseline": "tests/test_terminal.py:Terminal.test_native_command_diagnostic_starts_on_its_own_line",
+        "current": "tests/test_terminal.py:Terminal.test_native_command_diagnostic_starts_on_its_own_line"
+      },
+      {
+        "baseline": "tests/test_terminal.py:Terminal.test_silent_commands_keep_timer_and_leave_only_final_row",
+        "current": "tests/test_terminal.py:Terminal.test_silent_commands_keep_timer_and_leave_only_final_row"
+      },
+      {
+        "baseline": "tests/test_terminal.py:Terminal.test_command_failure_preserves_diagnostic_and_final_row",
+        "current": "tests/test_terminal.py:Terminal.test_command_failure_preserves_diagnostic_and_final_row"
+      },
+      {
+        "baseline": "tests/test_terminal.py:Terminal.test_native_output_preserves_terminal_and_line_endings",
+        "current": "tests/test_terminal.py:Terminal.test_native_output_preserves_terminal_and_line_endings"
+      },
+      {
+        "baseline": "tests/test_terminal.py:Terminal.test_silent_native_command_continues_timer",
+        "current": "tests/test_terminal.py:Terminal.test_silent_native_command_continues_timer"
+      },
+      {
+        "baseline": "tests/test_terminal.py:Terminal.test_native_live_utf8_and_progress_are_forwarded",
+        "current": "tests/test_terminal.py:Terminal.test_native_live_utf8_and_progress_are_forwarded"
+      },
+      {
+        "baseline": "tests/test_terminal.py:Terminal.test_native_interrupt_restores_output_and_cursor",
+        "current": "tests/test_terminal.py:Terminal.test_native_interrupt_restores_output_and_cursor"
+      },
+      {
+        "baseline": "tests/test_terminal.py:Terminal.test_command_progress_returns_to_menu_without_old_rows",
+        "current": "tests/test_terminal.py:Terminal.test_command_progress_returns_to_menu_without_old_rows"
+      },
+      {
+        "baseline": "tests/test_terminal.py:Terminal.test_unavailable_mtp_activation_is_inert",
+        "current": "tests/test_terminal.py:Terminal.test_unavailable_mtp_activation_is_inert"
+      }
+    ],
+    "added": [
+      "tests/test_environment.py:Environment.test_capabilities_not_container_identity",
+      "tests/test_environment.py:Environment.test_complete_environment_does_not_mutate_packages",
+      "tests/test_environment.py:Environment.test_dependencies_install_only_missing_and_verify_again",
+      "tests/test_environment.py:Environment.test_missing_or_unreachable_systemd_is_explicit",
+      "tests/test_environment.py:Environment.test_missing_privilege_is_not_silently_ignored",
+      "tests/test_environment.py:Environment.test_package_failure_and_remaining_dependencies_are_not_success",
+      "tests/test_environment.py:Environment.test_supported_package_managers_do_not_upgrade_system",
+      "tests/test_independence.py:Independence.test_agent_query_only_requests_configuration_and_closes_process",
+      "tests/test_independence.py:Independence.test_agent_timeout_and_protocol_failure_are_reported",
+      "tests/test_independence.py:Independence.test_installed_checks_refuse_a_different_product_before_agent_or_services",
+      "tests/test_independence.py:Independence.test_native_hosts_are_not_restricted",
+      "tests/test_independence.py:Independence.test_public_help_has_no_removed_feature",
+      "tests/test_language.py:Language.test_cancel_interrupt_and_missing_terminal_stop_before_mutation",
+      "tests/test_language.py:Language.test_catalogs_cover_the_same_keys_and_format_values",
+      "tests/test_language.py:Language.test_corrupt_and_invalid_preferences_are_not_overwritten",
+      "tests/test_language.py:Language.test_existing_install_without_language_prompts_and_updates_reuse",
+      "tests/test_language.py:Language.test_help_and_owned_errors_use_saved_language_keep_identifiers",
+      "tests/test_language.py:Language.test_language_cli_never_instantiates_model_manager",
+      "tests/test_language.py:Language.test_persistence_preserves_other_fields_and_private_mode",
+      "tests/test_language.py:Language.test_progress_uses_one_locale_and_preserves_native_output",
+      "tests/test_language.py:Language.test_readonly_default_does_not_create_configuration",
+      "tests/test_native_coverage.py:NativeCoverage.test_agent_state_disagreement_fails_permission_acceptance",
+      "tests/test_native_coverage.py:NativeCoverage.test_client_uses_written_profile_and_catalog_without_regeneration",
+      "tests/test_native_coverage.py:NativeCoverage.test_every_original_and_previous_portable_test_remains_discoverable",
+      "tests/test_native_coverage.py:NativeCoverage.test_interrupted_native_phase_cleans_private_home_and_preserves_user_permissions",
+      "tests/test_native_coverage.py:NativeCoverage.test_missing_original_native_check_cannot_pass",
+      "tests/test_native_coverage.py:NativeCoverage.test_yolo_enable_disable_and_restore_read_agent_configuration",
+      "tests/test_privilege.py:Privilege.test_authentication_failure_preserves_exit_and_restores_terminal",
+      "tests/test_privilege.py:Privilege.test_cached_and_command_specific_nopasswd_do_not_prompt",
+      "tests/test_privilege.py:Privilege.test_interrupt_during_authentication_restores_terminal",
+      "tests/test_privilege.py:Privilege.test_live_parent_capture_keeps_nested_authentication_visible",
+      "tests/test_privilege.py:Privilege.test_live_stderr_retains_text_bytes_and_failure_diagnostics",
+      "tests/test_privilege.py:Privilege.test_live_stderr_timeout_retains_partial_diagnostics",
+      "tests/test_privilege.py:Privilege.test_noninteractive_missing_authentication_fails_without_waiting",
+      "tests/test_privilege.py:Privilege.test_password_prompt_is_live_with_piped_stdin_and_json_stdout",
+      "tests/test_privilege.py:Privilege.test_root_bypasses_sudo",
+      "tests/test_processes.py:Processes.test_checked_failure_preserves_exception_output_and_stops_children",
+      "tests/test_processes.py:Processes.test_configuration_query_cleans_plugin_like_child_before_returning",
+      "tests/test_processes.py:Processes.test_interruption_stops_its_writer_and_preserves_unrelated_session",
+      "tests/test_processes.py:Processes.test_real_pty_picker_stops_writer_after_normal_terminal_restoration",
+      "tests/test_processes.py:Processes.test_real_pty_picker_stops_writer_when_main_exits_before_picker",
+      "tests/test_processes.py:Processes.test_sigint_during_communicate_preserves_130_and_cleans_writer",
+      "tests/test_processes.py:Processes.test_success_and_nonzero_exit_stop_surviving_writer_and_keep_outputs",
+      "tests/test_processes.py:Processes.test_timeout_preserves_partial_output_and_stops_children",
+      "tests/test_processes.py:Processes.test_unavailable_pidfd_uses_verified_owned_processes",
+      "tests/test_terminal.py:Terminal.test_options_contains_language_and_about_in_real_terminal",
+      "tests/test_terminal.py:Terminal.test_options_language_switch_updates_current_value"
+    ]
+  },
+  "delivery": {
+    "baseline_count": 10,
+    "previous_count": 13,
+    "current_count": 13,
+    "missing": [],
+    "mapping": [
+      {
+        "baseline": "scripts/test_bootstrap.py:Delivery.test_numeric_test_discovery_excludes_other_channels_and_drafts",
+        "current": "scripts/test_bootstrap.py:Delivery.test_numeric_test_discovery_excludes_other_channels_and_drafts"
+      },
+      {
+        "baseline": "scripts/test_bootstrap.py:Delivery.test_test_discovery_reads_later_pages",
+        "current": "scripts/test_bootstrap.py:Delivery.test_test_discovery_reads_later_pages"
+      },
+      {
+        "baseline": "scripts/test_bootstrap.py:Delivery.test_stable_uses_latest_official_release",
+        "current": "scripts/test_bootstrap.py:Delivery.test_stable_uses_latest_official_release"
+      },
+      {
+        "baseline": "scripts/test_bootstrap.py:Delivery.test_exact_version_uses_its_channel_tag",
+        "current": "scripts/test_bootstrap.py:Delivery.test_exact_version_uses_its_channel_tag"
+      },
+      {
+        "baseline": "scripts/test_bootstrap.py:Delivery.test_wrong_channel_version_and_draft_are_refused",
+        "current": "scripts/test_bootstrap.py:Delivery.test_wrong_channel_version_and_draft_are_refused"
+      },
+      {
+        "baseline": "scripts/test_bootstrap.py:Delivery.test_invalid_version_and_empty_test_channel",
+        "current": "scripts/test_bootstrap.py:Delivery.test_invalid_version_and_empty_test_channel"
+      },
+      {
+        "baseline": "scripts/test_bootstrap.py:Delivery.test_verified_stable_and_test_keep_the_same_program_pair",
+        "current": "scripts/test_bootstrap.py:Delivery.test_verified_stable_and_test_keep_the_same_program_pair"
+      },
+      {
+        "baseline": "scripts/test_bootstrap.py:Delivery.test_unpaired_install_does_not_run_tester",
+        "current": "scripts/test_bootstrap.py:Delivery.test_unpaired_install_does_not_run_tester"
+      },
+      {
+        "baseline": "scripts/test_bootstrap.py:Delivery.test_corrupt_payload_is_rejected_before_install",
+        "current": "scripts/test_bootstrap.py:Delivery.test_corrupt_payload_is_rejected_before_install"
+      },
+      {
+        "baseline": "scripts/test_bootstrap.py:Delivery.test_metadata_pairing_mismatch_is_rejected_before_install",
+        "current": "scripts/test_bootstrap.py:Delivery.test_metadata_pairing_mismatch_is_rejected_before_install"
+      }
+    ],
+    "added": [
+      "scripts/test_bootstrap.py:Delivery.test_frozen_release_does_not_receive_unsupported_language_flag",
+      "scripts/test_bootstrap.py:Delivery.test_generated_shell_prepares_bootstrap_tools_and_forwards_overrides",
+      "scripts/test_bootstrap.py:Delivery.test_new_release_forwards_language_only_after_asset_verification"
+    ]
+  },
+  "native": {
+    "baseline_count": 35,
+    "current_required_count": 42,
+    "missing": [],
+    "mapping": [
+      {
+        "baseline": "installed-version",
+        "current": "installed-version",
+        "permission_verification": null
+      },
+      {
+        "baseline": "explicit-yolo-test-baseline",
+        "current": "explicit-yolo-test-baseline",
+        "permission_verification": "native config/read in private CODEX_HOME"
+      },
+      {
+        "baseline": "hf-exact-download",
+        "current": "hf-exact-download",
+        "permission_verification": null
+      },
+      {
+        "baseline": "ollama-native-pull",
+        "current": "ollama-native-pull",
+        "permission_verification": null
+      },
+      {
+        "baseline": "hf-invalid-file-rejected",
+        "current": "hf-invalid-file-rejected",
+        "permission_verification": null
+      },
+      {
+        "baseline": "llamacpp-select",
+        "current": "llamacpp-select",
+        "permission_verification": null
+      },
+      {
+        "baseline": "llamacpp-catalog",
+        "current": "llamacpp-catalog",
+        "permission_verification": null
+      },
+      {
+        "baseline": "llamacpp-responses",
+        "current": "llamacpp-responses",
+        "permission_verification": null
+      },
+      {
+        "baseline": "llamacpp-native-function-call",
+        "current": "llamacpp-native-function-call",
+        "permission_verification": null
+      },
+      {
+        "baseline": "llamacpp-codex-cli",
+        "current": "llamacpp-codex-cli",
+        "permission_verification": null
+      },
+      {
+        "baseline": "llamacpp-manager-independent",
+        "current": "llamacpp-manager-independent",
+        "permission_verification": null
+      },
+      {
+        "baseline": "llamacpp-model-status",
+        "current": "llamacpp-model-status",
+        "permission_verification": null
+      },
+      {
+        "baseline": "llamacpp-configuration-without-reload",
+        "current": "llamacpp-configuration-without-reload",
+        "permission_verification": null
+      },
+      {
+        "baseline": "llamacpp-codex-model-picker",
+        "current": "llamacpp-codex-model-picker",
+        "permission_verification": null
+      },
+      {
+        "baseline": "ollama-select",
+        "current": "ollama-select",
+        "permission_verification": null
+      },
+      {
+        "baseline": "ollama-catalog",
+        "current": "ollama-catalog",
+        "permission_verification": null
+      },
+      {
+        "baseline": "ollama-responses",
+        "current": "ollama-responses",
+        "permission_verification": null
+      },
+      {
+        "baseline": "ollama-native-function-call",
+        "current": "ollama-native-function-call",
+        "permission_verification": null
+      },
+      {
+        "baseline": "ollama-codex-cli",
+        "current": "ollama-codex-cli",
+        "permission_verification": null
+      },
+      {
+        "baseline": "ollama-manager-independent",
+        "current": "ollama-manager-independent",
+        "permission_verification": null
+      },
+      {
+        "baseline": "ollama-model-status",
+        "current": "ollama-model-status",
+        "permission_verification": null
+      },
+      {
+        "baseline": "ollama-configuration-without-reload",
+        "current": "ollama-configuration-without-reload",
+        "permission_verification": null
+      },
+      {
+        "baseline": "ollama-codex-model-picker",
+        "current": "ollama-codex-model-picker",
+        "permission_verification": null
+      },
+      {
+        "baseline": "ollama-resident-entry-reuses-alias",
+        "current": "ollama-resident-entry-reuses-alias",
+        "permission_verification": null
+      },
+      {
+        "baseline": "ollama-expired-entry-wakes-existing-alias",
+        "current": "ollama-expired-entry-wakes-existing-alias",
+        "permission_verification": null
+      },
+      {
+        "baseline": "ollama-explicit-start-wakes-without-restart",
+        "current": "ollama-explicit-start-wakes-without-restart",
+        "permission_verification": null
+      },
+      {
+        "baseline": "ollama-unchanged-inventory-reuses-registry",
+        "current": "ollama-unchanged-inventory-reuses-registry",
+        "permission_verification": null
+      },
+      {
+        "baseline": "codex-direct-shell-and-result-replay",
+        "current": "codex-direct-shell-and-result-replay",
+        "permission_verification": null
+      },
+      {
+        "baseline": "pause-start-retains-target",
+        "current": "pause-start-retains-target",
+        "permission_verification": null
+      },
+      {
+        "baseline": "interrupted-candidate-restores-accepted-native-target",
+        "current": "interrupted-candidate-restores-accepted-native-target",
+        "permission_verification": null
+      },
+      {
+        "baseline": "native-load-failure-rollback",
+        "current": "native-load-failure-rollback",
+        "permission_verification": null
+      },
+      {
+        "baseline": "invalid-fixture-cleaned",
+        "current": "invalid-fixture-cleaned",
+        "permission_verification": null
+      },
+      {
+        "baseline": "yolo-off",
+        "current": "yolo-off",
+        "permission_verification": "native config/read in private CODEX_HOME"
+      },
+      {
+        "baseline": "product-reinstall-retains-yolo-off-and-native-instance",
+        "current": "product-reinstall-retains-yolo-off-and-native-instance",
+        "permission_verification": "native config/read in private CODEX_HOME"
+      },
+      {
+        "baseline": "yolo-on",
+        "current": "yolo-on",
+        "permission_verification": "native config/read in private CODEX_HOME"
+      }
+    ],
+    "added": [
+      "linux-prerequisites",
+      "current-model-state",
+      "independent-launcher",
+      "codex-version",
+      "agent-permission-state",
+      "configuration-retained",
+      "user-permissions-retained"
+    ],
+    "execution_evidence": "V0_1_14_LOCAL.json and V0_1_14_PUBLIC.json; inventory alone is not execution evidence"
+  }
+}

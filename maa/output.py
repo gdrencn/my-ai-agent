@@ -201,7 +201,7 @@ def diagnostic(value):
         writer.write(value)
 
 
-def run(command, *, native=False, **kwargs):
+def run(command, *, native=False, tee_stderr=False, **kwargs):
     """Run a command with one output policy, shared by all management entries.
 
     Normal commands keep the elapsed timer alive and replay actual output after
@@ -209,17 +209,19 @@ def run(command, *, native=False, **kwargs):
     contract. Native installers/downloaders forward live output through a PTY
     on terminals so their own progress behavior remains available.
     """
+    if tee_stderr and (not native or kwargs.get('capture_output') or kwargs.get('stderr') is not None):
+        raise ValueError('Live stderr capture requires native mode and inherited stderr')
     if kwargs.get('capture_output'):
         return subprocess.run(command, **kwargs)
     inherited = [name for name in ('stdout', 'stderr') if kwargs.get(name) is None]
     if not inherited:
         return subprocess.run(command, **kwargs)
     if native:
-        if len(inherited) != 2:
-            raise ValueError('Native output requires inherited stdout and stderr')
+        if tee_stderr and inherited != ['stderr']:
+            raise ValueError('Live stderr capture requires independently redirected stdout')
         for name in inherited:
             kwargs.pop(name, None)
-        return _run_native(command, kwargs)
+        return _run_native(command, kwargs, inherited, tee_stderr)
     check = kwargs.pop('check', False)
     for name in inherited:
         kwargs[name] = subprocess.PIPE
@@ -243,7 +245,7 @@ def _replay(result, streams):
             writer.write(value.decode(errors='replace') if isinstance(value, bytes) else value)
 
 
-def _run_native(command, kwargs):
+def _run_native(command, kwargs, inherited=('stdout', 'stderr'), tee_stderr=False):
     import select
     stream = activity.get().stream if activity.get() else sys.stderr
     if stream.isatty():
@@ -257,6 +259,15 @@ def _run_native(command, kwargs):
     else:
         source, destination = os.pipe()
     errors = []
+    captured = []
+    check = kwargs.pop('check', False)
+    def stderr_value():
+        data = b''.join(captured)
+        if kwargs.get('text') or kwargs.get('universal_newlines') or kwargs.get('encoding') or kwargs.get('errors'):
+            import locale
+            encoding = kwargs.get('encoding') or ('utf-8' if sys.flags.utf8_mode else locale.getencoding())
+            return data.decode(encoding, kwargs.get('errors') or 'strict').replace('\r\n', '\n').replace('\r', '\n')
+        return data
     finished = threading.Event()
     with native_output() as writer:
         def forward():
@@ -276,6 +287,8 @@ def _run_native(command, kwargs):
                         raise
                     if not value:
                         break
+                    if tee_stderr:
+                        captured.append(value)
                     writer.write(decoder.decode(value))
                 writer.write(decoder.decode(b'', final=True))
             except BaseException as exc:
@@ -285,11 +298,20 @@ def _run_native(command, kwargs):
         reader = threading.Thread(target=forward, daemon=True)
         reader.start()
         try:
-            result = subprocess.run(command, stdout=destination, stderr=destination, **kwargs)
-        finally:
-            os.close(destination)
-            finished.set()
-            reader.join()
+            try:
+                result = subprocess.run(command, check=False, **{**kwargs, **{name: destination for name in inherited}})
+            finally:
+                os.close(destination)
+                finished.set()
+                reader.join()
+        except subprocess.TimeoutExpired as exc:
+            if tee_stderr:
+                exc.stderr = stderr_value()
+            raise
         if errors:
             raise errors[0]
+        if tee_stderr:
+            result.stderr = stderr_value()
+        if check:
+            result.check_returncode()
         return result

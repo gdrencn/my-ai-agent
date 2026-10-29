@@ -13,6 +13,7 @@ sys.path.insert(0, str(Path.home() / '.local/share/my-ai-agent/maa.pyz'))
 from maa import __version__
 from maa.store import Store, read, write
 from maa.processes import run as run_owned
+from maa.output import run as run_live
 
 MAA = str(Path.home() / '.local/bin/maa')
 LOCAL = str(Path.home() / '.local/bin/codex-local')
@@ -88,7 +89,8 @@ def client():
 
 
 def command(*args, structured=True, success=True, timeout=900):
-    result = subprocess.run([MAA, *args], text=True, capture_output=True, timeout=timeout)
+    result = run_live([MAA, *args], native=True, stdout=subprocess.PIPE, tee_stderr=True,
+                      text=True, timeout=timeout)
     if success and result.returncode:
         raise RuntimeError(result.stdout + result.stderr)
     if not success:

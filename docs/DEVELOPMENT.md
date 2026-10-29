@@ -1,6 +1,6 @@
 # Development and publication
 
-The current requirements are in REQUIREMENTS.md and docs/INDEPENDENCE.md. Product and tests are self-contained Linux code: no sibling checkout, instance marker, container-manager command or outer-environment configuration. The immutable baseline is stable/0.1.9. The 0.1.13 tree excludes IM and Web.
+The current requirements are in REQUIREMENTS.md and docs/INDEPENDENCE.md. Product and tests are self-contained Linux code: no sibling checkout, instance marker, container-manager command or outer-environment configuration. The immutable baseline is stable/0.1.9. The 0.1.14 tree excludes IM and Web.
 
 ## Shared modules
 
@@ -10,6 +10,8 @@ The current requirements are in REQUIREMENTS.md and docs/INDEPENDENCE.md. Produc
 - models/gguf/backends/telemetry: model inventory/download, native arguments and read-only observations.
 - codex/agent_status: lossless YOLO/profile configuration, independent launcher and bounded native configuration query without Agent turns.
 - preferences/i18n/locales/menu/text/output/ui: shared bilingual presentation and terminal handling.
+
+All privileged management calls share service.privileged. Root runs directly. Interactive sudo inherits the controlling terminal for password input and uses the common live-output runner for diagnostics, with independently captured/redirected stdout. A noninteractive validation probe only determines when progress must yield the terminal; the real command retains native sudo policy, including command-specific NOPASSWD and zero-duration timestamps. Noninteractive calls use sudo -n. Native test CLI calls tee live stderr while keeping captured JSON stdout separate. Never read passwords, supply them through stdin, create an askpass program or change user sudo policy.
 - bootstrap: verified version/channel asset pairing. Old frozen products retain their own historical installer contract.
 
 The build generates shell entries from scripts/entry.template.sh and environment.PACKAGE_MANAGERS. Shell bootstrap only prepares tools needed to run the verified Python installer. Product dependency checks prepare operation-specific tools and CA certificates. Never infer a capability from the operating environment's origin. systemd availability includes a live manager query; command existence alone is insufficient.
@@ -33,6 +35,6 @@ Build twice and compare artifacts. Check Python 3.11 grammar, shell syntax, pack
 
 ## Release
 
-0.1.13 test uses tag v0.1.13 and an immutable prerelease. Generated test entries pin its version, because frozen 0.2.x experimental releases also exist. Explicit --version overrides are supported. Default numeric discovery remains available to historical bootstraps.
+0.1.14 test uses tag v0.1.14 and an immutable prerelease. Generated test entries pin its version, because frozen 0.2.x experimental releases also exist. Explicit --version overrides are supported. Default numeric discovery remains available to historical bootstraps.
 
 After verified source/docs reach main and CI passes, publish paired maa.pyz, maa-test.pyz, VERSION.json, bootstrap.py, install.sh and SHA256SUMS. Include validation receipts and their checksum. Download public assets again, compare bytes and run the public entry. Additional fixes after handing the user a test command need a new version. Stable requires user acceptance and must preserve the approved product/test bytes. Do not replace existing releases, tags or assets. New deployments cannot assume old frozen products support their environment.

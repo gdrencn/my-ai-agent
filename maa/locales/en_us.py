@@ -490,3 +490,5 @@ TEXT = {'%(prog)s: error: %(message)s\n': '%(prog)s: error: %(message)s\n',
  '读取本地模型清单': 'Read local model inventory',
  '配置未变化；保留当前运行状态': 'Configuration unchanged; retain current runtime state',
  '重新下载校验失败的 GGUF 缓存：{v0}': 'Redownload GGUF cache that failed verification: {v0}'}
+
+TEXT['sudo authentication: enter your password at the native prompt; command output follows.\n'] = 'sudo authentication: enter your password at the native prompt; command output follows.\n'

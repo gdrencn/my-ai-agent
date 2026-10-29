@@ -5,13 +5,15 @@ import os
 from pathlib import Path
 import pwd
 import subprocess
+import sys
+from contextlib import nullcontext
 import time
 import uuid
 from .backends import (binary, llama_arguments, llama_endpoint, llama_observe,
                        ollama_capabilities, check_options, ollama_environment,
                        ollama_endpoint, ollama_prepare, ollama_observe)
 from .http import request
-from .output import stage, run, diagnostic
+from .output import stage, run, diagnostic, activity, native_output
 from .store import Error, atomic, read, write
 
 UNITS = {'ollama': 'ollama.service', 'llamacpp': 'llama-server.service'}
@@ -22,7 +24,20 @@ def fingerprint(target):
 
 
 def privileged(command, **kwargs):
-    return run(([] if os.geteuid() == 0 else ['sudo']) + command, check=True, **kwargs)
+    if os.geteuid() == 0:
+        return run(command, check=True, **kwargs)
+    progress = activity.get()
+    stream = progress.stream if progress else sys.stderr
+    interactive = stream.isatty() and kwargs.get('stderr') is None and not kwargs.get('capture_output')
+    prefix = ['sudo'] if interactive else ['sudo', '-n']
+    needs_terminal = interactive and subprocess.run(['sudo', '-n', '-v'],
+        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode != 0
+    with native_output() if needs_terminal else nullcontext() as writer:
+        if needs_terminal:
+            from .i18n import text
+            writer.write(text('sudo authentication: enter your password at the native prompt; command output follows.\n'))
+        kwargs.setdefault('native', interactive)
+        return run(prefix + command, check=True, **kwargs)
 
 
 def escaped(value):
@@ -124,7 +139,7 @@ class Controller:
         for backend, enabled in snapshot['enabled'].items():
             if self.unit_path(backend).exists() or backend == 'ollama':
                 privileged(['systemctl', 'enable' if enabled else 'disable', UNITS[backend]],
-                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                           stdout=subprocess.DEVNULL)
 
     def begin(self):
         # An interrupted validation must never boot an unaccepted candidate.

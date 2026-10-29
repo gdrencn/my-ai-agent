@@ -2,7 +2,7 @@
 
 在 Linux 中安装并管理 Ollama、llama.cpp 和 Codex CLI。Maa 不依赖容器管理程序，不判断自身运行在容器、WSL 还是服务器中。
 
-当前测试版本：**0.1.13 test**，基于已验收的 0.1.9，解除环境身份绑定。中英文界面保留，语言和关于位于“选项”中。本版不含 IM 或 Web；后续功能继续在 Maa 内开发。既有 0.1.9 stable 和 0.2.x test 保持不变。
+当前测试版本：**0.1.14 test**，基于已验收的 0.1.9，解除环境身份绑定。中英文界面保留，语言和关于位于“选项”中。本版不含 IM 或 Web；后续功能继续在 Maa 内开发。既有 0.1.9 stable 和 0.2.x test 保持不变。
 
 ## Install and test
 
@@ -12,7 +12,7 @@
 curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/test.sh | bash
 ```
 
-该入口固定默认安装 **0.1.13 test**，安装所选官方程序后运行配对检查。不会因为已有更高版本号的实验版而装到 0.2.x。可使用 `--version` 明确选择其他已发布版本。
+该入口固定默认安装 **0.1.14 test**，安装所选官方程序后运行配对检查。不会因为已有更高版本号的实验版而装到 0.2.x。可使用 `--version` 明确选择其他已发布版本。
 
 底座和 Codex 已安装时，可跳过组件安装；配对检查仍执行完整功能验收：
 
@@ -20,9 +20,11 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/test.
 curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/test.sh | bash -s -- --components none
 ```
 
-不运行配对测试时，将 `test/test.sh` 换成 `test/install.sh`。根 `install.sh` 仍选择已发布的 latest stable；0.1.13 需要用户验收后才晋升。普通 Linux 部署请使用本轮 test 入口，旧 stable 不具备本轮解耦能力。
+不运行配对测试时，将 `test/test.sh` 换成 `test/install.sh`。根 `install.sh` 仍选择已发布的 latest stable；0.1.14 需要用户验收后才晋升。普通 Linux 部署请使用本轮 test 入口，旧 stable 不具备本轮解耦能力。
 
 安装器要求 Linux、Python 3.11+ 和正在运行的 systemd 系统管理器。Shell 入口会尝试准备 curl、CA 证书和系统仓库提供的 Python；如果仓库 Python 版本不足，会明确提示安装支持的版本，不添加软件源。Maa 通过共享依赖表调用现有 apt-get、dnf、yum、zypper 或 pacman，安装缺少的所需工具；不进行整机升级，不启动或安装 init 系统，不改变容器权限。需要系统修改时使用当前环境的 root 或 sudo。没有受支持的软件包工具时，提示缺少的依赖。
+
+需要密码认证时，交互终端立即显示原生 sudo 提示，包括 `curl | bash` 安装和配对测试中的服务操作；认证期间暂停 Maa 计时刷新，命令结束后恢复。密码只由 sudo 从终端读取。非交互调用使用 `sudo -n`；认证不可用时立即报错，不等待隐藏的密码输入。
 
 底座和 Codex 使用官方安装程序。默认 `--components all`；可指定 `none`、`ollama`、`llamacpp`、`codex`。原生服务只启用当前选择的底座。Maa 管理命令执行后退出，`codex-local` 独立启动官方 Codex。
 

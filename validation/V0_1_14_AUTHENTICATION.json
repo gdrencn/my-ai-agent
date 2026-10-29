@@ -1,0 +1,119 @@
+{
+  "version": "0.1.14",
+  "status": "passed",
+  "classic": {
+    "version": "0.1.14",
+    "sudo": "Sudo version 1.9.15p5",
+    "python": "3.12.3",
+    "checks": [
+      {
+        "name": "piped-stdin-live-json-and-cache",
+        "status": "passed",
+        "native_password_prompts": 1,
+        "secret_echoed": false,
+        "terminal_restored": true
+      },
+      {
+        "name": "native-test-capture-shows-authentication",
+        "status": "passed",
+        "native_password_prompts": 1,
+        "secret_echoed": false,
+        "terminal_restored": true
+      },
+      {
+        "name": "incorrect-password-then-correct",
+        "status": "passed",
+        "native_password_prompts": 2,
+        "secret_echoed": false,
+        "terminal_restored": true
+      },
+      {
+        "name": "authentication-interrupt",
+        "status": "passed",
+        "native_password_prompts": 1,
+        "secret_echoed": false,
+        "terminal_restored": true
+      },
+      {
+        "name": "noninteractive-authentication-fails-promptly",
+        "status": "passed",
+        "native_password_prompts": 0,
+        "secret_echoed": false,
+        "terminal_restored": true
+      },
+      {
+        "name": "zero-duration-timestamp-retains-native-authentication",
+        "status": "passed",
+        "native_password_prompts": 2,
+        "secret_echoed": false,
+        "terminal_restored": true
+      },
+      {
+        "name": "command-specific-nopasswd-without-sudo-validate-policy",
+        "status": "passed",
+        "native_password_prompts": 0,
+        "secret_echoed": false,
+        "terminal_restored": true
+      }
+    ],
+    "status": "passed"
+  },
+  "sudo_rs": {
+    "version": "0.1.14",
+    "sudo": "sudo-rs 0.2.13-0ubuntu1.2",
+    "python": "3.14.4",
+    "checks": [
+      {
+        "name": "piped-stdin-live-json-and-cache",
+        "status": "passed",
+        "native_password_prompts": 1,
+        "secret_echoed": false,
+        "terminal_restored": true
+      },
+      {
+        "name": "native-test-capture-shows-authentication",
+        "status": "passed",
+        "native_password_prompts": 1,
+        "secret_echoed": false,
+        "terminal_restored": true
+      },
+      {
+        "name": "incorrect-password-then-correct",
+        "status": "passed",
+        "native_password_prompts": 2,
+        "secret_echoed": false,
+        "terminal_restored": true
+      },
+      {
+        "name": "authentication-interrupt",
+        "status": "passed",
+        "native_password_prompts": 1,
+        "secret_echoed": false,
+        "terminal_restored": true
+      },
+      {
+        "name": "noninteractive-authentication-fails-promptly",
+        "status": "passed",
+        "native_password_prompts": 0,
+        "secret_echoed": false,
+        "terminal_restored": true
+      },
+      {
+        "name": "zero-duration-timestamp-retains-native-authentication",
+        "status": "passed",
+        "native_password_prompts": 2,
+        "secret_echoed": false,
+        "terminal_restored": true
+      },
+      {
+        "name": "command-specific-nopasswd-without-sudo-validate-policy",
+        "status": "passed",
+        "native_password_prompts": 0,
+        "secret_echoed": false,
+        "terminal_restored": true
+      }
+    ],
+    "status": "passed"
+  },
+  "password_handling": "Generated credentials exist only in owned validation environments; native sudo reads the controlling terminal. No credentials or transcripts are included in this receipt."
+}

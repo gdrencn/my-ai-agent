@@ -1,14 +1,14 @@
-# 0.1.13 coverage compared with 0.1.9
+# 0.1.14 coverage compared with 0.1.9
 
 Every baseline functional check is present in the default paired test entry. Version 0.1.10 additions remain. Test identities and permission writes are isolated; no environment-origin requirement is restored.
 
-| Suite | 0.1.9 | 0.1.13 | Missing |
+| Suite | 0.1.9 | 0.1.14 | Missing |
 | --- | ---: | ---: | ---: |
-| Portable / real PTY | 90 | 128 | 0 |
+| Portable / real PTY | 90 | 137 | 0 |
 | Delivery | 10 | 13 | 0 |
 | Installed functional acceptance | 35 | 42 | 0 |
 
-The machine-readable correspondence is [V0_1_13_COVERAGE.json](../validation/V0_1_13_COVERAGE.json). The runtime report requires each native ID to pass, not merely exist in source. Local and public execution receipts establish execution; the inventory alone does not.
+The machine-readable correspondence is [V0_1_14_COVERAGE.json](../validation/V0_1_14_COVERAGE.json). The runtime report requires each native ID to pass, not merely exist in source. Local and public execution receipts establish execution; the inventory alone does not.
 
 ## Original native checks
 
@@ -64,4 +64,4 @@ Every 0.1.12 test remains. The 0.1.10 language, environment, independence and op
 
 The former deployment-identity gate is not restored. Actual Linux/systemd/dependency checks replace it, as explicitly requested; model and Codex functional acceptance does not depend on where Linux was created. No GPU/MTP hardware claim is derived from a portable fixture.
 
-Ordinary-user/root acceptance each passed 128 paired plus 42 native checks. The actual default public command passed the same complete suite under Python 3.14.10 with Git and an explicit system CA file. Ten additional real expired-Ollama-entry repetitions across Python 3.12/3.14.10 passed without residue. [Execution receipts](../validation/V0_1_13_PUBLIC.json) and [the separate CA-directory issue](KNOWN_ISSUES.md) record exact scope. Nine additional process-lifecycle regressions cover successful/nonzero exits with surviving writers, timeout output, checked failure output, interruption with unrelated-session survival, unavailable optional pidfd syscalls, native configuration-reader cleanup, real SIGINT exit 130, normal PTY restoration and early PTY exit. None replaces a baseline test.
+Nine additional regressions cover immediate native authentication with piped stdin, nested live stderr capture, authentication failure, interruption and terminal restoration, cached and command-specific NOPASSWD policy, noninteractive failure, root bypass, checked failure output and partial timeout diagnostics. All 128 portable IDs from 0.1.13 remain, in addition to every baseline and independence check. Real authentication exercises both classic sudo and sudo-rs, including a zero-duration timestamp. Execution receipts separately record full installed acceptance and authenticated public installation; portable fixtures do not establish native hardware or upstream compatibility. The historical 0.1.13 process-cleanup and CA-directory observations remain available in their immutable receipts and [KNOWN_ISSUES.md](KNOWN_ISSUES.md).
