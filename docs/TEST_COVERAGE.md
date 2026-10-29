@@ -64,4 +64,4 @@ The 0.1.10 language, environment, independence and options-menu checks remain. S
 
 The former deployment-identity gate is not restored. Actual Linux/systemd/dependency checks replace it, as explicitly requested; model and Codex functional acceptance does not depend on where Linux was created. No GPU/MTP hardware claim is derived from a portable fixture.
 
-Execution evidence for this version is added after validation. Version 0.1.11 evidence remains historical; the current clients additionally exercise the exact written profile/catalog.
+Ordinary-user and root frozen-payload acceptance each passed all 42 native checks. The actual public default entry passed 119 portable/PTY plus all 42 native checks, retained an off YOLO choice, used exact written-profile clients and executed both real-home/private-off reinstall paths. See [local evidence](../validation/V0_1_12_LOCAL.json) and [public evidence](../validation/V0_1_12_PUBLIC.json). Version 0.1.11 evidence remains historical.
