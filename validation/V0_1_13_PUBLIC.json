@@ -1,0 +1,632 @@
+{
+  "version": "0.1.13",
+  "channel": "test",
+  "status": "passed",
+  "release": "https://github.com/gdrencn/my-ai-agent/releases/tag/v0.1.13",
+  "source_commit": "d34bcccb78deb3f63973c89789e07e134d6a5a50",
+  "payload_sha256": {
+    "maa.pyz": "37543743e21f5d456ae525dfcc6da3ffd78cd61c23b882981ab0bbf3e0671a42",
+    "maa-test.pyz": "634cf97a376bce3efdcc8b6d654d169a43a56bbcdaa1acf0fbe34c8c4efe0496",
+    "VERSION.json": "96f9399b9291dd4b9dc99cd1b5491139bcd6910b3ba2102157efadf1c862f32f",
+    "bootstrap.py": "485573d1c435f22e2a285984ca23cac5a09000f6bbb033ef034ffb5da77add5f",
+    "install.sh": "cffe81dda195deca113c6c87b1b3a59df686dcd557d53dca6fd34e5e4336bcce",
+    "SHA256SUMS": "8785c2f7c4db94f4e485e992351f8706949d128e3e4d6be19ce56d3fd14fc854"
+  },
+  "anonymous_downloads": {
+    "release": "https://github.com/gdrencn/my-ai-agent/releases/tag/v0.1.13",
+    "anonymous_assets": 14,
+    "all_bytes_matched": true,
+    "manifests_verified": true,
+    "assets": [
+      {
+        "name": "bootstrap.py",
+        "size": 5158,
+        "digest": "sha256:485573d1c435f22e2a285984ca23cac5a09000f6bbb033ef034ffb5da77add5f"
+      },
+      {
+        "name": "install.sh",
+        "size": 3077,
+        "digest": "sha256:cffe81dda195deca113c6c87b1b3a59df686dcd557d53dca6fd34e5e4336bcce"
+      },
+      {
+        "name": "maa-test.pyz",
+        "size": 153437,
+        "digest": "sha256:634cf97a376bce3efdcc8b6d654d169a43a56bbcdaa1acf0fbe34c8c4efe0496"
+      },
+      {
+        "name": "maa.pyz",
+        "size": 103762,
+        "digest": "sha256:37543743e21f5d456ae525dfcc6da3ffd78cd61c23b882981ab0bbf3e0671a42"
+      },
+      {
+        "name": "SHA256SUMS",
+        "size": 388,
+        "digest": "sha256:8785c2f7c4db94f4e485e992351f8706949d128e3e4d6be19ce56d3fd14fc854"
+      },
+      {
+        "name": "V0_1_13_COVERAGE.json",
+        "size": 33653,
+        "digest": "sha256:e05b898931c9d5dbf0066c02ef7e7766beb93e7d3f7c509cb46fe75e23608f1b"
+      },
+      {
+        "name": "V0_1_13_CPU.json",
+        "size": 1698,
+        "digest": "sha256:fe0f586551755378063a2a76634c86d61ccedfc1f33fdab3e37dcdc30a364e63"
+      },
+      {
+        "name": "V0_1_13_DESCENDANTS.json",
+        "size": 790,
+        "digest": "sha256:c0db6ad9852d2ab3904000ddb3c8c184dd5c3efdebf5cb83a44194160879dd90"
+      },
+      {
+        "name": "V0_1_13_LOCAL.json",
+        "size": 2945,
+        "digest": "sha256:28574bceec9e8dc0e0c26c88858b25103df984add5a443f144ff668a1e95d840"
+      },
+      {
+        "name": "V0_1_13_NATIVE.json",
+        "size": 67771,
+        "digest": "sha256:bd4f35f13745b80a1300846897374fd87a656d69ce6dec7cf2414161ad3f00b2"
+      },
+      {
+        "name": "V0_1_13_REGRESSION.json",
+        "size": 811,
+        "digest": "sha256:a9cab6bbd03be6ccd84f0d5b18ab56238ef9a8cca7c2bf11e42e7c0f06fb99f5"
+      },
+      {
+        "name": "V0_1_13_ROOT_NATIVE.json",
+        "size": 67595,
+        "digest": "sha256:2b6d2d81c71bb5857239b26623b3c6812379fac61bdcc0fb64f4b3ad5b880085"
+      },
+      {
+        "name": "VALIDATION_SHA256SUMS",
+        "size": 614,
+        "digest": "sha256:067bc650c20bb7bca47776237ea10ac3cdc7f85e169279290e104c5b28f49683"
+      },
+      {
+        "name": "VERSION.json",
+        "size": 47,
+        "digest": "sha256:96f9399b9291dd4b9dc99cd1b5491139bcd6910b3ba2102157efadf1c862f32f"
+      }
+    ]
+  },
+  "public_entry": {
+    "command": "curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/test.sh | bash",
+    "exit_status": 0,
+    "components": "all (default)",
+    "python": "3.14.10",
+    "git_available": true,
+    "portable_PTY_checks": 128,
+    "native_checks": 42,
+    "original_native_retained": 35,
+    "missing": [],
+    "retention_audit": {
+      "python": "3.14.10 (main, Oct 26 2026, 14:09:22) [Clang 23.1.3 ]",
+      "ssl_ca_file": "/etc/ssl/certs/ca-certificates.crt",
+      "yolo_remains_off": true,
+      "permission_recovery_bytes_and_modes_retained": true,
+      "private_homes_remaining": [],
+      "test_target_state": "paused",
+      "installed_product_sha256": "37543743e21f5d456ae525dfcc6da3ffd78cd61c23b882981ab0bbf3e0671a42"
+    }
+  },
+  "targeted_repetition": {
+    "python_3_12_real_ollama_expired_entry_passes": 5,
+    "python_3_14_10_real_ollama_expired_entry_passes": 5,
+    "private_homes_remaining": []
+  },
+  "coverage": {
+    "baseline_portable": 90,
+    "previous_portable": 119,
+    "current_portable": 128,
+    "delivery": 13,
+    "native": 42,
+    "baseline_native": 35,
+    "missing": [],
+    "no_plugins_or_checks_disabled": true
+  },
+  "ci": {
+    "develop": "40834621827 success",
+    "tag": "40835306294 success",
+    "main_source": "40835607436 success"
+  },
+  "frozen_releases": {
+    "unchanged": true,
+    "latest_stable": "stable/0.1.9",
+    "releases": {
+      "stable/0.1.9": {
+        "id": 406407193,
+        "tag_name": "stable/0.1.9",
+        "published_at": "2026-10-08T04:18:59Z",
+        "prerelease": false,
+        "assets": [
+          {
+            "id": 620698002,
+            "name": "bootstrap.py",
+            "size": 4423,
+            "digest": "sha256:12d1cf03fd7836e70d66d94f5e985f6e943697e4af663fb1559678293d035a3c",
+            "updated_at": "2026-10-08T04:18:32Z"
+          },
+          {
+            "id": 620697998,
+            "name": "install.sh",
+            "size": 246,
+            "digest": "sha256:22c899084c179199c6fe5dbcdfa69547cb4813dd21a7fa1b3a55adfd52018d21",
+            "updated_at": "2026-10-08T04:18:32Z"
+          },
+          {
+            "id": 620697995,
+            "name": "maa-test.pyz",
+            "size": 113434,
+            "digest": "sha256:01c0dd97a4658cd59770993efbfcfa43871684c97296fc1905e81107ea52e281",
+            "updated_at": "2026-10-08T04:18:32Z"
+          },
+          {
+            "id": 620698000,
+            "name": "maa.pyz",
+            "size": 82870,
+            "digest": "sha256:2dcda1dd4eba9697d4a4e1e7a47b74fd932685be19a548973d810d6c1af9b399",
+            "updated_at": "2026-10-08T04:18:32Z"
+          },
+          {
+            "id": 620704153,
+            "name": "PUBLIC_SHA256SUMS",
+            "size": 91,
+            "digest": "sha256:05f3157a3f1545bc6b28f1fea869460b2ccc6ec8c19b9278a3f8bec634700023",
+            "updated_at": "2026-10-08T04:21:32Z"
+          },
+          {
+            "id": 620698010,
+            "name": "SHA256SUMS",
+            "size": 388,
+            "digest": "sha256:dc808d6dd31eab98fdd98087cad4c6b9c78ee903d42a9a21b01f1e71938ab801",
+            "updated_at": "2026-10-08T04:18:32Z"
+          },
+          {
+            "id": 620698015,
+            "name": "STABLE_0_1_9_NATIVE.json",
+            "size": 63431,
+            "digest": "sha256:50405783a61dd18075b56c62f8ba992736b03d707c318e352e8d4719e252758b",
+            "updated_at": "2026-10-08T04:18:32Z"
+          },
+          {
+            "id": 620704154,
+            "name": "STABLE_0_1_9_PUBLIC.json",
+            "size": 5278,
+            "digest": "sha256:088b88d5d7fd99102492c68e263d0e14bdbc9549c75ac16c87eb5bb8ab6482bb",
+            "updated_at": "2026-10-08T04:21:32Z"
+          },
+          {
+            "id": 620698013,
+            "name": "STABLE_0_1_9_REVIEW.json",
+            "size": 3574,
+            "digest": "sha256:b7b881c265440edcd2d3462552e4fa20f10e9384416dcdd7b00b2f2431bc0096",
+            "updated_at": "2026-10-08T04:18:32Z"
+          },
+          {
+            "id": 620698016,
+            "name": "VALIDATION_SHA256SUMS",
+            "size": 182,
+            "digest": "sha256:fa0ae643b78a19c3bb01b2e6cbc425ee88bca2ba24e1d3d2eab906eaff9828ad",
+            "updated_at": "2026-10-08T04:18:33Z"
+          },
+          {
+            "id": 620697994,
+            "name": "VERSION.json",
+            "size": 48,
+            "digest": "sha256:5aeadd5553666049da1fb6a34d6dab0627e898c7fc024079a9958d2d96ba5b32",
+            "updated_at": "2026-10-08T04:18:32Z"
+          }
+        ]
+      },
+      "v0.1.10": {
+        "id": 427394769,
+        "tag_name": "v0.1.10",
+        "published_at": "2026-10-29T02:18:25Z",
+        "prerelease": true,
+        "assets": [
+          {
+            "id": 687073003,
+            "name": "bootstrap.py",
+            "size": 5158,
+            "digest": "sha256:485573d1c435f22e2a285984ca23cac5a09000f6bbb033ef034ffb5da77add5f",
+            "updated_at": "2026-10-29T02:16:47Z"
+          },
+          {
+            "id": 687092589,
+            "name": "CLEANUP_SHA256SUMS",
+            "size": 87,
+            "digest": "sha256:58b7cf2ea42ef2843a6cac39aabe7f9eb988f8691e4ae169231b0c2bc8aaaf8c",
+            "updated_at": "2026-10-29T02:24:55Z"
+          },
+          {
+            "id": 687073008,
+            "name": "install.sh",
+            "size": 3077,
+            "digest": "sha256:2b9f30c11136f9c3b1ac91913f6f7c67fde5aa158c9fffc43f786f9580e05ed6",
+            "updated_at": "2026-10-29T02:16:47Z"
+          },
+          {
+            "id": 687073006,
+            "name": "maa-test.pyz",
+            "size": 131849,
+            "digest": "sha256:96860d437da5cbba01599f607862343c79151ea27bb7f87ba82ac87c0910528f",
+            "updated_at": "2026-10-29T02:16:47Z"
+          },
+          {
+            "id": 687073007,
+            "name": "maa.pyz",
+            "size": 101907,
+            "digest": "sha256:5f54863a6cd17db845518c6d14ff57b68cdf4afa5ea4866f15dd4b717a4cf849",
+            "updated_at": "2026-10-29T02:16:47Z"
+          },
+          {
+            "id": 687088587,
+            "name": "PUBLIC_SHA256SUMS",
+            "size": 86,
+            "digest": "sha256:af648311f8ae0eefe7c71b25be3a297fa42f41dcbac3787807b9ef5fc68b5005",
+            "updated_at": "2026-10-29T02:23:11Z"
+          },
+          {
+            "id": 687073030,
+            "name": "SHA256SUMS",
+            "size": 388,
+            "digest": "sha256:c08b3597f1130783b93e1d8c7cd312e240852420c316f586b441b0dda595b225",
+            "updated_at": "2026-10-29T02:16:48Z"
+          },
+          {
+            "id": 687092593,
+            "name": "V0_1_10_CLEANUP.json",
+            "size": 286,
+            "digest": "sha256:d526baa488b1ea0ed08fea8a5e18282f18b38cf16005eeee635ccf957f917d89",
+            "updated_at": "2026-10-29T02:24:55Z"
+          },
+          {
+            "id": 687073034,
+            "name": "V0_1_10_LOCAL.json",
+            "size": 2116,
+            "digest": "sha256:596e0e7549fcaf0d02903579636a6d259430e6d23471eb0c4346e4e56f5ed8ec",
+            "updated_at": "2026-10-29T02:16:48Z"
+          },
+          {
+            "id": 687088586,
+            "name": "V0_1_10_PUBLIC.json",
+            "size": 3901,
+            "digest": "sha256:c06ee0d6fe74130e8f456b3702cef24b3d3abbde39cb72144ff1a41432fed58c",
+            "updated_at": "2026-10-29T02:23:11Z"
+          },
+          {
+            "id": 687073035,
+            "name": "VALIDATION_SHA256SUMS",
+            "size": 85,
+            "digest": "sha256:99554461219fa0eb76ce84d7013504cbe9b033aa0c928a27953cc8c6e274aee7",
+            "updated_at": "2026-10-29T02:16:48Z"
+          },
+          {
+            "id": 687073009,
+            "name": "VERSION.json",
+            "size": 47,
+            "digest": "sha256:d6d7dd4fc1f136f2ca49de9b4861987c47924cd92224d53bf25ae3d74d56654b",
+            "updated_at": "2026-10-29T02:16:47Z"
+          }
+        ]
+      },
+      "v0.1.11": {
+        "id": 427476795,
+        "tag_name": "v0.1.11",
+        "published_at": "2026-10-29T04:49:18Z",
+        "prerelease": true,
+        "assets": [
+          {
+            "id": 687385193,
+            "name": "bootstrap.py",
+            "size": 5158,
+            "digest": "sha256:485573d1c435f22e2a285984ca23cac5a09000f6bbb033ef034ffb5da77add5f",
+            "updated_at": "2026-10-29T04:48:15Z"
+          },
+          {
+            "id": 687385195,
+            "name": "install.sh",
+            "size": 3077,
+            "digest": "sha256:c2347bbb96b899db494479ea3d6a26c083f74b497bbbc7851560fdea0054e790",
+            "updated_at": "2026-10-29T04:48:15Z"
+          },
+          {
+            "id": 687385200,
+            "name": "maa-test.pyz",
+            "size": 147993,
+            "digest": "sha256:b3805b2c4e6dc4905b7d3e28cf5d558fa88f7c28e86f95d4df928a9f0076c277",
+            "updated_at": "2026-10-29T04:48:15Z"
+          },
+          {
+            "id": 687385201,
+            "name": "maa.pyz",
+            "size": 101907,
+            "digest": "sha256:e833e2940fa815f91a80ed4f7368c026774875e2cee320594177c2591d312be9",
+            "updated_at": "2026-10-29T04:48:15Z"
+          },
+          {
+            "id": 687397142,
+            "name": "PUBLIC_VALIDATION_SHA256SUMS",
+            "size": 179,
+            "digest": "sha256:297c9180c6bf96166165d966d7d06cfab666dc65a90293e0d6390ff612b4aff8",
+            "updated_at": "2026-10-29T04:53:58Z"
+          },
+          {
+            "id": 687385172,
+            "name": "SHA256SUMS",
+            "size": 388,
+            "digest": "sha256:2a65f26269c7fa4bda6b02d0e67cbee840d56ac045c08339af70e7682a8f714c",
+            "updated_at": "2026-10-29T04:48:14Z"
+          },
+          {
+            "id": 687385165,
+            "name": "V0_1_11_COVERAGE.json",
+            "size": 32571,
+            "digest": "sha256:3c150c29ed2da3aea2ad38114ac18b47a04a40f7c3a2e5e9ac77a55b5af1c63e",
+            "updated_at": "2026-10-29T04:48:14Z"
+          },
+          {
+            "id": 687385173,
+            "name": "V0_1_11_CPU.json",
+            "size": 1698,
+            "digest": "sha256:fe0f586551755378063a2a76634c86d61ccedfc1f33fdab3e37dcdc30a364e63",
+            "updated_at": "2026-10-29T04:48:14Z"
+          },
+          {
+            "id": 687385164,
+            "name": "V0_1_11_LOCAL.json",
+            "size": 2710,
+            "digest": "sha256:88a0190b073da6396c49aa9d6dcd993ada1228144916f0779e8dde1b0441b38a",
+            "updated_at": "2026-10-29T04:48:14Z"
+          },
+          {
+            "id": 687397141,
+            "name": "V0_1_11_PUBLIC.json",
+            "size": 13812,
+            "digest": "sha256:288b23014f56c7f21c4920757550193ac7eeffcef4d30175c7b81ae0f3617d31",
+            "updated_at": "2026-10-29T04:53:58Z"
+          },
+          {
+            "id": 687397143,
+            "name": "V0_1_11_PUBLIC_NATIVE.json",
+            "size": 67534,
+            "digest": "sha256:b44a0e2b10ebde10a7039ebed6402efd7ee428ba0ef6edfce72926336de95fe0",
+            "updated_at": "2026-10-29T04:53:58Z"
+          },
+          {
+            "id": 687385169,
+            "name": "V0_1_11_ROOT_NATIVE.json",
+            "size": 67387,
+            "digest": "sha256:ff76562536fb8f206ab2cd64091248e3dfe0277a110bc9d75d63fd55bc931b5c",
+            "updated_at": "2026-10-29T04:48:14Z"
+          },
+          {
+            "id": 687385181,
+            "name": "VALIDATION_SHA256SUMS",
+            "size": 347,
+            "digest": "sha256:ee723c81b5c9dd34034e03bd0dce80c93e96f9e73c20f4115b179ce789f5c55b",
+            "updated_at": "2026-10-29T04:48:14Z"
+          },
+          {
+            "id": 687385189,
+            "name": "VERSION.json",
+            "size": 47,
+            "digest": "sha256:49fdaed24b922ce8d799055c18cf71791e1129a8960cf94140dc4b578bd13262",
+            "updated_at": "2026-10-29T04:48:14Z"
+          }
+        ]
+      },
+      "v0.1.12": {
+        "id": 427487393,
+        "tag_name": "v0.1.12",
+        "published_at": "2026-10-29T05:09:34Z",
+        "prerelease": true,
+        "assets": [
+          {
+            "id": 687429057,
+            "name": "bootstrap.py",
+            "size": 5158,
+            "digest": "sha256:485573d1c435f22e2a285984ca23cac5a09000f6bbb033ef034ffb5da77add5f",
+            "updated_at": "2026-10-29T05:08:45Z"
+          },
+          {
+            "id": 687429056,
+            "name": "install.sh",
+            "size": 3077,
+            "digest": "sha256:f596dc1af63f3e143ed6cc4a6643e7d6c2ce10010c3b4b5fee1baa30bb2e0343",
+            "updated_at": "2026-10-29T05:08:45Z"
+          },
+          {
+            "id": 687429063,
+            "name": "maa-test.pyz",
+            "size": 148545,
+            "digest": "sha256:369582effb643ec9a171673e9e58b89c63dd5b5128d1cf3b2abccf064172e3c2",
+            "updated_at": "2026-10-29T05:08:45Z"
+          },
+          {
+            "id": 687429065,
+            "name": "maa.pyz",
+            "size": 101907,
+            "digest": "sha256:2f7a526d322cd214244e24337abc5c4eeea67ac3add2d91118c6ed85a9cc8c4d",
+            "updated_at": "2026-10-29T05:08:45Z"
+          },
+          {
+            "id": 687441392,
+            "name": "PUBLIC_VALIDATION_SHA256SUMS",
+            "size": 179,
+            "digest": "sha256:901ddc09396bcfc40d28c73073b46aa6c08f7baf4e791af10f645c0d746701cd",
+            "updated_at": "2026-10-29T05:14:59Z"
+          },
+          {
+            "id": 687429036,
+            "name": "SHA256SUMS",
+            "size": 388,
+            "digest": "sha256:4110aa23a2e6d9ee68fd7026b8de44f8a9851801b257ebf4c7603bacffd6a3fa",
+            "updated_at": "2026-10-29T05:08:44Z"
+          },
+          {
+            "id": 687429033,
+            "name": "V0_1_12_COVERAGE.json",
+            "size": 32691,
+            "digest": "sha256:7212780fd2e9728a94e7ccfee1fd74b7fc427f517dfe845b408111a4cffeadce",
+            "updated_at": "2026-10-29T05:08:44Z"
+          },
+          {
+            "id": 687429032,
+            "name": "V0_1_12_CPU.json",
+            "size": 1698,
+            "digest": "sha256:fe0f586551755378063a2a76634c86d61ccedfc1f33fdab3e37dcdc30a364e63",
+            "updated_at": "2026-10-29T05:08:44Z"
+          },
+          {
+            "id": 687429039,
+            "name": "V0_1_12_LOCAL.json",
+            "size": 2598,
+            "digest": "sha256:042831c0e6be7b4db71f3a0b8b44eb9d1170f605b41844047fc8859b5ebf8e8a",
+            "updated_at": "2026-10-29T05:08:44Z"
+          },
+          {
+            "id": 687429038,
+            "name": "V0_1_12_NATIVE.json",
+            "size": 67751,
+            "digest": "sha256:9b6d4abec15531eaf53ef41df6b551c14e45c92a6660ecb099930eabf78329bd",
+            "updated_at": "2026-10-29T05:08:44Z"
+          },
+          {
+            "id": 687441386,
+            "name": "V0_1_12_PUBLIC.json",
+            "size": 18045,
+            "digest": "sha256:d3825c3eb9fc6b8ee504bb87d267c81a836e9df8849a5649cd921d1b2a136a38",
+            "updated_at": "2026-10-29T05:14:59Z"
+          },
+          {
+            "id": 687441390,
+            "name": "V0_1_12_PUBLIC_NATIVE.json",
+            "size": 67755,
+            "digest": "sha256:0204146a01912cefe76a5625675096248716f8ce5547cf773c897447259dfd02",
+            "updated_at": "2026-10-29T05:14:59Z"
+          },
+          {
+            "id": 687429053,
+            "name": "V0_1_12_ROOT_NATIVE.json",
+            "size": 67601,
+            "digest": "sha256:d267216c0f4feba1df8775353a7363de662a0384e2d9c5733da356459a9a23af",
+            "updated_at": "2026-10-29T05:08:45Z"
+          },
+          {
+            "id": 687429054,
+            "name": "VALIDATION_SHA256SUMS",
+            "size": 433,
+            "digest": "sha256:de98c7d6bdf05aa5832f03ae1028299865a91318c386ab7647d63bf187162d7c",
+            "updated_at": "2026-10-29T05:08:45Z"
+          },
+          {
+            "id": 687429055,
+            "name": "VERSION.json",
+            "size": 47,
+            "digest": "sha256:aaf5d36291cb9e7dcc188da4c5a1234b1a6b5c44ce24d27f646b06c6e726e189",
+            "updated_at": "2026-10-29T05:08:45Z"
+          }
+        ]
+      },
+      "v0.2.2": {
+        "id": 413320007,
+        "tag_name": "v0.2.2",
+        "published_at": "2026-10-15T01:11:03Z",
+        "prerelease": true,
+        "assets": [
+          {
+            "id": 642236203,
+            "name": "bootstrap.py",
+            "size": 5201,
+            "digest": "sha256:9fa1248a42b8028ccb26c89f7d4468fb49fcd583b450102f1bf21056d21e82fc",
+            "updated_at": "2026-10-15T01:11:02Z"
+          },
+          {
+            "id": 642236201,
+            "name": "install.sh",
+            "size": 244,
+            "digest": "sha256:c5f446b02ece8ec9c365d66687fab19ff671c8408b176c65b8434437447c2d4e",
+            "updated_at": "2026-10-15T01:11:02Z"
+          },
+          {
+            "id": 642236195,
+            "name": "maa-test.pyz",
+            "size": 174845,
+            "digest": "sha256:41cac495c4a9d3c924e31062e81b6c7a06e399fbb2e6f45e8e0b4d1446539d1a",
+            "updated_at": "2026-10-15T01:11:02Z"
+          },
+          {
+            "id": 642236205,
+            "name": "maa.pyz",
+            "size": 124849,
+            "digest": "sha256:e1eea520681c37a4cb25720413c0a5e4b8d42daa70543ce4159c9a064d639eaf",
+            "updated_at": "2026-10-15T01:11:02Z"
+          },
+          {
+            "id": 642243771,
+            "name": "PUBLIC_SHA256SUMS",
+            "size": 85,
+            "digest": "sha256:ffc3889465eeb8f16acf35de1ffdf6b12fe122a8422210f4004fa71b00f33dd6",
+            "updated_at": "2026-10-15T01:14:30Z"
+          },
+          {
+            "id": 642236230,
+            "name": "SHA256SUMS",
+            "size": 388,
+            "digest": "sha256:e559fb8969a4f60fe0481b9d0bf57950dbdcc9ee1a642b6a3480dec3320e5315",
+            "updated_at": "2026-10-15T01:11:02Z"
+          },
+          {
+            "id": 642236231,
+            "name": "V0_2_2_LOCAL.json",
+            "size": 76125,
+            "digest": "sha256:ae6d5c2f2911e1e6b9d7e7a3ca054411f3294d58b34773ab14643538dbc17a1a",
+            "updated_at": "2026-10-15T01:11:02Z"
+          },
+          {
+            "id": 642243770,
+            "name": "V0_2_2_PUBLIC.json",
+            "size": 83087,
+            "digest": "sha256:0e10b209ac51f547750bc096ef8d2a02f56091a958d3939af975f2207dff16db",
+            "updated_at": "2026-10-15T01:14:30Z"
+          },
+          {
+            "id": 642236234,
+            "name": "VALIDATION_SHA256SUMS",
+            "size": 84,
+            "digest": "sha256:7a9213a8b605e3aa65fb0276e984dcfdd72ecdb8905fc944983b239ed758b89c",
+            "updated_at": "2026-10-15T01:11:03Z"
+          },
+          {
+            "id": 642236194,
+            "name": "VERSION.json",
+            "size": 46,
+            "digest": "sha256:9e14b12ec63afb42c75f63b3516346805c79e79f0b69fe0a0803169cd297a495",
+            "updated_at": "2026-10-15T01:11:02Z"
+          }
+        ]
+      }
+    }
+  },
+  "cleanup": {
+    "owned_validation_environments_removed": [
+      "maa-acceptance-0113",
+      "maa-root-acceptance-0113"
+    ],
+    "pending_cleanup": false,
+    "shared_global_guidelines_unchanged": true
+  },
+  "additional_observation": {
+    "issue": "Portable Python with lazy CA-directory loading is falsely considered to lack ca-certificates",
+    "initial_attempt": "Stopped during prerequisite checks before tests",
+    "validation_environment_configuration": "SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt",
+    "code_changed_for_CA_detection": false,
+    "followup": "docs/KNOWN_ISSUES.md"
+  },
+  "limits": [
+    "External-machine user acceptance pending.",
+    "Non-apt native distribution acceptance, large-model and MTP performance not established."
+  ]
+}
