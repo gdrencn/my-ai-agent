@@ -1,0 +1,75 @@
+{
+  "version": "0.1.11",
+  "channel": "test",
+  "baseline": "stable/0.1.9",
+  "audit": {
+    "grammar_files": 59,
+    "reproducible": true,
+    "package_boundaries": true,
+    "runtime_coupling_absent": true,
+    "sha256": {
+      "maa.pyz": "e833e2940fa815f91a80ed4f7368c026774875e2cee320594177c2591d312be9",
+      "maa-test.pyz": "b3805b2c4e6dc4905b7d3e28cf5d558fa88f7c28e86f95d4df928a9f0076c277",
+      "VERSION.json": "49fdaed24b922ce8d799055c18cf71791e1129a8960cf94140dc4b578bd13262",
+      "bootstrap.py": "485573d1c435f22e2a285984ca23cac5a09000f6bbb033ef034ffb5da77add5f",
+      "install.sh": "c2347bbb96b899db494479ea3d6a26c083f74b497bbbc7851560fdea0054e790",
+      "SHA256SUMS": "2a65f26269c7fa4bda6b02d0e67cbee840d56ac045c08339af70e7682a8f714c"
+    }
+  },
+  "acceptance": {
+    "source_portable": 118,
+    "outside_checkout_paired": 118,
+    "delivery": 13,
+    "ordinary_user_precheck": {
+      "native_checks": 42,
+      "original_retained": 35,
+      "missing": [],
+      "tester_sha256": "568e61b0f9677faf5d39642f67a3965b18634f55232ed31c4b7eba6a43b29ab7",
+      "note": "Before inventory formatting and explicit status acceptance labels; final-byte ordinary acceptance is recorded by public verification."
+    },
+    "root": {
+      "paired": 118,
+      "native_checks": 42,
+      "original_retained": 35,
+      "missing": [],
+      "gpu_assertions": "passed for both native backends"
+    },
+    "cpu_status": {
+      "backend": "llamacpp",
+      "model_context": 32768,
+      "model_KV_compute_host_buffers": true,
+      "gpu_verified": false,
+      "native_cpu_build": "official installer reprobed after test hardware change"
+    },
+    "autostart": {
+      "native_autostart_without_manager": true,
+      "launcher_without_manager": "codex-cli 0.165.0",
+      "archive_restored": true
+    },
+    "upstream": {
+      "codex": "0.165.0",
+      "llama": "b11941",
+      "ollama": "0.40.12"
+    },
+    "yolo": {
+      "enable_disable_restore": "native config/read",
+      "permission_write_home": "private",
+      "confirmation_probe": false,
+      "user_permission_and_recovery_files": "unchanged"
+    },
+    "tool_protocol": "real Codex fixed shell command, function declarations and output replay retained"
+  },
+  "comparison": {
+    "portable": "90 -> 118",
+    "delivery": "10 -> 13",
+    "native": "35 -> 42",
+    "baseline_missing": [],
+    "previous_additions_retained": true
+  },
+  "limitations": [
+    "Public entry acceptance pending at this receipt.",
+    "External-machine user acceptance pending.",
+    "Non-apt native distributions, large-model and MTP performance not established."
+  ],
+  "frozen_previous_releases": "before-state recorded; after publication comparison pending"
+}

@@ -2,7 +2,7 @@
 
 在 Linux 中安装并管理 Ollama、llama.cpp 和 Codex CLI。Maa 不依赖容器管理程序，不判断自身运行在容器、WSL 还是服务器中。
 
-当前测试版本：**0.1.10 test**，基于已验收的 0.1.9，解除环境身份绑定。中英文界面保留，语言和关于位于“选项”中。本版不含 IM 或 Web；后续功能继续在 Maa 内开发。既有 0.1.9 stable 和 0.2.x test 保持不变。
+当前测试版本：**0.1.11 test**，基于已验收的 0.1.9，解除环境身份绑定。中英文界面保留，语言和关于位于“选项”中。本版不含 IM 或 Web；后续功能继续在 Maa 内开发。既有 0.1.9 stable 和 0.2.x test 保持不变。
 
 ## Install and test
 
@@ -12,15 +12,15 @@
 curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/test.sh | bash
 ```
 
-该入口固定默认安装 **0.1.10 test**，安装所选官方程序后运行配对检查。不会因为已有更高版本号的实验版而装到 0.2.x。可使用 `--version` 明确选择其他已发布版本。
+该入口固定默认安装 **0.1.11 test**，安装所选官方程序后运行配对检查。不会因为已有更高版本号的实验版而装到 0.2.x。可使用 `--version` 明确选择其他已发布版本。
 
-只安装管理工具并核验，保留现有底座和 Codex：
+底座和 Codex 已安装时，可跳过组件安装；配对检查仍执行完整功能验收：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/test.sh | bash -s -- --components none
 ```
 
-不运行配对测试时，将 `test/test.sh` 换成 `test/install.sh`。根 `install.sh` 仍选择已发布的 latest stable；0.1.10 需要用户验收后才晋升。普通 Linux 部署请使用本轮 test 入口，旧 stable 不具备本轮解耦能力。
+不运行配对测试时，将 `test/test.sh` 换成 `test/install.sh`。根 `install.sh` 仍选择已发布的 latest stable；0.1.11 需要用户验收后才晋升。普通 Linux 部署请使用本轮 test 入口，旧 stable 不具备本轮解耦能力。
 
 安装器要求 Linux、Python 3.11+ 和正在运行的 systemd 系统管理器。Shell 入口会尝试准备 curl、CA 证书和系统仓库提供的 Python；如果仓库 Python 版本不足，会明确提示安装支持的版本，不添加软件源。Maa 通过共享依赖表调用现有 apt-get、dnf、yum、zypper 或 pacman，安装缺少的所需工具；不进行整机升级，不启动或安装 init 系统，不改变容器权限。需要系统修改时使用当前环境的 root 或 sudo。没有受支持的软件包工具时，提示缺少的依赖。
 
@@ -188,10 +188,12 @@ codex-local exec --skip-git-repo-check 'Explain this directory.'
 
 ## Verification
 
-配对检查包括私有配置和进程夹具中的单元/真实 PTY 检查，以及当前安装的只读核验。后者读取程序版本、systemd 可用性、当前模型状态、启动脚本和 Codex 原生 `config/read` 返回的权限配置。
+配对入口运行全部单元/真实 PTY 检查、安装状态检查，以及从 0.1.9 恢复的完整双底座功能验收。它实际下载并保留 `unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf` 和 Ollama `qwen2.5:3b`，测试加载、切换、流式/非流式回复、函数调用回放、真实 Codex 会话和 `/model` 菜单、资源状态、服务复用、失败回滚、重装保留配置。需要两个底座和 Codex；`--components none` 只跳过组件安装，不减少测试。
 
-检查不下载测试模型，不切换当前目标，不启停当前服务，不更改用户 YOLO，不向 Agent 发送任务或让它执行工具。未安装 Codex 时如实记录未安装；已安装 Codex 但状态查询失败会报错，不伪装通过。输出报告保存在当前用户 HOME 下，权限 0600，不保存凭据、对话或完整 Codex 配置。
+测试会切换当前模型、启停及重配原生服务；成功后保留下载模型，当前测试模型处于暂停状态。YOLO 开启、关闭、恢复仍完整测试，但写入独立 `CODEX_HOME`，只以 Agent 的 `config/read` 结果判断权限，不用命令执行或确认提示推断权限。工具协议测试使用独立测试目录和固定测试输入，与权限状态检查分开。调用用户原有权限配置及恢复文件的字节与权限必须保持不变。临时配置和无效模型夹具在结束或中断后清理。
 
-模型、底座和推理功能需要用户在目标机器实际验收。已选择模型时状态查询只读，不唤醒或加载模型。HOST 由原生环境配置决定，Maa 不新增地址限制。
+安装检查保留版本配对、Linux 依赖、只读当前状态、独立启动脚本、Codex 版本、Agent 权限状态和配置不变核验。缺失原有功能检查或执行失败均判验收失败。GPU 可用时执行原有 GPU 加载和显存断言；无 GPU 时增加实际内存分配检查并明确报告 GPU 未验证。报告位于当前用户 HOME，权限 0600；仅包含测试输入输出、配置字段和诊断，不复制用户会话或凭据。
+
+仅安装而不运行上述验收，使用 `test/install.sh`。HOST 沿用实际底座环境配置，Maa 不新增地址限制。
 
 [开发说明](docs/DEVELOPMENT.md)、[独立性要求](docs/INDEPENDENCE.md) 和 [已完成核验](IMPLEMENTED.md)。历史 0.1.9 文档保存在 `docs/history/0.1.9/`，不能代替当前安装条件。

@@ -1,0 +1,74 @@
+{
+  "backend": "llamacpp",
+  "model": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+  "state": "running",
+  "context": 32768,
+  "allocations": {
+    "load_id": "11337",
+    "gpu_layers": null,
+    "buffers": [
+      {
+        "phase": "main",
+        "component": "load_tensors",
+        "backend": "CPU_Mapped",
+        "kind": "model",
+        "mib": 0.0,
+        "location": "host"
+      },
+      {
+        "phase": "main",
+        "component": "load_tensors",
+        "backend": "CPU_REPACK",
+        "kind": "model",
+        "mib": 204.75,
+        "location": "host"
+      },
+      {
+        "phase": "main",
+        "component": "llama_context",
+        "backend": "CPU",
+        "kind": "output",
+        "mib": 0.58,
+        "location": "host"
+      },
+      {
+        "phase": "main",
+        "component": "llama_kv_cache",
+        "backend": "CPU",
+        "kind": "KV",
+        "mib": 1904.0,
+        "location": "host"
+      },
+      {
+        "phase": "main",
+        "component": "sched_reserve",
+        "backend": "CPU",
+        "kind": "compute",
+        "mib": 60.1,
+        "location": "host"
+      }
+    ],
+    "mtp_shared_kv": false,
+    "rs_sequences": 0,
+    "gpu_identified_mib": null,
+    "truncated": false,
+    "error": null
+  },
+  "usage": null,
+  "error": null,
+  "usage_note": "Native direct connection: no maa conversation interceptor or token receipt.",
+  "mtp": "unavailable",
+  "saved_context": 32768,
+  "gpu_memory": {
+    "devices": [],
+    "error": "nvidia-smi is unavailable"
+  },
+  "resources": {
+    "sleeping": false,
+    "total_slots": 1
+  },
+  "acceptance": {
+    "allocation_location": "host",
+    "gpu_assertions": "unavailable; not verified"
+  }
+}

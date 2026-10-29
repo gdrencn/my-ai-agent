@@ -52,7 +52,8 @@ def build(channel='test'):
     tester['__main__.py'] = (ROOT / 'scripts/test_runner.py').read_bytes()
     tester.update({str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT / 'tests').rglob('*.py')})
     tester['maa_testing/__init__.py'] = b''
-    tester['maa_testing/native.py'] = (ROOT / 'test/native.py').read_bytes()
+    for name in ('native', 'installed', 'codex_ui', 'codex_tool', 'coverage'):
+        tester['maa_testing/' + name + '.py'] = (ROOT / ('test/' + name + '.py')).read_bytes()
     with zipfile.ZipFile(out / 'maa-test.pyz', 'w', compression=zipfile.ZIP_DEFLATED) as archive:
         for name in sorted(tester):
             info = zipfile.ZipInfo(name, date_time=(2020, 1, 1, 0, 0, 0))

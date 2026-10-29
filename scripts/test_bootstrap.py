@@ -7,9 +7,12 @@ import unittest
 import tempfile
 import subprocess
 import os
+import sys
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+from maa import __version__
 spec = importlib.util.spec_from_file_location('maa_bootstrap', ROOT / 'bootstrap.py')
 bootstrap = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(bootstrap)
@@ -39,7 +42,7 @@ class Delivery(unittest.TestCase):
             value=trace.read_text()
             self.assertIn('APT update',value)
             self.assertIn('APT install -y curl ca-certificates',value)
-            self.assertIn('--version\n0.1.10',value)
+            self.assertIn('--version\n' + __version__,value)
             self.assertTrue(value.rstrip().endswith('--version\n0.1.9'),value)
 
     def test_numeric_test_discovery_excludes_other_channels_and_drafts(self):
