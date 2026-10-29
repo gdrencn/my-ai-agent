@@ -1,0 +1,184 @@
+{
+  "version": "0.2.1",
+  "channel": "test",
+  "status": "passed",
+  "at": "2026-10-14T10:08:55.710713+00:00",
+  "release": "https://github.com/gdrencn/my-ai-agent/releases/tag/v0.2.1",
+  "source_commit": "e40380bd4eaaccd1872a62802f69e08cbee78128",
+  "asset_sha256": {
+    "maa.pyz": "2712368be31562cbcb36131e64147cd87d860f089de3375da41f3f8bf229e370",
+    "maa-test.pyz": "cf5ae698d46c86e12d00ca4b7e3304e8dd9a33a00b9c516a7b861d937b853d9c",
+    "VERSION.json": "ed59b0da9558d26116b89e3ac791a48864bf53a6bb3117b32e3bac2ad295db47",
+    "bootstrap.py": "12d1cf03fd7836e70d66d94f5e985f6e943697e4af663fb1559678293d035a3c",
+    "install.sh": "c5f446b02ece8ec9c365d66687fab19ff671c8408b176c65b8434437447c2d4e",
+    "SHA256SUMS": "7100e264055cfde2f38d2419a7e69be75f5ef03488e096ae9d9b6521d408a42d"
+  },
+  "ci": {
+    "main": {
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/gdrencn/my-ai-agent/actions/runs/38545543010"
+    },
+    "tag": {
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/gdrencn/my-ai-agent/actions/runs/38545909423"
+    }
+  },
+  "verified_assets": [
+    {
+      "name": "IM_DIRECTORY_IDENTITY_FIX.json",
+      "sha256": "385847d573c5c9baa31b84368bc0922f8dfcedd1d0062d193530d0a5cb66f368",
+      "identical": true
+    },
+    {
+      "name": "PUBLIC_SHA256SUMS",
+      "sha256": "2e778628c057bc6ce410ef434e8ccd98f668c277bc1255add8532e0edfe804bb",
+      "identical": true
+    },
+    {
+      "name": "SHA256SUMS",
+      "sha256": "7100e264055cfde2f38d2419a7e69be75f5ef03488e096ae9d9b6521d408a42d",
+      "identical": true
+    },
+    {
+      "name": "V0_2_1_IM_LIFECYCLE.json",
+      "sha256": "b473eb831f37d3411748d0392201e2889f9b76721493103b6d25e133b7894efa",
+      "identical": true
+    },
+    {
+      "name": "V0_2_1_IM_NATIVE.json",
+      "sha256": "48da6b358488a666e8772cb83f514988abcfde12514110c6af9bcffebd8853ca",
+      "identical": true
+    },
+    {
+      "name": "V0_2_1_LOCAL.json",
+      "sha256": "e61e5f8b9690139e4164e30dda920a87d65f1adb5eade1b19628c16d789211d3",
+      "identical": true
+    },
+    {
+      "name": "V0_2_1_MENU.json",
+      "sha256": "901e0d11cd0538d6edc6fdfbd7c802599a2c9ffa7172c8b654b665c87d19f19e",
+      "identical": true
+    },
+    {
+      "name": "V0_2_1_NATIVE.json",
+      "sha256": "a1e9513718c9d52ea8c2766fa32405a678f7a3ae21ee2da8d6238459ea8aeff2",
+      "identical": true
+    },
+    {
+      "name": "V0_2_1_PUBLIC.json",
+      "sha256": "7be41a474032d072ec22824297d606118069310fad9a9d340795ae3b8e7d40fa",
+      "identical": true
+    },
+    {
+      "name": "V0_2_1_ROLLBACK.json",
+      "sha256": "5f96ea9af484dcf8ca1a1d9d40037c644271bce8949f9e302bc203a0adb183d9",
+      "identical": true
+    },
+    {
+      "name": "V0_2_1_ROOT_IM_LIFECYCLE.json",
+      "sha256": "bf81374ef365f4bf55158a7f26c05324c2bb4b409c363c610c5511719a1d215e",
+      "identical": true
+    },
+    {
+      "name": "V0_2_1_ROOT_IM_NATIVE.json",
+      "sha256": "a7490ca3c1c9b4eec9df025bb41e79804bb76f5f485539914d61d644c6c95e52",
+      "identical": true
+    },
+    {
+      "name": "VALIDATION_SHA256SUMS",
+      "sha256": "0facd4d6435519ae701142d0a319f7cb11762f817f23be6c89a36a397cb88e00",
+      "identical": true
+    },
+    {
+      "name": "VERSION.json",
+      "sha256": "ed59b0da9558d26116b89e3ac791a48864bf53a6bb3117b32e3bac2ad295db47",
+      "identical": true
+    },
+    {
+      "name": "bootstrap.py",
+      "sha256": "12d1cf03fd7836e70d66d94f5e985f6e943697e4af663fb1559678293d035a3c",
+      "identical": true
+    },
+    {
+      "name": "install.sh",
+      "sha256": "c5f446b02ece8ec9c365d66687fab19ff671c8408b176c65b8434437447c2d4e",
+      "identical": true
+    },
+    {
+      "name": "maa-test.pyz",
+      "sha256": "cf5ae698d46c86e12d00ca4b7e3304e8dd9a33a00b9c516a7b861d937b853d9c",
+      "identical": true
+    },
+    {
+      "name": "maa.pyz",
+      "sha256": "2712368be31562cbcb36131e64147cd87d860f089de3375da41f3f8bf229e370",
+      "identical": true
+    }
+  ],
+  "verified_manifests": [
+    "SHA256SUMS",
+    "VALIDATION_SHA256SUMS",
+    "PUBLIC_SHA256SUMS"
+  ],
+  "public_installers": {
+    "status": "passed",
+    "kind": "actual public installer, components none",
+    "entries": [
+      {
+        "entry": "install.sh",
+        "arguments": [
+          "--components",
+          "none"
+        ],
+        "version": "0.1.9",
+        "sha256": "2dcda1dd4eba9697d4a4e1e7a47b74fd932685be19a548973d810d6c1af9b399",
+        "configuration_hashes_unchanged": true,
+        "disabled_yolo_preserved": true
+      },
+      {
+        "entry": "test/install.sh",
+        "arguments": [
+          "--components",
+          "none"
+        ],
+        "version": "0.2.1",
+        "sha256": "2712368be31562cbcb36131e64147cd87d860f089de3375da41f3f8bf229e370",
+        "configuration_hashes_unchanged": true,
+        "disabled_yolo_preserved": true
+      },
+      {
+        "entry": "test/install.sh",
+        "arguments": [
+          "--components",
+          "none",
+          "--version",
+          "0.2.1"
+        ],
+        "version": "0.2.1",
+        "sha256": "2712368be31562cbcb36131e64147cd87d860f089de3375da41f3f8bf229e370",
+        "configuration_hashes_unchanged": true,
+        "disabled_yolo_preserved": true
+      }
+    ]
+  },
+  "stable_unchanged": {
+    "status": "passed",
+    "latest": "stable/0.1.9",
+    "tag_object": "d7e5771a72c41ac2fee68811dc38509317da668d",
+    "source_commit": "b3189e95d996cbb36911076e5e90ef9feca39021",
+    "all_11_asset_digests_unchanged": true
+  },
+  "cleanup": {
+    "status": "passed",
+    "deleted_owned_container": "maa-021-menu-check",
+    "remaining_mas_containers": []
+  },
+  "scope": "Same 0.2.1 test iteration; primary paired assets updated after completed menu self-checks. Earlier receipts retain their original hashes.",
+  "limitations": [
+    "No real official account acceptance in this correction.",
+    "No new model/Codex native suite; 118 portable/PTY checks and nine connector native checks per user are in V0_2_1_MENU.json."
+  ],
+  "asset_verification_phase": "The listed 18 assets were verified before appending this public receipt. PUBLIC_SHA256SUMS was then updated to cover both public receipts; its listed initial digest is historical. The final receipt and checksum were downloaded and compared separately."
+}

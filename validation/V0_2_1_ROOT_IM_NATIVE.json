@@ -1,0 +1,92 @@
+{
+  "version": "0.2.1",
+  "uid": 0,
+  "kind": "native connector lifecycle, no official accounts",
+  "product_sha256": "424ea75bcfcacd5cf803b03c3aea6835d98982feb19cb8a1f40da3c645d50700",
+  "checks": [
+    {
+      "name": "im-native-install",
+      "status": "passed",
+      "detail": {
+        "ok": true
+      }
+    },
+    {
+      "name": "im-native-independent-unit",
+      "status": "passed",
+      "detail": {
+        "independent_runtime": true,
+        "initially_closed": true,
+        "unit": "maa-connectors-0.service"
+      }
+    },
+    {
+      "name": "im-native-manager-independent",
+      "status": "passed",
+      "detail": {
+        "manager_archive_absent": true,
+        "empty_runtime_active": true,
+        "network_requests": 0
+      }
+    },
+    {
+      "name": "im-native-close-all",
+      "status": "passed",
+      "detail": {
+        "ok": true
+      }
+    },
+    {
+      "name": "im-native-disabled-account",
+      "status": "passed",
+      "detail": {
+        "id": "613ee48d731f4ba780e44ebaaf92bf9c",
+        "platform": "whatsapp",
+        "name": "native fixture",
+        "owner_id": "",
+        "platform_id": "",
+        "api_base": "https://api.whatsapp.com",
+        "enabled": false,
+        "created_at": 1791698924.2356818,
+        "reply": "my-ai-agent：消息收发测试成功。",
+        "credential_set": true
+      }
+    },
+    {
+      "name": "im-native-private-export",
+      "status": "passed",
+      "detail": {
+        "path": "/tmp/maa-im-native-3753bjg8/backup.json",
+        "connections": 1,
+        "contains_credentials": true
+      }
+    },
+    {
+      "name": "im-native-delete",
+      "status": "passed",
+      "detail": {
+        "deleted": "613ee48d731f4ba780e44ebaaf92bf9c",
+        "remote_changed": false
+      }
+    },
+    {
+      "name": "im-native-import-closed",
+      "status": "passed",
+      "detail": {
+        "imported": 1,
+        "enabled": false
+      }
+    },
+    {
+      "name": "im-native-uninstall",
+      "status": "passed",
+      "detail": {
+        "deleted": "connector-module",
+        "remote_changed": false
+      }
+    }
+  ],
+  "status": "passed",
+  "finished": "2026-10-11T06:08:45.347243+00:00",
+  "iteration_evidence": "Initial 0.2.1 attempt before the directory identity correction. Original hashes and results retained; corrected-byte checks are recorded in IM_DIRECTORY_IDENTITY_FIX.json and final public verification."
+}

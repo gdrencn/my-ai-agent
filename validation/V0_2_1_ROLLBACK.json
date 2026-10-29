@@ -1,0 +1,148 @@
+{
+  "stable-before-upgrade": {
+    "hashes": {
+      "/home/sandbox/.local/state/my-ai-agent/runtime.json": "632a29f6c3aef118f38148ea6cf4e535636e4662e5fd231071835bba7118b6da",
+      "/home/sandbox/.local/state/my-ai-agent/models.json": "96e36f5d784a320c4b1d75f17172ee632b914a9de88bba028281147328690df6",
+      "/home/sandbox/.local/state/my-ai-agent/target.json": "28aa5805b8a6f6291199c3f87bd352cb4945ed310fd0a8b771154c38cbe920f7",
+      "/home/sandbox/.local/state/my-ai-agent/installation.json": "4b8894d57dfa621e534ef4eb25263e8f00254cbcb4327f1f98796314ac279dde",
+      "/home/sandbox/.local/state/my-ai-agent/selected.json": "28aa5805b8a6f6291199c3f87bd352cb4945ed310fd0a8b771154c38cbe920f7",
+      "/home/sandbox/.local/state/my-ai-agent/configs/07591f8b732c1e7241bfe575.json": "68e7240d2a34fa6281e0d475cfff20453a20009f165f34754bf97e33611a32f2",
+      "/home/sandbox/.local/state/my-ai-agent/models/66204dcd0d42165045cefdeb/Qwen3-0.6B-Q4_K_M.gguf": "ac2d97712095a558e31573f62f466a3f9d93990898b0ec79d7c974c1780d524a",
+      "/home/sandbox/.codex/config.toml": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/home/sandbox/.codex/maa-local.config.toml": "673a09ef408e6345a2251724f7faecbf518a83a803d7b1e54d1b40d3944c9f8d",
+      "/home/sandbox/.codex/maa-model-catalogs/0ab4ac0b7320c28ceaa01e6ce73b18a743e1777f16556e7d96ea3aab25c86a56.json": "0ab4ac0b7320c28ceaa01e6ce73b18a743e1777f16556e7d96ea3aab25c86a56",
+      "/etc/systemd/system/llama-server.service": "ff5d01f08c2d75de6ccc23d80a0c3ad710ea3602f018924c8c19057701582070",
+      "/etc/systemd/system/ollama.service": "6b787a80e9a1c1f1f870c862d803679afab435bda2e33a0a1363992c516b6308"
+    },
+    "native": {
+      "InvocationID": "fbd51e81b5b54b66b7b8a8e4597a6357",
+      "MainPID": "3150",
+      "ActiveState": "active"
+    },
+    "version": "0.1.9",
+    "codex": "codex-cli 0.162.1"
+  },
+  "upgraded": {
+    "hashes": {
+      "/home/sandbox/.local/state/my-ai-agent/runtime.json": "632a29f6c3aef118f38148ea6cf4e535636e4662e5fd231071835bba7118b6da",
+      "/home/sandbox/.local/state/my-ai-agent/models.json": "96e36f5d784a320c4b1d75f17172ee632b914a9de88bba028281147328690df6",
+      "/home/sandbox/.local/state/my-ai-agent/target.json": "28aa5805b8a6f6291199c3f87bd352cb4945ed310fd0a8b771154c38cbe920f7",
+      "/home/sandbox/.local/state/my-ai-agent/installation.json": "4b8894d57dfa621e534ef4eb25263e8f00254cbcb4327f1f98796314ac279dde",
+      "/home/sandbox/.local/state/my-ai-agent/selected.json": "28aa5805b8a6f6291199c3f87bd352cb4945ed310fd0a8b771154c38cbe920f7",
+      "/home/sandbox/.local/state/my-ai-agent/configs/07591f8b732c1e7241bfe575.json": "68e7240d2a34fa6281e0d475cfff20453a20009f165f34754bf97e33611a32f2",
+      "/home/sandbox/.local/state/my-ai-agent/models/66204dcd0d42165045cefdeb/Qwen3-0.6B-Q4_K_M.gguf": "ac2d97712095a558e31573f62f466a3f9d93990898b0ec79d7c974c1780d524a",
+      "/home/sandbox/.codex/config.toml": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/home/sandbox/.codex/maa-local.config.toml": "673a09ef408e6345a2251724f7faecbf518a83a803d7b1e54d1b40d3944c9f8d",
+      "/home/sandbox/.codex/maa-model-catalogs/0ab4ac0b7320c28ceaa01e6ce73b18a743e1777f16556e7d96ea3aab25c86a56.json": "0ab4ac0b7320c28ceaa01e6ce73b18a743e1777f16556e7d96ea3aab25c86a56",
+      "/etc/systemd/system/llama-server.service": "ff5d01f08c2d75de6ccc23d80a0c3ad710ea3602f018924c8c19057701582070",
+      "/etc/systemd/system/ollama.service": "6b787a80e9a1c1f1f870c862d803679afab435bda2e33a0a1363992c516b6308"
+    },
+    "native": {
+      "InvocationID": "fbd51e81b5b54b66b7b8a8e4597a6357",
+      "MainPID": "3150",
+      "ActiveState": "active"
+    },
+    "version": "0.2.1",
+    "codex": "codex-cli 0.162.1"
+  },
+  "test-before-downgrade": {
+    "hashes": {
+      "/home/sandbox/.local/state/my-ai-agent/ollama-originals.json": "768a9b0dbd0f40648754d7c1e18b4032714de3f63c1f6837fb9533dab6a82b7d",
+      "/home/sandbox/.local/state/my-ai-agent/runtime.json": "4446d9188dadc943607c4d54d7993109cf10c8ee05eec0db9e5417fb37e0b3cc",
+      "/home/sandbox/.local/state/my-ai-agent/models.json": "33ef4491f82163b5b8387b3c02abf969fac0edc6f2d20853ef511cf74a83d9cf",
+      "/home/sandbox/.local/state/my-ai-agent/target.json": "26206d8d7cf3597b341e160f463e38d79b37ba9885c59cddbd4035225e96c8d9",
+      "/home/sandbox/.local/state/my-ai-agent/installation.json": "4b8894d57dfa621e534ef4eb25263e8f00254cbcb4327f1f98796314ac279dde",
+      "/home/sandbox/.local/state/my-ai-agent/selected.json": "26206d8d7cf3597b341e160f463e38d79b37ba9885c59cddbd4035225e96c8d9",
+      "/home/sandbox/.local/state/my-ai-agent/native/ollama-preload.json": "12fdfe2a6bf82eb8a9730eb1f98771b1588450a50813c8c00ba07edb8d74cf21",
+      "/home/sandbox/.local/state/my-ai-agent/configs/3c675f8a255333c855c7a80b.json": "97b9eb67ecf0357893b94b3d5e3ca0f58ab3178b8d8645ea25c93cf60a187766",
+      "/home/sandbox/.local/state/my-ai-agent/configs/07591f8b732c1e7241bfe575.json": "97b9eb67ecf0357893b94b3d5e3ca0f58ab3178b8d8645ea25c93cf60a187766",
+      "/home/sandbox/.local/state/my-ai-agent/models/66204dcd0d42165045cefdeb/Qwen3-0.6B-Q4_K_M.gguf": "ac2d97712095a558e31573f62f466a3f9d93990898b0ec79d7c974c1780d524a",
+      "/home/sandbox/.codex/config.toml": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/home/sandbox/.codex/maa-local.config.toml": "50107e06e06ad8d60ee436cc0787521ec2ed2518f227ddfa44c972e149cdde48",
+      "/home/sandbox/.codex/maa-model-catalogs/841865aa21ab81d0c9f9db648d87635e5b847a4b6d8571801fea05cc411d3d32.json": "841865aa21ab81d0c9f9db648d87635e5b847a4b6d8571801fea05cc411d3d32",
+      "/home/sandbox/.codex/maa-model-catalogs/0ab4ac0b7320c28ceaa01e6ce73b18a743e1777f16556e7d96ea3aab25c86a56.json": "0ab4ac0b7320c28ceaa01e6ce73b18a743e1777f16556e7d96ea3aab25c86a56",
+      "/home/sandbox/.codex/maa-model-catalogs/14b764d1fc9e133b853fc97b1961c4987c8905b34391c48d660401b2a4346bbb.json": "14b764d1fc9e133b853fc97b1961c4987c8905b34391c48d660401b2a4346bbb",
+      "/etc/systemd/system/llama-server.service": "a9fa1bed8b86cf0f1792046913970476a184e6b99fb756f49c263822c828125b",
+      "/etc/systemd/system/ollama.service": "6b787a80e9a1c1f1f870c862d803679afab435bda2e33a0a1363992c516b6308",
+      "/etc/systemd/system/ollama.service.d/50-local-model.conf": "f586b59bbac8aeb31eb0591daff96e38d03a80154e82727ce7683cdaddab56e2"
+    },
+    "native": {
+      "InvocationID": "74570f962f6b4db2be04461728425868",
+      "MainPID": "231",
+      "ActiveState": "active"
+    },
+    "version": "0.2.1",
+    "codex": "codex-cli 0.162.1"
+  },
+  "downgraded": {
+    "hashes": {
+      "/home/sandbox/.local/state/my-ai-agent/ollama-originals.json": "768a9b0dbd0f40648754d7c1e18b4032714de3f63c1f6837fb9533dab6a82b7d",
+      "/home/sandbox/.local/state/my-ai-agent/runtime.json": "4446d9188dadc943607c4d54d7993109cf10c8ee05eec0db9e5417fb37e0b3cc",
+      "/home/sandbox/.local/state/my-ai-agent/models.json": "33ef4491f82163b5b8387b3c02abf969fac0edc6f2d20853ef511cf74a83d9cf",
+      "/home/sandbox/.local/state/my-ai-agent/target.json": "26206d8d7cf3597b341e160f463e38d79b37ba9885c59cddbd4035225e96c8d9",
+      "/home/sandbox/.local/state/my-ai-agent/installation.json": "4b8894d57dfa621e534ef4eb25263e8f00254cbcb4327f1f98796314ac279dde",
+      "/home/sandbox/.local/state/my-ai-agent/selected.json": "26206d8d7cf3597b341e160f463e38d79b37ba9885c59cddbd4035225e96c8d9",
+      "/home/sandbox/.local/state/my-ai-agent/native/ollama-preload.json": "12fdfe2a6bf82eb8a9730eb1f98771b1588450a50813c8c00ba07edb8d74cf21",
+      "/home/sandbox/.local/state/my-ai-agent/configs/3c675f8a255333c855c7a80b.json": "97b9eb67ecf0357893b94b3d5e3ca0f58ab3178b8d8645ea25c93cf60a187766",
+      "/home/sandbox/.local/state/my-ai-agent/configs/07591f8b732c1e7241bfe575.json": "97b9eb67ecf0357893b94b3d5e3ca0f58ab3178b8d8645ea25c93cf60a187766",
+      "/home/sandbox/.local/state/my-ai-agent/models/66204dcd0d42165045cefdeb/Qwen3-0.6B-Q4_K_M.gguf": "ac2d97712095a558e31573f62f466a3f9d93990898b0ec79d7c974c1780d524a",
+      "/home/sandbox/.codex/config.toml": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/home/sandbox/.codex/maa-local.config.toml": "50107e06e06ad8d60ee436cc0787521ec2ed2518f227ddfa44c972e149cdde48",
+      "/home/sandbox/.codex/maa-model-catalogs/841865aa21ab81d0c9f9db648d87635e5b847a4b6d8571801fea05cc411d3d32.json": "841865aa21ab81d0c9f9db648d87635e5b847a4b6d8571801fea05cc411d3d32",
+      "/home/sandbox/.codex/maa-model-catalogs/0ab4ac0b7320c28ceaa01e6ce73b18a743e1777f16556e7d96ea3aab25c86a56.json": "0ab4ac0b7320c28ceaa01e6ce73b18a743e1777f16556e7d96ea3aab25c86a56",
+      "/home/sandbox/.codex/maa-model-catalogs/14b764d1fc9e133b853fc97b1961c4987c8905b34391c48d660401b2a4346bbb.json": "14b764d1fc9e133b853fc97b1961c4987c8905b34391c48d660401b2a4346bbb",
+      "/etc/systemd/system/llama-server.service": "a9fa1bed8b86cf0f1792046913970476a184e6b99fb756f49c263822c828125b",
+      "/etc/systemd/system/ollama.service": "6b787a80e9a1c1f1f870c862d803679afab435bda2e33a0a1363992c516b6308",
+      "/etc/systemd/system/ollama.service.d/50-local-model.conf": "f586b59bbac8aeb31eb0591daff96e38d03a80154e82727ce7683cdaddab56e2"
+    },
+    "native": {
+      "InvocationID": "74570f962f6b4db2be04461728425868",
+      "MainPID": "231",
+      "ActiveState": "active"
+    },
+    "version": "0.1.9",
+    "codex": "codex-cli 0.162.1"
+  },
+  "after-reboot": {
+    "hashes": {
+      "/home/sandbox/.local/state/my-ai-agent/ollama-originals.json": "768a9b0dbd0f40648754d7c1e18b4032714de3f63c1f6837fb9533dab6a82b7d",
+      "/home/sandbox/.local/state/my-ai-agent/runtime.json": "4446d9188dadc943607c4d54d7993109cf10c8ee05eec0db9e5417fb37e0b3cc",
+      "/home/sandbox/.local/state/my-ai-agent/models.json": "33ef4491f82163b5b8387b3c02abf969fac0edc6f2d20853ef511cf74a83d9cf",
+      "/home/sandbox/.local/state/my-ai-agent/target.json": "26206d8d7cf3597b341e160f463e38d79b37ba9885c59cddbd4035225e96c8d9",
+      "/home/sandbox/.local/state/my-ai-agent/installation.json": "4b8894d57dfa621e534ef4eb25263e8f00254cbcb4327f1f98796314ac279dde",
+      "/home/sandbox/.local/state/my-ai-agent/selected.json": "26206d8d7cf3597b341e160f463e38d79b37ba9885c59cddbd4035225e96c8d9",
+      "/home/sandbox/.local/state/my-ai-agent/native/ollama-preload.json": "12fdfe2a6bf82eb8a9730eb1f98771b1588450a50813c8c00ba07edb8d74cf21",
+      "/home/sandbox/.local/state/my-ai-agent/configs/3c675f8a255333c855c7a80b.json": "97b9eb67ecf0357893b94b3d5e3ca0f58ab3178b8d8645ea25c93cf60a187766",
+      "/home/sandbox/.local/state/my-ai-agent/configs/07591f8b732c1e7241bfe575.json": "97b9eb67ecf0357893b94b3d5e3ca0f58ab3178b8d8645ea25c93cf60a187766",
+      "/home/sandbox/.local/state/my-ai-agent/models/66204dcd0d42165045cefdeb/Qwen3-0.6B-Q4_K_M.gguf": "ac2d97712095a558e31573f62f466a3f9d93990898b0ec79d7c974c1780d524a",
+      "/home/sandbox/.codex/config.toml": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/home/sandbox/.codex/maa-local.config.toml": "50107e06e06ad8d60ee436cc0787521ec2ed2518f227ddfa44c972e149cdde48",
+      "/home/sandbox/.codex/maa-model-catalogs/841865aa21ab81d0c9f9db648d87635e5b847a4b6d8571801fea05cc411d3d32.json": "841865aa21ab81d0c9f9db648d87635e5b847a4b6d8571801fea05cc411d3d32",
+      "/home/sandbox/.codex/maa-model-catalogs/0ab4ac0b7320c28ceaa01e6ce73b18a743e1777f16556e7d96ea3aab25c86a56.json": "0ab4ac0b7320c28ceaa01e6ce73b18a743e1777f16556e7d96ea3aab25c86a56",
+      "/home/sandbox/.codex/maa-model-catalogs/14b764d1fc9e133b853fc97b1961c4987c8905b34391c48d660401b2a4346bbb.json": "14b764d1fc9e133b853fc97b1961c4987c8905b34391c48d660401b2a4346bbb",
+      "/etc/systemd/system/llama-server.service": "a9fa1bed8b86cf0f1792046913970476a184e6b99fb756f49c263822c828125b",
+      "/etc/systemd/system/ollama.service": "6b787a80e9a1c1f1f870c862d803679afab435bda2e33a0a1363992c516b6308",
+      "/etc/systemd/system/ollama.service.d/50-local-model.conf": "f586b59bbac8aeb31eb0591daff96e38d03a80154e82727ce7683cdaddab56e2"
+    },
+    "native": {
+      "InvocationID": "d91cdd80c53b43dcbe453849f78c16d9",
+      "MainPID": "231",
+      "ActiveState": "active"
+    },
+    "version": "0.1.9",
+    "codex": "codex-cli 0.162.1"
+  },
+  "post_reboot_codex": {
+    "returncode": 0,
+    "stdout": "MAA_ROLLBACK_OK\n",
+    "diagnostic": "Reading additional input from stdin...\nOpenAI Codex v0.162.1\n--------\nworkdir: /tmp/maa-rollback-codex-o_ytk70r\nmodel: qwen2.5:3b\nprovider: maa_local\napproval: never\nsandbox: read-only\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a12997-f6a5-7f62-9d0e-6aef6e35e043\n--------\nuser\nReply with MAA_ROLLBACK_OK. Do not use tools.\ncodex\nMAA_ROLLBACK_OK\ntokens used\n3,661\n",
+    "backend_running": true,
+    "yolo_remains_off": true,
+    "selected_key": "3c675f8a255333c855c7a80b"
+  },
+  "status": "passed",
+  "version": "0.2.1",
+  "stable_tag": "stable/0.1.9",
+  "stable_product_sha256": "2dcda1dd4eba9697d4a4e1e7a47b74fd932685be19a548973d810d6c1af9b399",
+  "iteration_evidence": "Initial 0.2.1 attempt before the directory identity correction. Original hashes and results retained; corrected-byte checks are recorded in IM_DIRECTORY_IDENTITY_FIX.json and final public verification."
+}

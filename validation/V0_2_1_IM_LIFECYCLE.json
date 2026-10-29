@@ -1,0 +1,29 @@
+{
+  "kind": "native IM with fictional credentials, no network",
+  "phases": {
+    "prepare": {
+      "selective_close_delete": true,
+      "other_workers_running": true,
+      "reinstall_kept_switches_and_instance": true,
+      "archive_removed_for_boot": true,
+      "before_boot": "ActiveState=active\nInvocationID=d48446dccc4b4489b10c31ef8d8f38cb\nMainPID=828\n"
+    },
+    "after-boot": {
+      "autostart_without_manager": true,
+      "configured_workers": 3,
+      "native_unit": "ActiveState=active\nInvocationID=498e0e826dfa4da4a88ff0af5ac290ed\nMainPID=177\n"
+    },
+    "clean": {
+      "off_disabled_autostart": true,
+      "unit_program_and_state_removed": true,
+      "backup_mode": "0o600"
+    }
+  },
+  "at": "2026-10-11T06:12:15.435301+00:00",
+  "version": "0.2.1",
+  "status": "passed",
+  "network_interfaces_during_fixture": [
+    "lo"
+  ],
+  "iteration_evidence": "Initial 0.2.1 attempt before the directory identity correction. Original hashes and results retained; corrected-byte checks are recorded in IM_DIRECTORY_IDENTITY_FIX.json and final public verification."
+}
