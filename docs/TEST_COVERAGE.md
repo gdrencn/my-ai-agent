@@ -4,7 +4,7 @@ Every baseline functional check is present in the default paired test entry. Ver
 
 | Suite | 0.1.9 | 0.1.14 | Missing |
 | --- | ---: | ---: | ---: |
-| Portable / real PTY | 90 | 137 | 0 |
+| Portable / real PTY | 90 | 138 | 0 |
 | Delivery | 10 | 13 | 0 |
 | Installed functional acceptance | 35 | 42 | 0 |
 
@@ -64,4 +64,4 @@ Every 0.1.12 test remains. The 0.1.10 language, environment, independence and op
 
 The former deployment-identity gate is not restored. Actual Linux/systemd/dependency checks replace it, as explicitly requested; model and Codex functional acceptance does not depend on where Linux was created. No GPU/MTP hardware claim is derived from a portable fixture.
 
-Nine additional regressions cover immediate native authentication with piped stdin, nested live stderr capture, authentication failure, interruption and terminal restoration, cached and command-specific NOPASSWD policy, noninteractive failure, root bypass, checked failure output and partial timeout diagnostics. All 128 portable IDs from 0.1.13 remain, in addition to every baseline and independence check. Real authentication exercises both classic sudo and sudo-rs, including a zero-duration timestamp. Execution receipts separately record full installed acceptance and authenticated public installation; portable fixtures do not establish native hardware or upstream compatibility. The historical 0.1.13 process-cleanup and CA-directory observations remain available in their immutable receipts and [KNOWN_ISSUES.md](KNOWN_ISSUES.md).
+Ten additional regressions cover immediate native authentication with piped stdin, nested live stderr capture, authentication failure, interruption and terminal restoration, cached and command-specific NOPASSWD policy, noninteractive failure, root bypass, checked failure output and partial timeout diagnostics and bounded process-exit waiting after PTY EOF. All 128 portable IDs from 0.1.13 remain, in addition to every baseline and independence check. Real authentication exercises both classic sudo and sudo-rs, including a zero-duration timestamp. Execution receipts separately record full installed acceptance and authenticated public installation; portable fixtures do not establish native hardware or upstream compatibility. The historical 0.1.13 process-cleanup and CA-directory observations remain available in their immutable receipts and [KNOWN_ISSUES.md](KNOWN_ISSUES.md).

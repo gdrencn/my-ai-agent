@@ -11,13 +11,13 @@
     "runtime_coupling_absent": true,
     "sha256": {
       "maa.pyz": "dc2319a609f5079c9f7dd0336a82ab29634f3290271f1f456179af4f26e83860",
-      "maa-test.pyz": "9c8956a23f095c6fbb572432fad7aa6cc07de690d8d7b189d50bc6a85fd5083a",
+      "maa-test.pyz": "2a6fa6c7a8ce30bef2f244a2fa6332278fcf66ea1c5605a0ee48b242348d3cd9",
       "VERSION.json": "9d17be5f8fd0dbe455e0e8b2b142c139ebb520e3bc41c1f64d1f95412747a79f",
       "bootstrap.py": "485573d1c435f22e2a285984ca23cac5a09000f6bbb033ef034ffb5da77add5f",
       "install.sh": "f365a42edfd7a5e418bb4fe6637f27e4b1705b8801477ea4f832af1ef8a123c7",
-      "SHA256SUMS": "56100de282f96470c224ebc2652eb497baaf31ea61bb0426ce564967746b871c"
+      "SHA256SUMS": "e457a85bd9ec350d278bc8786586616ad755cc9238eb3e1aa2dcde40c642c188"
     },
-    "current_portable": 137,
+    "current_portable": 138,
     "previous_portable": {
       "v0.1.9": {
         "count": 90,
@@ -42,17 +42,17 @@
     }
   },
   "acceptance": {
-    "portable": 137,
+    "portable": 138,
     "delivery": 13,
-    "outside_checkout_paired": 137,
+    "outside_checkout_paired": 138,
     "ordinary_user": {
       "python": "3.14.4",
-      "paired": 137,
+      "paired": 138,
       "native": 42
     },
     "root": {
       "python": "3.12.3",
-      "paired": 137,
+      "paired": 138,
       "native": 42
     },
     "real_authentication": {
@@ -75,5 +75,11 @@
     "no_baseline_test_removed": true,
     "stable_0_1_9_unchanged": true
   },
-  "public_entry": "pending separate public receipt after publication"
+  "public_entry": "pending separate public receipt after publication",
+  "test_harness_correction": {
+    "cause": "PTY EOF may precede process exit readiness",
+    "bounded_wait": true,
+    "deterministic_early_eof_regression": true,
+    "all_native_checks_rerun": true
+  }
 }

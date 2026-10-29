@@ -1,7 +1,7 @@
 {
   "version": "0.1.14",
   "kind": "complete installed functional acceptance",
-  "started": "2026-10-29T10:13:10.233421+00:00",
+  "started": "2026-10-29T10:25:56.566960+00:00",
   "checks": [
     {
       "name": "installed-version",
@@ -20,16 +20,16 @@
       "name": "current-model-state",
       "status": "passed",
       "detail": {
-        "backend": null,
-        "model": null,
-        "state": "unselected",
+        "backend": "ollama",
+        "model": "qwen2.5:3b",
+        "state": "paused",
         "context": null,
         "allocations": null,
         "usage": null,
         "error": null,
         "usage_note": "Native direct connection: no maa conversation interceptor or token receipt.",
         "mtp": "unavailable",
-        "saved_context": null
+        "saved_context": 32768
       }
     },
     {
@@ -62,7 +62,7 @@
       "status": "passed",
       "detail": {
         "configurations_unchanged": true,
-        "model_state": "unselected"
+        "model_state": "paused"
       }
     },
     {
@@ -310,13 +310,13 @@
             "device": 2112,
             "inode": 543303,
             "offset": 0,
-            "service_id": "9340fa7f9f9b4ed3a5669feebe24a896"
+            "service_id": "bd7e375bcd0b48c7b734b11b8f0cd25b"
           },
           "native_config": {
             "/etc/systemd/system/llama-server.service": "8d09c06f06a3ba0606920600bde111387a46776f89cd81f38c0fd556ace67faa"
           },
           "log_path": "/root/.local/state/my-ai-agent/native/llamacpp.log",
-          "pid": 2443,
+          "pid": 7952,
           "base_url": "http://127.0.0.1:8080/v1",
           "capabilities": {
             "native_direct_connection": true
@@ -404,8 +404,8 @@
                 "index": "0",
                 "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
                 "total_mib": 24463.0,
-                "used_mib": 5497.0,
-                "free_mib": 18641.0,
+                "used_mib": 5522.0,
+                "free_mib": 18616.0,
                 "reserved_mib": 326.0
               }
             ],
@@ -432,9 +432,9 @@
       "status": "passed",
       "detail": {
         "nonstream": {
-          "completed_at": 1793268846,
-          "created_at": 1793268846,
-          "id": "resp_xHStm3gnlcGlksRGr7ON6HSZJziE13l0",
+          "completed_at": 1793269563,
+          "created_at": 1793269563,
+          "id": "resp_PJjU7SVPEEgJ3XpVAUNiRCoFV3VaGIa4",
           "model": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
           "object": "response",
           "output": [
@@ -444,10 +444,10 @@
                   "type": "output_text",
                   "annotations": [],
                   "logprobs": [],
-                  "text": "Hello!"
+                  "text": "Hello! 😊"
                 }
               ],
-              "id": "msg_5tg8TnYB2aUcRnqSfetiIutjf4rmYW2P",
+              "id": "msg_6uFyVrCA6pOKbOkv3vQsywKGm9ecybtO",
               "role": "assistant",
               "status": "completed",
               "type": "message"
@@ -456,8 +456,8 @@
           "status": "completed",
           "usage": {
             "input_tokens": 18,
-            "output_tokens": 3,
-            "total_tokens": 21,
+            "output_tokens": 5,
+            "total_tokens": 23,
             "input_tokens_details": {
               "cached_tokens": 3
             }
@@ -471,18 +471,18 @@
       "status": "passed",
       "detail": {
         "call": {
-          "completed_at": 1793268846,
-          "created_at": 1793268846,
-          "id": "resp_XDuFX1wwitpP0PlItkBFCYDWzgLY4lDb",
+          "completed_at": 1793269563,
+          "created_at": 1793269563,
+          "id": "resp_Fl3mxMnv5Th0rT4A3O56K24v4cpqI3HL",
           "model": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
           "object": "response",
           "output": [
             {
-              "id": "fc_b2P5QAXDwLNpSYOmGpZrgkcH0WiG5iKR",
+              "id": "fc_DtIp1vFJ6IdJg1Dbsx0AQ7IhvOsPoisV",
               "type": "function_call",
               "status": "completed",
               "arguments": "{\"city\": \"London\"}",
-              "call_id": "call_b2P5QAXDwLNpSYOmGpZrgkcH0WiG5iKR",
+              "call_id": "call_DtIp1vFJ6IdJg1Dbsx0AQ7IhvOsPoisV",
               "name": "get_weather"
             }
           ],
@@ -497,9 +497,9 @@
           }
         },
         "replay": {
-          "completed_at": 1793268847,
-          "created_at": 1793268847,
-          "id": "resp_yZQ7DoLvTv3SKsIVpaJwLBOrMtRJGep0",
+          "completed_at": 1793269563,
+          "created_at": 1793269563,
+          "id": "resp_GJZo32e2UkYEUzlwIEAyoMaIxDXOvfaa",
           "model": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
           "object": "response",
           "output": [
@@ -512,7 +512,7 @@
                   "text": "The weather in London is 18 degrees Celsius."
                 }
               ],
-              "id": "msg_tw9cH8uq0iwJJCbKVQPFOdsiKJtamGWR",
+              "id": "msg_NxikRLOVmExakZhbntVWPZrpEHDiFC09",
               "role": "assistant",
               "status": "completed",
               "type": "message"
@@ -535,7 +535,7 @@
       "status": "passed",
       "detail": {
         "output": "MAA_NATIVE_OK\n",
-        "diagnostic": "Reading additional input from stdin...\nOpenAI Codex v0.165.0\n--------\nworkdir: /root/.maa-native-client-q3y1huqu\nmodel: unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a18727-137f-7bf3-b0ec-07a35c3c1841\n--------\nuser\nReply with MAA_NATIVE_OK. Do not use tools.\ncodex\nMAA_NATIVE_OK\ntokens used\n3,275\n",
+        "diagnostic": "Reading additional input from stdin...\nOpenAI Codex v0.165.0\n--------\nworkdir: /root/.maa-native-client-cvgv53q5\nmodel: unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a18732-0375-7d61-9c4a-b56d36e60123\n--------\nuser\nReply with MAA_NATIVE_OK. Do not use tools.\ncodex\nMAA_NATIVE_OK\ntokens used\n3,295\n",
         "launcher_path_without_user_bin": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
       }
     },
@@ -545,8 +545,8 @@
       "detail": {
         "archive_absent": true,
         "codex": {
-          "output": "MAA_NATIVE_OK\n",
-          "diagnostic": "Reading additional input from stdin...\nOpenAI Codex v0.165.0\n--------\nworkdir: /root/.maa-native-client-8m2i9kvw\nmodel: unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a18727-183c-7352-85b9-4adefe5830b4\n--------\nuser\nReply with MAA_NATIVE_OK. Do not use tools.\ncodex\nMAA_NATIVE_OK\ntokens used\n1,254\n",
+          "output": "MAA_NATIVE_OK.\n",
+          "diagnostic": "Reading additional input from stdin...\nOpenAI Codex v0.165.0\n--------\nworkdir: /root/.maa-native-client-oix1k6lw\nmodel: unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a18732-08ac-7481-afc7-10e5c8bcf8af\n--------\nuser\nReply with MAA_NATIVE_OK. Do not use tools.\ncodex\nMAA_NATIVE_OK.\ntokens used\n1,236\n",
           "launcher_path_without_user_bin": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
         }
       }
@@ -632,8 +632,8 @@
               "index": "0",
               "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
               "total_mib": 24463.0,
-              "used_mib": 5513.0,
-              "free_mib": 18625.0,
+              "used_mib": 2800.0,
+              "free_mib": 21338.0,
               "reserved_mib": 326.0
             }
           ],
@@ -657,18 +657,18 @@
         "paused_configuration_did_not_wake": true,
         "saved_context": 32768,
         "before": {
-          "MainPID": "2443",
+          "MainPID": "7952",
           "Result": "success",
           "ActiveState": "active",
           "SubState": "running",
-          "InvocationID": "9340fa7f9f9b4ed3a5669feebe24a896"
+          "InvocationID": "bd7e375bcd0b48c7b734b11b8f0cd25b"
         },
         "after": {
-          "MainPID": "2443",
+          "MainPID": "7952",
           "Result": "success",
           "ActiveState": "active",
           "SubState": "running",
-          "InvocationID": "9340fa7f9f9b4ed3a5669feebe24a896"
+          "InvocationID": "bd7e375bcd0b48c7b734b11b8f0cd25b"
         }
       }
     },
@@ -678,7 +678,7 @@
       "detail": {
         "local_only": true,
         "warnings_absent": true,
-        "elapsed_seconds": 1.963,
+        "elapsed_seconds": 1.943,
         "picker": "Select Model and Effort  › 1. unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf (current)  Local model selected by my-ai-agent; native reasoning support varies.                               enter select · esc back                                                                                                                                       "
       }
     },
@@ -761,7 +761,7 @@
           "resources": {
             "size": 2801763614,
             "size_vram": 2801763614,
-            "expires_at": "2026-10-29T10:19:37.439835154Z"
+            "expires_at": "2026-10-29T10:31:18.944318067Z"
           },
           "display_name": "qwen2.5:3b",
           "backend": "ollama",
@@ -771,14 +771,14 @@
             "device": 2112,
             "inode": 543399,
             "offset": 0,
-            "service_id": "ae907f3a66ac4bc5a0e9474dbc670a04"
+            "service_id": "bc0eb455ed0d4e1fb1811df71c53af8a"
           },
           "native_config": {
             "/etc/systemd/system/ollama.service.d/50-local-model.conf": "9de2969243da072112f92936a539ac67726c49337d495ddec88db8326882c032",
             "/root/.local/state/my-ai-agent/native/ollama-preload.json": "12fdfe2a6bf82eb8a9730eb1f98771b1588450a50813c8c00ba07edb8d74cf21"
           },
           "log_path": "/root/.local/state/my-ai-agent/native/ollama.log",
-          "pid": 3550,
+          "pid": 9112,
           "base_url": "http://127.0.0.1:11434/v1",
           "capabilities": {
             "native_direct_connection": true
@@ -794,7 +794,7 @@
           "state": "running",
           "context": 32768,
           "allocations": {
-            "load_id": "14572",
+            "load_id": "14417",
             "gpu_layers": [
               37,
               37
@@ -866,8 +866,8 @@
                 "index": "0",
                 "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
                 "total_mib": 24463.0,
-                "used_mib": 5937.0,
-                "free_mib": 18201.0,
+                "used_mib": 3003.0,
+                "free_mib": 21135.0,
                 "reserved_mib": 326.0
               }
             ],
@@ -876,7 +876,7 @@
           "resources": {
             "size": 2801763614,
             "size_vram": 2801763614,
-            "expires_at": "2026-10-29T10:19:37.439835154Z"
+            "expires_at": "2026-10-29T10:31:18.944318067Z"
           }
         }
       }
@@ -895,10 +895,10 @@
       "status": "passed",
       "detail": {
         "nonstream": {
-          "id": "resp_994000",
+          "id": "resp_503342",
           "object": "response",
-          "created_at": 1793268898,
-          "completed_at": 1793268898,
+          "created_at": 1793269579,
+          "completed_at": 1793269579,
           "status": "completed",
           "incomplete_details": null,
           "model": "qwen2.5:3b",
@@ -906,7 +906,7 @@
           "instructions": null,
           "output": [
             {
-              "id": "msg_788055",
+              "id": "msg_424083",
               "type": "message",
               "status": "completed",
               "role": "assistant",
@@ -966,10 +966,10 @@
       "status": "passed",
       "detail": {
         "call": {
-          "id": "resp_345929",
+          "id": "resp_167801",
           "object": "response",
-          "created_at": 1793268899,
-          "completed_at": 1793268899,
+          "created_at": 1793269579,
+          "completed_at": 1793269579,
           "status": "completed",
           "incomplete_details": null,
           "model": "qwen2.5:3b",
@@ -977,10 +977,10 @@
           "instructions": null,
           "output": [
             {
-              "id": "fc_resp_345929_0",
+              "id": "fc_resp_167801_0",
               "type": "function_call",
               "status": "completed",
-              "call_id": "call_rr89zwgj",
+              "call_id": "call_ri22vf02",
               "name": "get_weather",
               "arguments": "{\"city\":\"London\"}"
             }
@@ -1042,10 +1042,10 @@
           "prompt_cache_key": null
         },
         "replay": {
-          "id": "resp_847549",
+          "id": "resp_494029",
           "object": "response",
-          "created_at": 1793268899,
-          "completed_at": 1793268899,
+          "created_at": 1793269580,
+          "completed_at": 1793269580,
           "status": "completed",
           "incomplete_details": null,
           "model": "qwen2.5:3b",
@@ -1053,14 +1053,14 @@
           "instructions": null,
           "output": [
             {
-              "id": "msg_714134",
+              "id": "msg_473844",
               "type": "message",
               "status": "completed",
               "role": "assistant",
               "content": [
                 {
                   "type": "output_text",
-                  "text": "The current weather in London is 18 degrees Celsius.",
+                  "text": "The weather in London is 18 degrees Celsius.",
                   "annotations": [],
                   "logprobs": []
                 }
@@ -1105,8 +1105,8 @@
           },
           "usage": {
             "input_tokens": 196,
-            "output_tokens": 13,
-            "total_tokens": 209,
+            "output_tokens": 12,
+            "total_tokens": 208,
             "input_tokens_details": {
               "cached_tokens": 169
             },
@@ -1130,7 +1130,7 @@
       "status": "passed",
       "detail": {
         "output": "MAA_NATIVE_OK\n",
-        "diagnostic": "Reading additional input from stdin...\nOpenAI Codex v0.165.0\n--------\nworkdir: /root/.maa-native-client-97ve4p4f\nmodel: qwen2.5:3b\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a18727-e009-7782-beea-a729c6eb94d8\n--------\nuser\nReply with MAA_NATIVE_OK. Do not use tools.\ncodex\nMAA_NATIVE_OK\ntokens used\n3,577\n",
+        "diagnostic": "Reading additional input from stdin...\nOpenAI Codex v0.165.0\n--------\nworkdir: /root/.maa-native-client-ojkklbvf\nmodel: qwen2.5:3b\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a18732-428b-7280-a67d-9f8a6530cc4e\n--------\nuser\nReply with MAA_NATIVE_OK. Do not use tools.\ncodex\nMAA_NATIVE_OK\ntokens used\n3,571\n",
         "launcher_path_without_user_bin": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
       }
     },
@@ -1141,7 +1141,7 @@
         "archive_absent": true,
         "codex": {
           "output": "MAA_NATIVE_OK\n",
-          "diagnostic": "Reading additional input from stdin...\nOpenAI Codex v0.165.0\n--------\nworkdir: /root/.maa-native-client-mm_49rti\nmodel: qwen2.5:3b\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a18727-e4f9-7362-a371-8fe6ecd0ee47\n--------\nuser\nReply with MAA_NATIVE_OK. Do not use tools.\ncodex\nMAA_NATIVE_OK\ntokens used\n120\n",
+          "diagnostic": "Reading additional input from stdin...\nOpenAI Codex v0.165.0\n--------\nworkdir: /root/.maa-native-client-nia79vpq\nmodel: qwen2.5:3b\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a18732-4667-70b2-a973-b4f1d66a4e9b\n--------\nuser\nReply with MAA_NATIVE_OK. Do not use tools.\ncodex\nMAA_NATIVE_OK\ntokens used\n120\n",
           "launcher_path_without_user_bin": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
         }
       }
@@ -1155,7 +1155,7 @@
         "state": "running",
         "context": 32768,
         "allocations": {
-          "load_id": "14572",
+          "load_id": "14417",
           "gpu_layers": [
             37,
             37
@@ -1227,8 +1227,8 @@
               "index": "0",
               "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
               "total_mib": 24463.0,
-              "used_mib": 5973.0,
-              "free_mib": 18165.0,
+              "used_mib": 5984.0,
+              "free_mib": 18154.0,
               "reserved_mib": 326.0
             }
           ],
@@ -1237,7 +1237,7 @@
         "resources": {
           "size": 2801763614,
           "size_vram": 2801763614,
-          "expires_at": "2026-10-29T10:20:01.2291642Z"
+          "expires_at": "2026-10-29T10:31:21.552676984Z"
         },
         "acceptance": {
           "allocation_location": "gpu",
@@ -1253,18 +1253,18 @@
         "paused_configuration_did_not_wake": true,
         "saved_context": 32768,
         "before": {
-          "MainPID": "3550",
+          "MainPID": "9112",
           "Result": "success",
           "ActiveState": "active",
           "SubState": "running",
-          "InvocationID": "ae907f3a66ac4bc5a0e9474dbc670a04"
+          "InvocationID": "bc0eb455ed0d4e1fb1811df71c53af8a"
         },
         "after": {
-          "MainPID": "3550",
+          "MainPID": "9112",
           "Result": "success",
           "ActiveState": "active",
           "SubState": "running",
-          "InvocationID": "ae907f3a66ac4bc5a0e9474dbc670a04"
+          "InvocationID": "bc0eb455ed0d4e1fb1811df71c53af8a"
         }
       }
     },
@@ -1274,7 +1274,7 @@
       "detail": {
         "local_only": true,
         "warnings_absent": true,
-        "elapsed_seconds": 1.942,
+        "elapsed_seconds": 2.027,
         "picker": "Select Model and Effort  › 1. qwen2.5:3b (current)  Local model selected by my-ai-agent; native reasoning support varies.                                                                   enter select · esc back                                                                                                                                       "
       }
     },
@@ -1284,8 +1284,8 @@
       "detail": {
         "native_tag_unchanged": true,
         "woke": false,
-        "elapsed_seconds": 1.051,
-        "diagnostic": "Reading additional input from stdin...\nOpenAI Codex v0.165.0\n--------\nworkdir: /root/.maa-native-client-rj83pdam\nmodel: qwen2.5:3b\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a18728-0a00-7920-948c-f06790336d7f\n--------\nuser\nReply with MAA_NATIVE_OK. Do not use tools.\ncodex\nMAA_NATIVE_OK\ntokens used\n3,637\n"
+        "elapsed_seconds": 1.322,
+        "diagnostic": "Reading additional input from stdin...\nOpenAI Codex v0.165.0\n--------\nworkdir: /root/.maa-native-client-_da3bkv5\nmodel: qwen2.5:3b\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a18732-6df4-77f1-80c2-234f8bab5f02\n--------\nuser\nReply with MAA_NATIVE_OK. Do not use tools.\ncodex\nMAA_NATIVE_OK\ntokens used\n3,637\n"
       }
     },
     {
@@ -1294,8 +1294,8 @@
       "detail": {
         "native_tag_unchanged": true,
         "woke": true,
-        "elapsed_seconds": 3.12,
-        "diagnostic": "Reading additional input from stdin...\nOpenAI Codex v0.165.0\n--------\nworkdir: /root/.maa-native-client-tqm0j37d\nmodel: qwen2.5:3b\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a18728-0f8e-7a61-9191-afe8fc520e77\n--------\nuser\nReply with MAA_NATIVE_OK. Do not use tools.\ncodex\nMAA_NATIVE_OK\ntokens used\n3,639\n"
+        "elapsed_seconds": 3.13,
+        "diagnostic": "Reading additional input from stdin...\nOpenAI Codex v0.165.0\n--------\nworkdir: /root/.maa-native-client-8j55w3ja\nmodel: qwen2.5:3b\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a18732-7603-7f60-a9c1-de4019f44c12\n--------\nuser\nReply with MAA_NATIVE_OK. Do not use tools.\ncodex\nMAA_NATIVE_OK\ntokens used\n3,641\n"
       }
     },
     {
@@ -1305,18 +1305,18 @@
         "native_instance_unchanged": true,
         "woke_existing_model": true,
         "before": {
-          "MainPID": "4326",
+          "MainPID": "9927",
           "Result": "success",
           "ActiveState": "active",
           "SubState": "running",
-          "InvocationID": "0c3538aacd594c0ebc3ac97ebd4c2b3b"
+          "InvocationID": "d565e6b5a4e54f8dae11d60af5d98f33"
         },
         "after": {
-          "MainPID": "4326",
+          "MainPID": "9927",
           "Result": "success",
           "ActiveState": "active",
           "SubState": "running",
-          "InvocationID": "0c3538aacd594c0ebc3ac97ebd4c2b3b"
+          "InvocationID": "d565e6b5a4e54f8dae11d60af5d98f33"
         }
       }
     },
@@ -1375,7 +1375,7 @@
           ]
         ],
         "stdout": "Done.\n",
-        "diagnostic": "Reading additional input from stdin...\nOpenAI Codex v0.165.0\n--------\nworkdir: /root/.maa-real-codex-tool-19rva7zb\nmodel: native_fixture\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a18728-2975-74a1-b37e-d540e3539b80\n--------\nuser\nUse a shell tool to print MAA_REAL_CODEX_TOOL_OK, then answer done.\nexec\n/bin/bash -lc 'printf MAA_REAL_CODEX_TOOL_OK > codex-proof.txt; cat codex-proof.txt' in /root/.maa-real-codex-tool-19rva7zb\n succeeded in 0ms:\nMAA_REAL_CODEX_TOOL_OK\ncodex\nDone.\ntokens used\n72\n"
+        "diagnostic": "Reading additional input from stdin...\nOpenAI Codex v0.165.0\n--------\nworkdir: /root/.maa-real-codex-tool-_za492k6\nmodel: native_fixture\nprovider: maa_local\napproval: never\nsandbox: danger-full-access\nreasoning effort: none\nreasoning summaries: none\nsession id: 01a18732-9254-7220-add5-5fc3eecdb6c6\n--------\nuser\nUse a shell tool to print MAA_REAL_CODEX_TOOL_OK, then answer done.\nexec\n/bin/bash -lc 'printf MAA_REAL_CODEX_TOOL_OK > codex-proof.txt; cat codex-proof.txt' in /root/.maa-real-codex-tool-_za492k6\n succeeded in 0ms:\nMAA_REAL_CODEX_TOOL_OK\ncodex\nDone.\ntokens used\n72\n"
       }
     },
     {
@@ -1457,7 +1457,7 @@
           "resources": {
             "size": 2801763614,
             "size_vram": 2801763614,
-            "expires_at": "2026-10-29T10:20:23.840103222Z"
+            "expires_at": "2026-10-29T10:31:47.224919171Z"
           },
           "display_name": "qwen2.5:3b",
           "backend": "ollama",
@@ -1467,14 +1467,14 @@
             "device": 2112,
             "inode": 543399,
             "offset": 0,
-            "service_id": "cb77ac4a1ee44e66b28d910298a83c9e"
+            "service_id": "7e52234565344600a61f29053c39fbc8"
           },
           "native_config": {
             "/etc/systemd/system/ollama.service.d/50-local-model.conf": "9de2969243da072112f92936a539ac67726c49337d495ddec88db8326882c032",
             "/root/.local/state/my-ai-agent/native/ollama-preload.json": "12fdfe2a6bf82eb8a9730eb1f98771b1588450a50813c8c00ba07edb8d74cf21"
           },
           "log_path": "/root/.local/state/my-ai-agent/native/ollama.log",
-          "pid": 5462,
+          "pid": 11069,
           "base_url": "http://127.0.0.1:11434/v1",
           "capabilities": {
             "native_direct_connection": true
@@ -1562,8 +1562,8 @@
                 "index": "0",
                 "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
                 "total_mib": 24463.0,
-                "used_mib": 2978.0,
-                "free_mib": 21160.0,
+                "used_mib": 3585.0,
+                "free_mib": 20553.0,
                 "reserved_mib": 326.0
               }
             ],
@@ -1572,7 +1572,7 @@
           "resources": {
             "size": 2801763614,
             "size_vram": 2801763614,
-            "expires_at": "2026-10-29T10:20:23.840103222Z"
+            "expires_at": "2026-10-29T10:31:47.224919171Z"
           }
         }
       }
@@ -1589,7 +1589,7 @@
     {
       "name": "native-load-failure-rollback",
       "status": "passed",
-      "detail": "[In progress] Apply model configuration — waited 0.0s\nRemoved \"/etc/systemd/system/default.target.wants/ollama.service\".\nCreated symlink /etc/systemd/system/default.target.wants/ollama.service → /etc/systemd/system/ollama.service.\n[Failed] Apply model configuration: Wait for native backend and model loading; native logs: maa logs — elapsed 5.3s\nmaa: Switch failed: Native service failed; inspect maa logs\nPrevious service restored.\n"
+      "detail": "[In progress] Apply model configuration — waited 0.0s\nRemoved \"/etc/systemd/system/default.target.wants/ollama.service\".\nCreated symlink /etc/systemd/system/default.target.wants/ollama.service → /etc/systemd/system/ollama.service.\n[Failed] Apply model configuration: Wait for native backend and model loading; native logs: maa logs — elapsed 5.9s\nmaa: Switch failed: Native service failed; inspect maa logs\nPrevious service restored.\n"
     },
     {
       "name": "invalid-fixture-cleaned",
@@ -1643,7 +1643,7 @@
   "cleanup": [
     {
       "fixture": "bad-native.gguf",
-      "key": "075f0a7cbf67cc653454de7d",
+      "key": "42f323e385c4df0ad7347350",
       "registry_removed": true,
       "temporary_directory": true
     },
@@ -1704,5 +1704,5 @@
       "user-permissions-retained"
     ]
   },
-  "finished": "2026-10-29T10:15:38.979167+00:00"
+  "finished": "2026-10-29T10:27:04.280519+00:00"
 }

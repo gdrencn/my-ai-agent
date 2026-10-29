@@ -5,7 +5,7 @@
   "portable": {
     "baseline_count": 90,
     "previous_count": 113,
-    "current_count": 137,
+    "current_count": 138,
     "missing": [],
     "mapping": [
       {
@@ -406,6 +406,7 @@
       "tests/test_privilege.py:Privilege.test_noninteractive_missing_authentication_fails_without_waiting",
       "tests/test_privilege.py:Privilege.test_password_prompt_is_live_with_piped_stdin_and_json_stdout",
       "tests/test_privilege.py:Privilege.test_root_bypasses_sudo",
+      "tests/test_privilege.py:Privilege.test_terminal_waits_for_exit_after_output_closes",
       "tests/test_processes.py:Processes.test_checked_failure_preserves_exception_output_and_stops_children",
       "tests/test_processes.py:Processes.test_configuration_query_cleans_plugin_like_child_before_returning",
       "tests/test_processes.py:Processes.test_interruption_stops_its_writer_and_preserves_unrelated_session",

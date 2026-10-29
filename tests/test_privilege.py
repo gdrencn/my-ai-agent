@@ -116,11 +116,15 @@ class Privilege(unittest.TestCase):
                         continue
                 if status is not None:
                     break
-            if pid:
+            # PTY EOF can precede waitpid readiness. Keep the original deadline
+            # instead of treating that scheduler gap as a command failure.
+            while pid and time.monotonic() < deadline:
                 done, status_value = os.waitpid(pid, os.WNOHANG)
                 if done:
                     status = os.waitstatus_to_exitcode(status_value)
                     pid = 0
+                else:
+                    time.sleep(.01)
             self.assertIsNotNone(status, output.decode(errors='replace'))
             self.assertEqual(before[3], termios.tcgetattr(fd)[3])
             self.assertNotIn(b'fixture-secret', output)
@@ -130,6 +134,14 @@ class Privilege(unittest.TestCase):
                 os.kill(pid, signal.SIGKILL)
                 os.waitpid(pid, 0)
             os.close(fd)
+
+    def test_terminal_waits_for_exit_after_output_closes(self):
+        code = ("print('COMMAND_FINISHED', flush=True)\n"
+                "os.close(0);os.close(1);os.close(2)\n"
+                "import time;time.sleep(.2)\n")
+        status, output, answered = self.terminal(code)
+        self.assertEqual(status, 0, output)
+        self.assertFalse(answered)
 
     def test_password_prompt_is_live_with_piped_stdin_and_json_stdout(self):
         command = [sys.executable, '-c', 'import sys;print("{\\"ok\\": true}");print("NATIVE_DIAGNOSTIC", file=sys.stderr)']
