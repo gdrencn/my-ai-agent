@@ -22,24 +22,45 @@ if [ -n "$maa_packages" ]; then
     fi
     maa_prepared=0
     if [ "$maa_prepared" = 0 ] && command -v apt-get >/dev/null 2>&1; then
+        maa_native_packages=''
+        for maa_package in $maa_packages; do
+            maa_native_packages="$maa_native_packages $maa_package"
+        done
         $maa_privilege apt-get update
-        $maa_privilege apt-get install -y $maa_packages
+        $maa_privilege apt-get install -y $maa_native_packages
         maa_prepared=1
     fi
     if [ "$maa_prepared" = 0 ] && command -v dnf >/dev/null 2>&1; then
-        $maa_privilege dnf install -y $maa_packages
+        maa_native_packages=''
+        for maa_package in $maa_packages; do
+            maa_native_packages="$maa_native_packages $maa_package"
+        done
+        $maa_privilege dnf install -y $maa_native_packages
         maa_prepared=1
     fi
     if [ "$maa_prepared" = 0 ] && command -v yum >/dev/null 2>&1; then
-        $maa_privilege yum install -y $maa_packages
+        maa_native_packages=''
+        for maa_package in $maa_packages; do
+            maa_native_packages="$maa_native_packages $maa_package"
+        done
+        $maa_privilege yum install -y $maa_native_packages
         maa_prepared=1
     fi
     if [ "$maa_prepared" = 0 ] && command -v zypper >/dev/null 2>&1; then
-        $maa_privilege zypper --non-interactive install $maa_packages
+        maa_native_packages=''
+        for maa_package in $maa_packages; do
+            maa_native_packages="$maa_native_packages $maa_package"
+        done
+        $maa_privilege zypper --non-interactive install $maa_native_packages
         maa_prepared=1
     fi
     if [ "$maa_prepared" = 0 ] && command -v pacman >/dev/null 2>&1; then
-        $maa_privilege pacman -S --needed --noconfirm $maa_packages
+        maa_native_packages=''
+        for maa_package in $maa_packages; do
+            [ "$maa_package" != python3 ] || maa_package=python
+            maa_native_packages="$maa_native_packages $maa_package"
+        done
+        $maa_privilege pacman -S --needed --noconfirm $maa_native_packages
         maa_prepared=1
     fi
     [ "$maa_prepared" = 1 ] || { echo "Install these prerequisites with your package manager: $maa_packages" >&2; exit 1; }

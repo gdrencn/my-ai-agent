@@ -54,6 +54,8 @@ class Environment(unittest.TestCase):
                 commands=environment.package_commands(['curl'])
                 self.assertIn('curl', commands[-1])
                 self.assertNotIn('-Syu', commands[-1])
+                python = environment.package_commands(['python3'])[-1]
+                self.assertIn('python' if tool == 'pacman' else 'python3', python)
         with patch.object(environment.shutil, 'which', return_value=None):
             with self.assertRaisesRegex(Error, 'curl'): environment.package_commands(['curl'])
 

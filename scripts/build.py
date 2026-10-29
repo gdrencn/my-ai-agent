@@ -13,13 +13,17 @@ from maa import __version__
 
 
 def entries():
-    from maa.environment import PACKAGE_MANAGERS
+    from maa.environment import PACKAGE_MANAGERS, PACKAGE_ALIASES
     template = (ROOT / 'scripts/entry.template.sh').read_text()
     cases = []
     for tool, operations in PACKAGE_MANAGERS:
         cases.append(f'    if [ "$maa_prepared" = 0 ] && command -v {tool} >/dev/null 2>&1; then')
+        cases.append("        maa_native_packages=''\n        for maa_package in $maa_packages; do")
+        for generic, native in PACKAGE_ALIASES.get(tool, {}).items():
+            cases.append(f'            [ "$maa_package" != {generic} ] || maa_package={native}')
+        cases.append('            maa_native_packages="$maa_native_packages $maa_package"\n        done')
         for i, args in enumerate(operations):
-            packages = ' $maa_packages' if i == len(operations)-1 else ''
+            packages = ' $maa_native_packages' if i == len(operations)-1 else ''
             cases.append('        $maa_privilege ' + ' '.join((tool, *args)) + packages)
         cases.append('        maa_prepared=1\n    fi')
     template = template.replace('@PACKAGE_CASES@', '\n'.join(cases))

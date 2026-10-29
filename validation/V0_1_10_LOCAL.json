@@ -10,12 +10,12 @@
     "package_boundaries": true,
     "runtime_coupling_absent": true,
     "sha256": {
-      "maa-test.pyz": "a3e82483df95f945471450c4f4dda947bfa7d98788a32d10f0f087042435b5de",
+      "maa-test.pyz": "96860d437da5cbba01599f607862343c79151ea27bb7f87ba82ac87c0910528f",
       "bootstrap.py": "485573d1c435f22e2a285984ca23cac5a09000f6bbb033ef034ffb5da77add5f",
-      "maa.pyz": "912df0b9f5dca6fab5e562c364c025302673164f67af7e63a4319a45d8d8a0ce",
-      "SHA256SUMS": "34c9ae42b35226d4755ac499065e3df1b3ae0e615bd5562f9f066db112915ba0",
+      "maa.pyz": "5f54863a6cd17db845518c6d14ff57b68cdf4afa5ea4866f15dd4b717a4cf849",
+      "SHA256SUMS": "c08b3597f1130783b93e1d8c7cd312e240852420c316f586b441b0dda595b225",
       "VERSION.json": "d6d7dd4fc1f136f2ca49de9b4861987c47924cd92224d53bf25ae3d74d56654b",
-      "install.sh": "8284216678def6c98f993987c92135be9af256911664693b35c8bc0fa632873c"
+      "install.sh": "2b9f30c11136f9c3b1ac91913f6f7c67fde5aa158c9fffc43f786f9580e05ed6"
     }
   },
   "acceptance": {
@@ -48,7 +48,12 @@
       "llama": "b11941",
       "ollama": "0.40.12"
     },
-    "agent_tools_executed": 0
+    "agent_tools_executed": 0,
+    "autostart": {
+      "native_autostart_without_manager": true,
+      "launcher_without_manager": "codex-cli 0.165.0",
+      "agent_tools_executed": 0
+    }
   },
   "limitations": [
     "External-machine acceptance remains for the user.",

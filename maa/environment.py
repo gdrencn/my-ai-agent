@@ -41,13 +41,15 @@ PACKAGE_MANAGERS = (
     ('zypper', (('--non-interactive', 'install'),)),
     ('pacman', (('-S', '--needed', '--noconfirm'),)),
 )
+PACKAGE_ALIASES = {'pacman': {'python3': 'python'}}
 
 
 def package_commands(packages):
     """Use the same package command table as generated shell bootstrappers."""
     for tool, operations in PACKAGE_MANAGERS:
         if shutil.which(tool):
-            return [[tool, *args, *(packages if i == len(operations)-1 else [])]
+            native_packages = [PACKAGE_ALIASES.get(tool, {}).get(p, p) for p in packages]
+            return [[tool, *args, *(native_packages if i == len(operations)-1 else [])]
                     for i, args in enumerate(operations)]
     raise Error('Install missing dependencies with your package manager: {v0}', v0=', '.join(packages))
 
