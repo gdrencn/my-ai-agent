@@ -52,14 +52,12 @@ class Controller:
         return path.exists() and path.read_text().startswith(self.marker + '\n')
 
     def ensure(self):
-        from .install import require_container
-        require_container()
-        if not Path('/run/systemd/system').exists():
-            raise Error('Native backend autostart requires systemd inside mas')
+        from .environment import require_systemd
+        require_systemd()
         for backend in UNITS:
             path = self.unit_path(backend)
             if path.exists() and not self.owned(backend):
-                raise Error(f'Native configuration is not owned by this installation: {path}')
+                raise Error('Native configuration is not owned by this installation: {v0}', v0=path)
 
     def legacy_path(self):
         path = Path('/etc/systemd/system/maa.service')
@@ -161,7 +159,7 @@ class Controller:
                   f'Environment=HOME={escaped(Path.home())}\n'
                   f'Environment=PATH={escaped(str(Path.home() / ".local/bin") + ":/usr/local/bin:/usr/bin:/bin")}\n'
                   f'StandardOutput=append:{log}\nStandardError=append:{log}\n'
-                  f'ExecStartPre=/usr/bin/truncate --size 0 {exec_arg(log)}\n'
+                  f'ExecStartPre={exec_arg(binary("truncate"))} --size 0 {exec_arg(log)}\n'
                   'TimeoutStartSec=660\nTimeoutStopSec=30\nKillMode=control-group\nRestart=on-failure\nRestartSec=10\n')
         if model['backend'] == 'ollama':
             from .models import ollama_session
@@ -181,7 +179,7 @@ class Controller:
             write(preload, {'model': model['name'], 'prompt': '', 'stream': False, 'keep_alive': values['keep_alive']})
             text = (self.marker + '\n[Service]\nExecStart=\nExecStartPre=\nExecStartPost=\n' + common + environments +
                     'ExecStart=' + exec_arg(binary('ollama')) + ' serve\n' +
-                    'ExecStartPost=/usr/bin/curl --fail --silent --show-error --retry 120 --retry-delay 1 '
+                    f'ExecStartPost={exec_arg(binary("curl"))} --fail --silent --show-error --retry 120 --retry-delay 1 '
                     '--retry-connrefused --max-time 600 --output /dev/null --header "Content-Type: application/json" '
                     '--data-binary ' + exec_arg('@' + str(preload)) + ' ' + exec_arg(ollama_endpoint() + '/api/generate') + '\n')
         else:
@@ -302,4 +300,4 @@ class Controller:
                 if self.unit_info(target).get('ActiveState') == 'failed':
                     raise Error(last)
             time.sleep(.2)
-        raise Error('Native backend readiness timed out: ' + last)
+        raise Error('Native backend readiness timed out: {v0}', v0=last)

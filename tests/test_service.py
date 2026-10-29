@@ -3,6 +3,7 @@ from contextlib import nullcontext
 import os
 from pathlib import Path
 import subprocess
+import shlex
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -66,15 +67,16 @@ class Service(unittest.TestCase):
                  patch('maa.models.ollama_session', return_value=nullcontext()), patch('maa.service.ollama_prepare'), \
                  patch('maa.service.request'), \
                  patch('socket.create_connection', side_effect=ConnectionRefusedError), \
-                 patch('maa.service.binary', return_value='/usr/local/bin/ollama'), \
+                 patch('maa.service.binary', side_effect=lambda name: '/usr/local/bin/' + name), \
                  patch('maa.service.llama_arguments', return_value=['/usr/local/bin/llama', 'serve', '--model', '/models/my model.gguf']):
                 self.controller.prepare(target)
             text = paths[backend].read_text()
             commands = [line for line in text.splitlines() if line.startswith('Exec') and line.split('=', 1)[1]]
             self.assertTrue(commands)
             for command in commands:
-                self.assertNotIn('maa', command)
-                self.assertNotIn('python', command)
+                executable = shlex.split(command.split('=', 1)[1])[0]
+                self.assertIn(Path(executable).name, ('ollama', 'llama', 'curl', 'truncate'))
+                self.assertNotIn('python', executable)
                 self.assertNotIn('.pyz', command)
             self.assertNotIn('18443', text)
         self.assertIn('ollama" serve', paths['ollama'].read_text())
@@ -82,7 +84,7 @@ class Service(unittest.TestCase):
 
     def test_foreign_native_unit_refused_before_mutation(self):
         path = self.root / 'foreign.service'; path.write_text('[Service]\nExecStart=/user/program\n')
-        with patch('maa.install.require_container'), patch.object(self.controller, 'unit_path', return_value=path), \
+        with patch('maa.environment.require_systemd'), patch.object(self.controller, 'unit_path', return_value=path), \
              patch('maa.service.privileged') as mutate:
             with self.assertRaisesRegex(Error, 'not owned'):
                 self.controller.ensure()

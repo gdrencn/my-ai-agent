@@ -12,7 +12,27 @@ sys.path.insert(0, str(ROOT))
 from maa import __version__
 
 
+def entries():
+    from maa.environment import PACKAGE_MANAGERS
+    template = (ROOT / 'scripts/entry.template.sh').read_text()
+    cases = []
+    for tool, operations in PACKAGE_MANAGERS:
+        cases.append(f'    if [ "$maa_prepared" = 0 ] && command -v {tool} >/dev/null 2>&1; then')
+        for i, args in enumerate(operations):
+            packages = ' $maa_packages' if i == len(operations)-1 else ''
+            cases.append('        $maa_privilege ' + ' '.join((tool, *args)) + packages)
+        cases.append('        maa_prepared=1\n    fi')
+    template = template.replace('@PACKAGE_CASES@', '\n'.join(cases))
+    for name, arguments in (
+        ('install.sh', '--channel stable'),
+        ('test/install.sh', '--channel test --version ' + __version__),
+        ('test/test.sh', '--channel test --version ' + __version__ + ' --test'),
+    ):
+        (ROOT / name).write_text(template.replace('@CHANNEL_ARGUMENTS@', arguments))
+
+
 def build(channel='test'):
+    entries()
     out = ROOT / 'dist'
     out.mkdir(exist_ok=True)
     files = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT / 'maa').rglob('*.py')}
@@ -29,8 +49,6 @@ def build(channel='test'):
     tester.update({str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT / 'tests').rglob('*.py')})
     tester['maa_testing/__init__.py'] = b''
     tester['maa_testing/native.py'] = (ROOT / 'test/native.py').read_bytes()
-    tester['maa_testing/codex_ui.py'] = (ROOT / 'test/codex_ui.py').read_bytes()
-    tester['maa_testing/codex_tool.py'] = (ROOT / 'test/codex_tool.py').read_bytes()
     with zipfile.ZipFile(out / 'maa-test.pyz', 'w', compression=zipfile.ZIP_DEFLATED) as archive:
         for name in sorted(tester):
             info = zipfile.ZipInfo(name, date_time=(2020, 1, 1, 0, 0, 0))

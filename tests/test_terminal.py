@@ -9,10 +9,24 @@ import sys
 import termios
 import time
 import unittest
+import tempfile
+from unittest.mock import patch
 import fcntl
+from maa import __version__
 
 
 class Terminal(unittest.TestCase):
+    def setUp(self):
+        self.preferences = tempfile.TemporaryDirectory()
+        self.env = patch.dict(os.environ, {'XDG_CONFIG_HOME': self.preferences.name})
+        self.env.start()
+        from maa.preferences import set_language
+        set_language('zh_cn')
+
+    def tearDown(self):
+        self.env.stop()
+        self.preferences.cleanup()
+
     def visible_lines(self, output):
         """Replay the controls used by Progress; retain committed terminal rows."""
         rows, line, cursor = [], [], 0
@@ -129,6 +143,24 @@ class Terminal(unittest.TestCase):
         self.assertNotIn('当前状态与配置', value)
         self.assertIn('MENU_EXIT', value)
         self.assertIn('\x1b[32m运行中\x1b[39m', value)
+
+    def test_options_contains_language_and_about_in_real_terminal(self):
+        operation = ("from maa.ui import options_menu\n"
+                     "interactive(options_menu)\nprint('OPTIONS_EXIT')")
+        value = self.session(operation, b'\x1b[B\r\r\x1b[B\r', '语言', (20, 100))
+        self.assertIn('选项', value)
+        self.assertIn('关于 my-ai-agent', value)
+        self.assertIn('my-ai-agent / maa ' + __version__, value)
+        self.assertIn('OPTIONS_EXIT', value)
+
+    def test_options_language_switch_updates_current_value(self):
+        operation = ("from maa.ui import options_menu\nfrom maa import preferences\n"
+                     "interactive(options_menu)\nassert preferences.language()=='en_us'\nprint('LANGUAGE_EXIT')")
+        value = self.session(operation, b'\r\x1b[B\r\x1b[A\r', '语言', (20, 110))
+        self.assertIn('Select interface language', value)
+        self.assertIn('Options', value)
+        self.assertIn('English (en_us)', value)
+        self.assertIn('LANGUAGE_EXIT', value)
 
     def test_configuration_colors_pending_values_and_cancel(self):
         operation = ("from maa.ui import edit_settings\nfrom maa.settings import settings\n"

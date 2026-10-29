@@ -21,7 +21,7 @@ def parse(text):
     try:
         return tomlkit.parse(text)
     except Exception as exc:
-        raise Error(f'Invalid Codex TOML: {exc}') from exc
+        raise Error('Invalid Codex TOML: {v0}', v0=exc) from exc
 
 
 @contextmanager
@@ -164,7 +164,7 @@ def install_launcher():
 
 def check_entrypoint(path):
     if path.is_symlink() or (path.exists() and '# managed by my-ai-agent\n' not in path.read_text()):
-        raise Error(f'Existing command is not owned by maa: {path}')
+        raise Error('Existing command is not owned by maa: {v0}', v0=path)
 
 
 def preflight():

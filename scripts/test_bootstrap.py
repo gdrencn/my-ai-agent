@@ -4,6 +4,9 @@ import importlib.util
 import json
 from pathlib import Path
 import unittest
+import tempfile
+import subprocess
+import os
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -17,6 +20,28 @@ def item(tag='v0.1.9', prerelease=True, draft=False):
 
 
 class Delivery(unittest.TestCase):
+    def test_generated_shell_prepares_bootstrap_tools_and_forwards_overrides(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder);trace=root/'trace'
+            python=root/'python3'
+            python.write_text('#!/bin/sh\n[ "$1" != -c ] || exit 0\nprintf "%s\\n" "$@" >> "$MAA_BOOT_TRACE"\n')
+            python.chmod(0o755)
+            curl=root/'curl-stub'
+            curl.write_text('#!/bin/sh\nwhile [ "$#" -gt 0 ]; do if [ "$1" = -o ]; then shift; printf "pass\\n" > "$1"; fi; shift; done\n')
+            curl.chmod(0o755)
+            (root/'id').write_text('#!/bin/sh\nprintf "0\\n"\n');(root/'id').chmod(0o755)
+            (root/'apt-get').write_text('#!/bin/sh\nprintf "APT %s\\n" "$*" >> "$MAA_BOOT_TRACE"\n[ "$1" != install ] || /bin/cp "$MAA_BOOT_CURL" "${MAA_BOOT_TRACE%/*}/curl"\n')
+            (root/'apt-get').chmod(0o755)
+            for name in ('mktemp','rm'):(root/name).symlink_to('/usr/bin/'+name)
+            result=subprocess.run(['/bin/sh',str(ROOT/'test/install.sh'),'--components','none','--version','0.1.9'],
+                env={'PATH':str(root),'MAA_BOOT_TRACE':str(trace),'MAA_BOOT_CURL':str(curl)},capture_output=True,text=True)
+            self.assertEqual(result.returncode,0,result.stderr)
+            value=trace.read_text()
+            self.assertIn('APT update',value)
+            self.assertIn('APT install -y curl ca-certificates',value)
+            self.assertIn('--version\n0.1.10',value)
+            self.assertTrue(value.rstrip().endswith('--version\n0.1.9'),value)
+
     def test_numeric_test_discovery_excludes_other_channels_and_drafts(self):
         rows = [item('v0.1.8'), item('v0.1.10'), item('v0.2.0', draft=True),
                 item('stable/0.9.0', False), item('v1.0.0-beta'), item('v0.3.0', False)]
@@ -60,10 +85,10 @@ class Delivery(unittest.TestCase):
             with self.assertRaises(ValueError):
                 bootstrap.release()
 
-    def fixture(self, channel, info=None, corrupt=None):
-        row = item('v0.1.9' if channel == 'test' else 'stable/0.1.9', channel == 'test')
+    def fixture(self, channel, info=None, corrupt=None, version='0.1.9'):
+        row = item(('v' if channel == 'test' else 'stable/') + version, channel == 'test')
         payloads = {'maa.pyz': b'approved-product', 'maa-test.pyz': b'approved-paired-tester',
-                    'VERSION.json': json.dumps(info or {'version': '0.1.9', 'channel': channel}).encode()}
+                    'VERSION.json': json.dumps(info or {'version': version, 'channel': channel}).encode()}
         payloads['SHA256SUMS'] = ''.join(hashlib.sha256(blob).hexdigest() + '  ' + name + '\n'
                                         for name, blob in payloads.items()).encode()
         if corrupt:
@@ -82,7 +107,6 @@ class Delivery(unittest.TestCase):
             seen.append({'name': Path(args[1]).name, 'blob': Path(args[1]).read_bytes(), 'args': args[2:]})
             self.assertTrue(kwargs['check'])
         with patch.object(bootstrap, 'fetch', side_effect=fetch), patch.object(
-                bootstrap.Path, 'exists', lambda path: str(path) == '/dev/lxd/sock' or exists(path)), patch.object(
                 bootstrap.subprocess, 'run', side_effect=command):
             bootstrap.run(['--channel', channel, '--components', 'none'] + (['--test'] if paired else []))
         return seen
@@ -118,6 +142,20 @@ class Delivery(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, 'pairing mismatch'):
                     bootstrap.run(['--channel', 'stable'])
                 command.assert_not_called()
+
+    def test_new_release_forwards_language_only_after_asset_verification(self):
+        with patch.object(bootstrap, 'fetch', side_effect=self.fixture('test', version='0.1.10')), \
+                patch.object(bootstrap.Path, 'exists', return_value=True), patch.object(bootstrap.subprocess, 'run') as command:
+            bootstrap.run(['--components', 'none', '--language', 'en_us'])
+        self.assertEqual(command.call_count, 1)
+        self.assertEqual(command.call_args.args[0][-2:], ['--language', 'en_us'])
+
+    def test_frozen_release_does_not_receive_unsupported_language_flag(self):
+        with patch.object(bootstrap, 'fetch', side_effect=self.fixture('stable')), \
+                patch.object(bootstrap.Path, 'exists', return_value=True), patch.object(bootstrap.subprocess, 'run') as command:
+            with self.assertRaisesRegex(ValueError, 'does not support --language'):
+                bootstrap.run(['--channel', 'stable', '--components', 'none', '--language', 'en_us'])
+        command.assert_not_called()
 
 
 if __name__ == '__main__':

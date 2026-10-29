@@ -1,4 +1,4 @@
-"""Minimal output contract reused by the mas-derived inline Screen."""
+"""Minimal output contract reused by the inline Screen."""
 from contextvars import ContextVar
 from contextlib import contextmanager
 import codecs
@@ -33,7 +33,11 @@ def say(value):
 
 class Progress:
     """One elapsed-time line on stderr; stdout remains usable for JSON."""
-    def __init__(self, label, stream=None):
+    def __init__(self, label, stream=None, **values):
+        from .i18n import text
+        from .preferences import language
+        self.locale = language()
+        label = text(label, locale=self.locale, **values)
         self.label, self.phase = label, ''
         self.stream = stream if stream is not None else sys.stderr
         self.tty = self.stream.isatty()
@@ -43,14 +47,15 @@ class Progress:
         self.suspended = 0
         self.visible = False
 
-    def render(self, outcome='进行中'):
+    def render(self, outcome='in_progress'):
         from .text import clipped
+        from .i18n import t
         with self.mutex:
             if self.suspended:
                 return
-            elapsed = f' — {"已等待" if outcome == "进行中" else "耗时"} {time.monotonic() - self.started:.1f} 秒'
-            detail = self.label + ('：' + self.phase if self.phase else '')
-            line = f'[{outcome}] {detail}'
+            elapsed = t('progress_wait' if outcome == 'in_progress' else 'progress_elapsed', locale=self.locale, elapsed=time.monotonic() - self.started)
+            detail = self.label + (t('separator', locale=self.locale) + self.phase if self.phase else '')
+            line = f'[{t("progress_" + outcome, locale=self.locale)}] {detail}'
             if self.tty:
                 width = max(1, terminal_size(self.stream).columns - 1)
                 from .text import cells
@@ -68,9 +73,10 @@ class Progress:
         while not self.stopped.wait(1):
             self.render()
 
-    def stage(self, phase):
+    def stage(self, phase, **values):
+        from .i18n import text
         with self.mutex:
-            self.phase = phase
+            self.phase = text(phase, locale=self.locale, **values)
             if self.tty:
                 self.render()
 
@@ -90,7 +96,7 @@ class Progress:
         self.stopped.set()
         if self.thread:
             self.thread.join()
-        self.render('成功' if kind is None else '中断' if issubclass(kind, (KeyboardInterrupt, SystemExit)) else '失败')
+        self.render('success' if kind is None else 'interrupted' if issubclass(kind, (KeyboardInterrupt, SystemExit)) else 'failed')
         if self.tty:
             self.stream.write('\n\033[?25h')
             self.stream.flush()
@@ -156,13 +162,13 @@ class ExternalOutput:
 
 
 @contextmanager
-def operation(label):
+def operation(label, **values):
     current = activity.get()
     if current is not None:
-        current.stage(label)
+        current.stage(label, **values)
         yield current
         return
-    with Progress(label) as progress:
+    with Progress(label, **values) as progress:
         token = activity.set(progress)
         try:
             yield progress
@@ -170,10 +176,10 @@ def operation(label):
             activity.reset(token)
 
 
-def stage(phase):
+def stage(phase, **values):
     current = activity.get()
     if current:
-        current.stage(phase)
+        current.stage(phase, **values)
 
 
 @contextmanager

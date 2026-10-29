@@ -19,7 +19,7 @@ def binary(name):
         candidate = Path.home() / '.local/bin' / name
         path = str(candidate) if candidate.is_file() else None
     if not path:
-        raise Error(f'{name} is not installed; use maa install')
+        raise Error('{v0} is not installed; use maa install', v0=name)
     return path
 
 
@@ -87,7 +87,7 @@ def ollama_capabilities():
 def check_options(help_text, options):
     missing = [option for option in options if option not in help_text]
     if missing:
-        raise Error('Installed backend does not support: ' + ', '.join(missing))
+        raise Error('Installed backend does not support: {v0}', v0=', '.join(missing))
 
 
 def llama_arguments(model, values):
@@ -101,7 +101,9 @@ def llama_arguments(model, values):
     if values['mtp']:
         check_options(help_text, ['draft-mtp', '--spec-draft-type-k', '--spec-draft-type-v'])
     check_options(help_text, ['--log-verbosity'])
-    args = command + ['--model', model['path'], '--alias', model['name'],
+    endpoint = urlparse(llama_endpoint())
+    args = command + ['--host', os.environ.get('LLAMA_ARG_HOST', '127.0.0.1'), '--port', str(endpoint.port),
+                      '--model', model['path'], '--alias', model['name'],
                       '--log-verbosity', '4',
                       '--parallel', '1',  # One local-agent slot; context is per conversation.
                       '--ctx-size', str(values['context']),
@@ -121,13 +123,13 @@ def wait_api(url, process, timeout=180):
     last = ''
     while time.monotonic() < end:
         if process.poll() is not None:
-            raise Error(f'Native backend exited with code {process.returncode}; inspect maa logs')
+            raise Error('Native backend exited with code {v0}; inspect maa logs', v0=process.returncode)
         try:
             return request(url, timeout=2)
         except Error as exc:
             last = str(exc)
             time.sleep(.2)
-    raise Error(f'Backend readiness timed out: {last}')
+    raise Error('Backend readiness timed out: {v0}', v0=last)
 
 
 def ollama_prepare(target, store):

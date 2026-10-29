@@ -9,7 +9,10 @@ import tempfile
 
 
 class Error(RuntimeError):
-    pass
+    """Raw business diagnostic plus format values for human presentation."""
+    def __init__(self, template, **values):
+        self.template, self.values = template, values
+        super().__init__(template.format(**values) if values else template)
 
 
 def atomic(path, data, mode=0o600):
@@ -33,7 +36,7 @@ def read(path, default=None):
     except FileNotFoundError:
         return default
     except (ValueError, OSError) as exc:
-        raise Error(f'Cannot read {path}: {exc}') from exc
+        raise Error('Cannot read {v0}: {v1}', v0=path, v1=exc) from exc
 
 
 def write(path, value):
@@ -66,7 +69,7 @@ class Store:
         try:
             return self.models()[key]
         except KeyError:
-            raise Error(f'Model is not registered: {key}') from None
+            raise Error('Model is not registered: {v0}', v0=key) from None
 
     def register(self, model):
         self.register_many([model])

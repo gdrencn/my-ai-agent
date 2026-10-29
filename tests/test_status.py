@@ -32,6 +32,10 @@ sched_reserve: CUDA0 compute buffer size = 487.03 MiB
 class Status(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
+        self.preferences = patch.dict(os.environ, {'XDG_CONFIG_HOME': str(Path(self.temp.name) / 'preferences')})
+        self.preferences.start()
+        from maa.preferences import set_language
+        set_language('zh_cn')
         self.store = Store(Path(self.temp.name))
         self.model = {'key': 'fixture-key', 'backend': 'ollama', 'name': 'qwen:test', 'mtp_supported': False}
         self.target = {'model': self.model, 'settings': settings()}
@@ -43,6 +47,7 @@ class Status(unittest.TestCase):
         write(self.store.path('runtime.json'), self.runtime)
         write(self.store.path('selected.json'), self.target)
     def tearDown(self):
+        self.preferences.stop()
         self.temp.cleanup()
 
     def test_actual_buffers_replace_probes_retries_and_deduplicate(self):

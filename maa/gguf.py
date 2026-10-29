@@ -11,7 +11,7 @@ def metadata(path):
             size = struct.calcsize('<' + fmt)
             data = source.read(size)
             if len(data) != size:
-                raise Error(f'Truncated GGUF: {path}')
+                raise Error('Truncated GGUF: {v0}', v0=path)
             return struct.unpack('<' + fmt, data)[0]
 
         def string(keep=True):
@@ -40,10 +40,10 @@ def metadata(path):
                     for _ in range(count):
                         value(element, False)
                 return None
-            raise Error(f'Unsupported GGUF metadata type: {kind}')
+            raise Error('Unsupported GGUF metadata type: {v0}', v0=kind)
 
         if source.read(4) != b'GGUF' or unpack('I') not in (2, 3):
-            raise Error(f'Not a supported GGUF v2/v3 file: {path}')
+            raise Error('Not a supported GGUF v2/v3 file: {v0}', v0=path)
         tensors, pairs = unpack('Q'), unpack('Q')
         if pairs > 100_000 or tensors > 1_000_000:
             raise Error('Invalid GGUF header')

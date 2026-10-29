@@ -1,0 +1,59 @@
+{
+  "version": "0.1.10",
+  "channel": "test",
+  "baseline": "b3189e95d996cbb36911076e5e90ef9feca39021",
+  "audit": {
+    "grammar_files": 52,
+    "portable_checks": 113,
+    "delivery_checks": 13,
+    "reproducible": true,
+    "package_boundaries": true,
+    "runtime_coupling_absent": true,
+    "sha256": {
+      "maa-test.pyz": "a3e82483df95f945471450c4f4dda947bfa7d98788a32d10f0f087042435b5de",
+      "bootstrap.py": "485573d1c435f22e2a285984ca23cac5a09000f6bbb033ef034ffb5da77add5f",
+      "maa.pyz": "912df0b9f5dca6fab5e562c364c025302673164f67af7e63a4319a45d8d8a0ce",
+      "SHA256SUMS": "34c9ae42b35226d4755ac499065e3df1b3ae0e615bd5562f9f066db112915ba0",
+      "VERSION.json": "d6d7dd4fc1f136f2ca49de9b4861987c47924cd92224d53bf25ae3d74d56654b",
+      "install.sh": "8284216678def6c98f993987c92135be9af256911664693b35c8bc0fa632873c"
+    }
+  },
+  "acceptance": {
+    "source_portable": 113,
+    "outside_checkout_paired": 113,
+    "delivery": 13,
+    "ordinary_user": {
+      "paired": 113,
+      "installed_read_only": 7,
+      "backends": [
+        "ollama",
+        "llamacpp"
+      ],
+      "native_inference": "small CPU models",
+      "yolo_choice_retained": "off",
+      "native_identity_retained": true
+    },
+    "root": {
+      "paired": 113,
+      "installed_read_only": 7
+    },
+    "dependency_installation": {
+      "package": "zstd",
+      "method": "native apt-get, ordinary user sudo",
+      "observed": true,
+      "scope": "earlier iteration; final dependency implementation unchanged"
+    },
+    "upstream": {
+      "codex": "0.165.0",
+      "llama": "b11941",
+      "ollama": "0.40.12"
+    },
+    "agent_tools_executed": 0
+  },
+  "limitations": [
+    "External-machine acceptance remains for the user.",
+    "Non-apt package command selection is covered by fixtures, not native distribution acceptance.",
+    "Small CPU model checks do not establish GPU, large-model or MTP performance."
+  ],
+  "public_verification": "pending"
+}

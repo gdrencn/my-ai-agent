@@ -1,32 +1,34 @@
 # my-ai-agent
 
-在 **my-ai-sandbox（mas）容器内**安装并管理 Ollama、llama.cpp 和 Codex CLI。
+在 Linux 中安装并管理 Ollama、llama.cpp 和 Codex CLI。Maa 不依赖容器管理程序，不判断自身运行在容器、WSL 还是服务器中。
 
-当前稳定版本：**0.1.9 stable**。两种底座可共存，通过 `maa` 选择一个当前底座和模型，并同步 `codex-local`。stable 的产品与配对测试包和已验收的 `v0.1.9` test 逐字节相同。
+当前测试版本：**0.1.10 test**，基于已验收的 0.1.9，解除环境身份绑定。中英文界面保留，语言和关于位于“选项”中。本版不含 IM 或 Web；后续功能继续在 Maa 内开发。既有 0.1.9 stable 和 0.2.x test 保持不变。
 
-安装、模型切换和暂停/启动共用进度反馈：静默阶段原地刷新等待时长，原生下载保留实时进度，实际诊断单独保留；不因无输出的命令增加重复提示或空行。
+## Install and test
 
-## Install
-
-先进入 mas 容器，在容器终端执行：
+在目标 Linux 环境中执行：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/test.sh | bash
 ```
 
-默认安装 maa，并依次运行 Ollama、llama.cpp、Codex 的官方安装程序。需要容器内 sudo 权限、网络、Python 3.11+、curl 和 systemd。mas 默认 Ubuntu 24.04 环境符合 Python 要求。官方程序安装完成后，maa 写入两种底座各自的原生 systemd 配置，只启用当前底座。maa 本身没有常驻服务。
+该入口固定默认安装 **0.1.10 test**，安装所选官方程序后运行配对检查。不会因为已有更高版本号的实验版而装到 0.2.x。可使用 `--version` 明确选择其他已发布版本。
 
-只安装管理程序，之后在菜单选择软件：
+只安装管理工具并核验，保留现有底座和 Codex：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/install.sh | bash -s -- --components none
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/test.sh | bash -s -- --components none
 ```
 
-已有底座和模型时，也可用上述 `--components none` 命令升级 maa，保留已下载模型和配置。
+不运行配对测试时，将 `test/test.sh` 换成 `test/install.sh`。根 `install.sh` 仍选择已发布的 latest stable；0.1.10 需要用户验收后才晋升。普通 Linux 部署请使用本轮 test 入口，旧 stable 不具备本轮解耦能力。
 
-根 `install.sh` 默认选择 GitHub latest 正式 stable release；`test/install.sh` 安装最新数字 test prerelease，`test/test.sh` 安装并运行该 test 版本的配对测试。指定版本可在上述命令的 `bash -s --` 后增加 `--version 0.1.9`，只在对应通道查找；stable tag 为 `stable/0.1.9`，test tag 为 `v0.1.9`。安装器核对版本、通道和 SHA-256，不把两个通道混用。
+安装器要求 Linux、Python 3.11+ 和正在运行的 systemd 系统管理器。Shell 入口会尝试准备 curl、CA 证书和系统仓库提供的 Python；如果仓库 Python 版本不足，会明确提示安装支持的版本，不添加软件源。Maa 通过共享依赖表调用现有 apt-get、dnf、yum、zypper 或 pacman，安装缺少的所需工具；不进行整机升级，不启动或安装 init 系统，不改变容器权限。需要系统修改时使用当前环境的 root 或 sudo。没有受支持的软件包工具时，提示缺少的依赖。
 
-从旧版本升级时，会核验并移除项目自己的 `maa.service`，保留模型、每模型配置和 YOLO 恢复记录，然后生成原生配置并核验保存目标。原来运行的目标恢复运行，原来暂停的目标核验后恢复暂停。修改过或属于其他用户的服务会被拒绝处理；尚未选择模型时，在菜单选择模型。
+底座和 Codex 使用官方安装程序。默认 `--components all`；可指定 `none`、`ollama`、`llamacpp`、`codex`。原生服务只启用当前选择的底座。Maa 管理命令执行后退出，`codex-local` 独立启动官方 Codex。
+
+首次安装或没有语言选择时询问“简体中文 / English”，更新沿用已保存选择。无交互终端时指定 `--language en_us` 或 `--language zh_cn`。菜单“选项 → 语言”可即时切换；CLI 使用 `maa language` 查询或 `maa language en_us` 设置。语言配置位于 `${XDG_CONFIG_HOME:-~/.config}/my-ai-agent/config.json`。
+
+首次安装默认写入当前用户 Codex 的两项 YOLO 配置；后续更新保留用户选择。普通环境与容器环境行为相同。测试不会强制开启或关闭它；菜单可关闭并恢复原设置。
 
 安装完成后运行：
 
@@ -35,7 +37,9 @@ maa
 codex-local
 ```
 
-当前终端找不到命令时，打开新终端，或使用 `~/.local/bin/maa`、`~/.local/bin/codex-local`。maa 首次安装时默认开启当前容器用户的 Codex 全局 YOLO；菜单可关闭并恢复原来的两项设置，后续更新保留用户选择。
+当前终端找不到命令时，可使用 `~/.local/bin/maa` 或 `~/.local/bin/codex-local`，或打开新终端。
+
+若从已配置聊天接入的 0.2.x 实验版切换，请先通过旧版关闭并卸载连接器；需要保留账号配置时先导出备份。本版不会管理或自动清理后续版本的独立服务。
 
 ## Models
 
@@ -69,7 +73,7 @@ HF 下载和本地文件扫描不占用全局管理锁，可在另一个终端�
 | Codex 配置 | YOLO 模式及当前状态、返回；进入 YOLO 后选择开启或关闭（恢复原设置） |
 | codex-local 配置 | 推理强度、跟随模型的只读上下文大小、固定 90% 的只读压缩阈值、应用修改、返回 |
 | 安装底座 / Codex CLI | 全部安装或单独安装 Ollama、llama.cpp、Codex CLI |
-| 关于 my-ai-agent | 当前 maa 版本 |
+| 选项 | 语言选择、关于 my-ai-agent、返回 |
 | 退出 | 结束菜单 |
 
 配置项直接显示当前值；选中后进入修改页面。标题使用正常文字颜色，数值与枚举为青色，开启与运行中为绿色，关闭、暂停与不可用为灰色。编辑后会提示存在未应用修改；返回取消，选择应用才生效。只读上下文与压缩阈值按 Enter/右键没有激活行为，保留当前菜单；暂停或空闲时可显示明确标注的已保存核验值。`NO_COLOR` 或 `TERM=dumb` 保留文字含义。
@@ -137,7 +141,7 @@ model = "qwen3.8:latest"
 model_provider = "maa_local"
 model_context_window = 262144
 model_auto_compact_token_limit = 235929
-model_catalog_json = "/home/sandbox/.codex/maa-model-catalogs/<hash>.json"
+model_catalog_json = "/home/alice/.codex/maa-model-catalogs/<hash>.json"
 
 [model_providers.maa_local]
 name = "my-ai-agent local"
@@ -182,12 +186,12 @@ codex-local exec --skip-git-repo-check 'Explain this directory.'
 
 数据默认在 `~/.local/state/my-ai-agent`（支持 `MAA_HOME` / `XDG_STATE_HOME`），程序在 `~/.local/share/my-ai-agent`。原生模型存储仍分别属于各底座。日志通过 `maa logs` 查看。
 
-## Test
+## Verification
 
-完整安装及小模型验证会修改当前选择，并显式开关 YOLO 验证工具执行与恢复；测试结束保持 YOLO 开启。请在**新建的专用临时 mas 容器**运行：
+配对检查包括私有配置和进程夹具中的单元/真实 PTY 检查，以及当前安装的只读核验。后者读取程序版本、systemd 可用性、当前模型状态、启动脚本和 Codex 原生 `config/read` 返回的权限配置。
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/test.sh | bash
-```
+检查不下载测试模型，不切换当前目标，不启停当前服务，不更改用户 YOLO，不向 Agent 发送任务或让它执行工具。未安装 Codex 时如实记录未安装；已安装 Codex 但状态查询失败会报错，不伪装通过。输出报告保存在当前用户 HOME 下，权限 0600，不保存凭据、对话或完整 Codex 配置。
 
-入口下载同版本测试包，运行 portable/PTY 检查与Qwen3-0.6B GGUF 和 Ollama qwen2.5:3b 的原生接口、真实 Codex `/model`、驻留复用、空闲唤醒、暂停恢复及失败回滚检查，保存 JSON 报告，最后暂停模型。Codex 启动检查使用不含用户安装目录的 PATH，覆盖刚安装后尚未重开终端的情况。测试产生的坏 GGUF 与登记记录在失败时也会清理；旧测试遗留文件只在路径、内容、登记身份均符合旧测试签名且未被选中时清理，保留用户的同名真实模型。大模型、MTP 实际速度和全 GPU 装载仍需使用自己的模型验收。已核验范围见 [IMPLEMENTED.md](IMPLEMENTED.md)，开发说明见 [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)。
+模型、底座和推理功能需要用户在目标机器实际验收。已选择模型时状态查询只读，不唤醒或加载模型。HOST 由原生环境配置决定，Maa 不新增地址限制。
+
+[开发说明](docs/DEVELOPMENT.md)、[独立性要求](docs/INDEPENDENCE.md) 和 [已完成核验](IMPLEMENTED.md)。历史 0.1.9 文档保存在 `docs/history/0.1.9/`，不能代替当前安装条件。

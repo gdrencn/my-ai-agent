@@ -16,6 +16,6 @@ def request(url, value=None, timeout=30, method=None):
                 raise Error('Native API response exceeded 32 MiB')
             return json.loads(body) if body else {}
     except urllib.error.HTTPError as exc:
-        raise Error(f'HTTP {exc.code} from {url}: {exc.read(8192).decode(errors="replace")}') from exc
+        raise Error('HTTP {v0} from {v1}: {v2}', v0=exc.code, v1=url, v2=exc.read(8192).decode(errors="replace")) from exc
     except (OSError, ValueError) as exc:
-        raise Error(f'{url}: {exc}') from exc
+        raise Error('{v0}: {v1}', v0=url, v1=exc) from exc

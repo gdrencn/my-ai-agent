@@ -49,7 +49,7 @@ def verify_file(model):
         except OSError:
             valid = False
         if not valid:
-            raise Error('Registered GGUF changed, is missing or was replaced; register it again before using it: ' + row['path'])
+            raise Error('Registered GGUF changed, is missing or was replaced; register it again before using it: {v0}', v0=row['path'])
 
 
 def local_model(path, backend='llamacpp', name=None):
@@ -60,7 +60,7 @@ def local_model(path, backend='llamacpp', name=None):
     info, records = None, []
     for shard in shard_paths(path):
         if not shard.is_file():
-            raise Error('GGUF shard must be an existing regular file: ' + str(shard))
+            raise Error('GGUF shard must be an existing regular file: {v0}', v0=str(shard))
         initial = file_identity(shard)
         shard_info = metadata(shard)
         if info is None:
@@ -70,7 +70,7 @@ def local_model(path, backend='llamacpp', name=None):
             for chunk in iter(lambda: source.read(4 * 1024 * 1024), b''):
                 digest.update(chunk)
         if file_identity(shard) != initial:
-            raise Error('GGUF changed during registration; retry: ' + str(shard))
+            raise Error('GGUF changed during registration; retry: {v0}', v0=str(shard))
         records.append({'path': str(shard), 'file_identity': initial, 'sha256': digest.hexdigest()})
     digest = records[0]['sha256'] if len(records) == 1 else hashlib.sha256(
         json.dumps([(row['path'], row['sha256']) for row in records]).encode()).hexdigest()
@@ -183,12 +183,12 @@ def hf_download(store, repo, filename):
             info = json.load(response)
     except urllib.error.HTTPError as exc:
         reason = 'Model repository not found' if exc.code == 404 else 'HF authentication/access error' if exc.code in (401, 403) else 'HF HTTP error'
-        raise Error(f'{reason}: HTTP {exc.code}: {repo}') from exc
+        raise Error('{v0}: HTTP {v1}: {v2}', v0=reason, v1=exc.code, v2=repo) from exc
     except (OSError, ValueError) as exc:
-        raise Error(f'HF metadata/network error: {exc}') from exc
+        raise Error('HF metadata/network error: {v0}', v0=exc) from exc
     files = {row['rfilename']: row for row in info['siblings']}
     if filename not in files:
-        raise Error(f'Exact GGUF file not found: {repo}/{filename}')
+        raise Error('Exact GGUF file not found: {v0}/{v1}', v0=repo, v1=filename)
     names = [filename]
     split = re.fullmatch(r'(.*)-(\d{5})-of-(\d{5})\.gguf', filename)
     if split:
@@ -211,8 +211,8 @@ def hf_download(store, repo, filename):
             for name in damaged:
                 (folder / name).unlink()
             if attempt:
-                raise Error('HF GGUF checksum mismatch after retry; damaged cache removed: ' + ', '.join(damaged))
-            stage('重新下载校验失败的 GGUF 缓存：' + ', '.join(damaged))
+                raise Error('HF GGUF checksum mismatch after retry; damaged cache removed: {v0}', v0=', '.join(damaged))
+            stage('重新下载校验失败的 GGUF 缓存：{v0}', v0=', '.join(damaged))
     model.update(key=identity('llamacpp', repo + '@' + commit + '/' + filename),
                  name=repo + '/' + filename, source='hf', repo=repo, filename=filename, revision=commit)
     return model
@@ -223,7 +223,7 @@ def _hf_files(folder, names, repo, commit, files, headers):
         hf_input(repo, name)
         destination = folder / name
         if not destination.parent.resolve().is_relative_to(folder.resolve()) or destination.is_symlink():
-            raise Error('HF cache path was replaced by a symbolic link; remove it before retrying: ' + str(destination))
+            raise Error('HF cache path was replaced by a symbolic link; remove it before retrying: {v0}', v0=str(destination))
         destination.parent.mkdir(parents=True, exist_ok=True)
         record = files[name]
         size = record.get('size') or (record.get('lfs') or {}).get('size')
@@ -235,11 +235,11 @@ def _hf_files(folder, names, repo, commit, files, headers):
                 valid = False
             if valid:
                 continue
-            stage('修复不完整的 GGUF 缓存：' + name)
+            stage('修复不完整的 GGUF 缓存：{v0}', v0=name)
             destination.unlink()
         partial = destination.with_name(destination.name + '.part')
         if partial.is_symlink():
-            raise Error('HF partial cache is a symbolic link; remove it before retrying: ' + str(partial))
+            raise Error('HF partial cache is a symbolic link; remove it before retrying: {v0}', v0=str(partial))
         # curl owns native progress and transfer failures; the model name is not
         # misreported as invalid when a network/disk failure occurs.
         link = f'https://huggingface.co/{repo}/resolve/{commit}/{quote(name, safe="/")}'
@@ -248,16 +248,16 @@ def _hf_files(folder, names, repo, commit, files, headers):
         config = '' if not headers else 'header = ' + json.dumps('Authorization: ' + headers['Authorization']) + '\n'
         if config:
             cmd[1:1] = ['--config', '-']
-        stage('下载 GGUF：' + name)
+        stage('下载 GGUF：{v0}', v0=name)
         completed = run(cmd, native=True, input=config, text=True)
         if completed.returncode:
-            raise Error(f'HF download failed (curl {completed.returncode}); partial retained for retry: {partial}')
+            raise Error('HF download failed (curl {v0}); partial retained for retry: {v1}', v0=completed.returncode, v1=partial)
         if partial.stat().st_size == 0 or (size is not None and partial.stat().st_size != size):
             partial.unlink()
-            raise Error('HF returned an incomplete GGUF file; retry: ' + name)
+            raise Error('HF returned an incomplete GGUF file; retry: {v0}', v0=name)
         try:
             metadata(partial)
         except Error:
             partial.unlink()
-            raise Error('HF returned invalid GGUF data; retry: ' + name) from None
+            raise Error('HF returned invalid GGUF data; retry: {v0}', v0=name) from None
         partial.replace(destination)

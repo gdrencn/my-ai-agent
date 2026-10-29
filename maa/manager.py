@@ -131,7 +131,7 @@ class Manager:
                 recovery = f'Recovery failed: {secondary}; saved selection retained. Run maa start.'
             if isinstance(primary, KeyboardInterrupt):
                 raise KeyboardInterrupt(recovery) from primary
-            raise Error(f'Switch failed: {primary}\n{recovery}') from primary
+            raise Error('Switch failed: {v0}\n{v1}', v0=primary, v1=recovery) from primary
         else:
             self.controller.finish()
         finally:
@@ -203,7 +203,7 @@ class Manager:
                     recovery = f'Recovery failed: {secondary}; saved selection retained. Run maa start.'
                 if isinstance(primary, KeyboardInterrupt):
                     raise KeyboardInterrupt(recovery) from primary
-                raise Error(f'Start failed: {primary}\n{recovery}') from primary
+                raise Error('Start failed: {v0}\n{v1}', v0=primary, v1=recovery) from primary
             return
         runtime['display_name'] = target['model']['name']
         write(self.store.path('runtime.json'), runtime)
@@ -295,7 +295,7 @@ class Manager:
                     if isinstance(primary, KeyboardInterrupt) or isinstance(exc, KeyboardInterrupt):
                         raise KeyboardInterrupt(detail) from (primary or exc)
                     if primary:
-                        raise Error(f'{primary}\n{detail}') from primary
+                        raise Error('{v0}\n{v1}', v0=primary, v1=detail) from primary
                     raise
                 else:
                     if isinstance(primary, KeyboardInterrupt):

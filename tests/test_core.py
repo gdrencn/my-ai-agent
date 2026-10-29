@@ -32,15 +32,8 @@ def gguf(path, mtp=False):
 
 
 def native_runner():
-    try:
-        from maa_testing import native
-        return native
-    except ImportError:
-        import importlib.util
-        spec = importlib.util.spec_from_file_location('maa_native_checks', Path(__file__).resolve().parent.parent / 'test/native.py')
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        return module
+    from tests import native_fixtures
+    return native_fixtures
 
 
 class FakeController:
@@ -86,12 +79,18 @@ class Core(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.root = Path(self.temp.name)
-        self.env = patch.dict(os.environ, {'MAA_HOME': str(self.root / 'state'), 'CODEX_HOME': str(self.root / 'codex')})
+        self.env = patch.dict(os.environ, {'MAA_HOME': str(self.root / 'state'), 'CODEX_HOME': str(self.root / 'codex'),
+                                          'XDG_CONFIG_HOME': str(self.root / 'preferences')})
         self.env.start()
+        from maa.preferences import set_language
+        set_language('zh_cn')
         self.entry = patch("maa.codex.launcher_path", return_value=self.root / "bin/codex-local")
         self.entry.start()
         self.store = Store()
+        self.dependencies = patch('maa.install.prepare_dependencies')
+        self.dependencies.start()
     def tearDown(self):
+        self.dependencies.stop()
         self.entry.stop()
         self.env.stop()
         self.temp.cleanup()
@@ -507,7 +506,7 @@ class Core(unittest.TestCase):
         profile = codex.profile_path().read_bytes()
         source = self.root / 'upgrade.pyz'
         source.write_bytes(b'owned upgrade fixture')
-        with patch('maa.install.require_container'), patch('maa.install.Controller', return_value=ctrl), \
+        with patch('maa.environment.require_systemd'), patch('maa.install.Controller', return_value=ctrl), \
              patch('maa.manager.Controller', return_value=ctrl), patch.object(ctrl, 'legacy_path', return_value=None, create=True), \
              patch.object(ctrl, 'migrate', create=True), patch('maa.install.Path.home', return_value=self.root):
             for component in ('none', 'codex', 'ollama'):
@@ -631,7 +630,7 @@ class Core(unittest.TestCase):
         source = self.root / 'product.pyz'
         source.write_bytes(b'new product fixture')
         ctrl = FakeController()
-        with patch('maa.install.require_container'), patch('maa.install.Controller', return_value=ctrl), \
+        with patch('maa.environment.require_systemd'), patch('maa.install.Controller', return_value=ctrl), \
              patch.object(ctrl, 'legacy_path', return_value=None, create=True), \
              patch.object(ctrl, 'migrate', create=True) as migrate, patch('maa.install.Path.home', return_value=self.root):
             yield product, source, migrate
@@ -725,7 +724,7 @@ class Core(unittest.TestCase):
         codex.yolo(True)
         codex.yolo(False)
         original = (codex.home() / 'config.toml').read_bytes()
-        with patch('maa.install.require_container'), \
+        with patch('maa.environment.require_systemd'), \
              patch('maa.install.run', return_value=subprocess.CompletedProcess([], 0)) as installer:
             component('codex')
         self.assertEqual(installer.call_count, 2)

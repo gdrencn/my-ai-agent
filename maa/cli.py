@@ -9,6 +9,9 @@ from .manager import Manager
 from .settings import DEFAULTS
 from .store import Error
 from .output import operation
+from .i18n import Parser, t, error_text
+from . import preferences
+from .menu import Cancelled
 
 
 def change_pairs(pairs):
@@ -16,24 +19,26 @@ def change_pairs(pairs):
     for pair in pairs:
         key, sep, value = pair.partition('=')
         if not sep or key not in DEFAULTS:
-            raise Error(f'Expected managed key=value: {pair}')
+            raise Error('Expected managed key=value: {v0}', v0=pair)
         if key in ('context', 'reserve_mib'):
             try:
                 value = int(value)
             except ValueError:
-                raise Error(f'{key} must be an integer') from None
+                raise Error('{v0} must be an integer', v0=key) from None
         elif isinstance(DEFAULTS[key], bool):
             if value not in ('on', 'off'):
-                raise Error(f'{key}: use on/off')
+                raise Error('{v0}: use on/off', v0=key)
             value = value == 'on'
         changes[key] = value
     return changes
 
 
 def parser():
-    root = argparse.ArgumentParser(prog='maa', description='my-ai-agent: manage local models and codex-local inside mas')
+    root = Parser(prog='maa', description='my-ai-agent: manage local models and codex-local on Linux')
     root.add_argument('--version', action='version', version=__version__)
     actions = root.add_subparsers(dest='action')
+    language = actions.add_parser('language', help='show or change interface language')
+    language.add_argument('value', nargs='?', choices=preferences.LANGUAGES)
     for name in ('status', 'pause', 'start', 'logs'):
         actions.add_parser(name)
     inventory = actions.add_parser('models', help='refresh native Ollama / list registered llama.cpp models')
@@ -55,6 +60,7 @@ def parser():
     installation.add_argument('component', choices=('ollama', 'llamacpp', 'codex', 'all'))
     product = actions.add_parser('_install')
     product.add_argument('--components', choices=('none', 'ollama', 'llamacpp', 'codex', 'all'), default='all')
+    product.add_argument('--language', choices=preferences.LANGUAGES, help='interface language; otherwise reuse saved selection or ask')
     return root
 
 
@@ -64,7 +70,11 @@ def run(argv=None):
         args = parser().parse_args(argv)
         if args.action == '_install':
             from .install import product
-            product(sys.argv[0], args.components)
+            product(sys.argv[0], args.components, language=args.language)
+            return 0
+        if args.action == 'language':
+            value = preferences.set_language(args.value) if args.value else preferences.load().get('language', preferences.DEFAULT_LANGUAGE)
+            print(json.dumps({'language': value}))
             return 0
         if args.action is None:
             if not sys.stdout.isatty():
@@ -109,9 +119,12 @@ def run(argv=None):
         if result is not None:
             print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0
+    except Cancelled:
+        print(t('cancelled'), file=sys.stderr)
+        return 130
     except KeyboardInterrupt as exc:
-        print('maa: 已中断。' + ('\n' + str(exc) if str(exc) else ''), file=sys.stderr)
+        print(t('interrupted') + ('\n' + str(exc) if str(exc) else ''), file=sys.stderr)
         return 130
     except (Error, OSError, ValueError, subprocess.SubprocessError) as exc:
-        print(f'maa: {exc}', file=sys.stderr)
+        print('maa: ' + error_text(exc), file=sys.stderr)
         return 1
