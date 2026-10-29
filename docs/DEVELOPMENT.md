@@ -1,6 +1,6 @@
 # Development and publication
 
-The current requirements are in REQUIREMENTS.md and docs/INDEPENDENCE.md. Product and tests are self-contained Linux code: no sibling checkout, instance marker, container-manager command or outer-environment configuration. The immutable baseline is stable/0.1.9. The 0.1.12 tree excludes IM and Web.
+The current requirements are in REQUIREMENTS.md and docs/INDEPENDENCE.md. Product and tests are self-contained Linux code: no sibling checkout, instance marker, container-manager command or outer-environment configuration. The immutable baseline is stable/0.1.9. The 0.1.13 tree excludes IM and Web.
 
 ## Shared modules
 
@@ -33,6 +33,6 @@ Build twice and compare artifacts. Check Python 3.11 grammar, shell syntax, pack
 
 ## Release
 
-0.1.12 test uses tag v0.1.12 and an immutable prerelease. Generated test entries pin its version, because frozen 0.2.x experimental releases also exist. Explicit --version overrides are supported. Default numeric discovery remains available to historical bootstraps.
+0.1.13 test uses tag v0.1.13 and an immutable prerelease. Generated test entries pin its version, because frozen 0.2.x experimental releases also exist. Explicit --version overrides are supported. Default numeric discovery remains available to historical bootstraps.
 
 After verified source/docs reach main and CI passes, publish paired maa.pyz, maa-test.pyz, VERSION.json, bootstrap.py, install.sh and SHA256SUMS. Include validation receipts and their checksum. Download public assets again, compare bytes and run the public entry. Additional fixes after handing the user a test command need a new version. Stable requires user acceptance and must preserve the approved product/test bytes. Do not replace existing releases, tags or assets. New deployments cannot assume old frozen products support their environment.

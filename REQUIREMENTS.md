@@ -1,4 +1,4 @@
-# my-ai-agent 0.1.12 requirements
+# my-ai-agent 0.1.13 requirements
 
 The current release follows [the independence contract](docs/INDEPENDENCE.md). The 0.1.9 model, Codex, native-service, rollback and terminal requirements remain applicable except for environment identity restrictions and the YOLO verification method. Their original text is preserved in [the baseline requirements](docs/history/0.1.9/REQUIREMENTS.md).
 
@@ -9,7 +9,7 @@ The current release follows [the independence contract](docs/INDEPENDENCE.md). T
 5. Preserve Chinese/English selection and saved preferences. Put language and version/about in one Options submenu.
 6. Restore every 0.1.9 functional acceptance check in the normal paired entry: real model download/registration/loading/switching, streaming/nonstreaming Responses, function-call replay, real codex-local conversation and model picker, native resource observations, lifecycle reuse, interruption recovery, failure rollback, cleanup and reinstall. Retain every 0.1.10 added check. YOLO checks still test enable/disable/restore, but determine state solely from native Codex configuration responses; never infer it from confirmation or command execution. Permission-write tests use an independent CODEX_HOME and do not change the invoking user's permission configuration. Agent tool protocol tests remain and are distinct from permission-state checks.
 7. Use private fixtures for configuration, command-output and service transaction regression checks, without virtualization assumptions. Never copy real credentials into test fixtures or reports.
-8. Pin the public test entry to 0.1.12; retain explicit version overrides and immutable previous releases. Publish a paired test release after verification; stable remains unchanged.
+8. Pin the public test entry to 0.1.13; retain explicit version overrides and immutable previous releases. Publish a paired test release after verification; stable remains unchanged.
 9. Audit source imports, hardcoded paths, external commands, package content, documentation, dependency failures and public artifacts. Record completed checks separately from pending external-machine acceptance.
 
 10. Publish a machine-readable coverage correspondence for all 35 baseline native check IDs, verify every baseline portable/delivery test is retained, and fail acceptance if a baseline check is missing. Retain GPU assertions when native GPU resources are present; CPU environments execute added host-allocation assertions and explicitly report GPU unavailability. Do not claim GPU acceptance from CPU fixtures.
@@ -18,3 +18,6 @@ The current release follows [the independence contract](docs/INDEPENDENCE.md). T
 12. Actual Codex conversation and PTY picker clients use the exact profile bytes written by Maa and the actual referenced catalog. Private permission isolation must not regenerate routing/model configuration and bypass installation/configuration verification.
 
 13. Reinstall acceptance runs in the actual configured Codex home as well as the isolated off-state home, verifying real profile/catalog routing preservation, user permission/recovery bytes and native PID/invocation. Permission isolation must not bypass the original real-home reinstall path.
+
+14. Codex conversation, tool fixture, PTY picker and native configuration reader share owned-process lifecycle cleanup. Successful exit, nonzero exit, timeout, exception and interruption terminate and wait for their owned child processes before temporary Codex homes are removed. Handle children which outlive the main process or create another process group inside the owned session. Do not target unrelated processes by executable name, path or user identity. Preserve output, exit status, original profile/catalog, terminal restoration and every existing check.
+15. Regression coverage includes background filesystem writers, main-process exit before descendants, SIGTERM-resistant children, separate child process groups, bounded cancellation and unrelated-process survival. Native acceptance includes ordinary-user/root environments with Git available, so normal Codex plugin cloning can execute. No plugin feature or original test is disabled to avoid cleanup races. Published 0.1.12 remains unchanged; use 0.1.13 for this correction.

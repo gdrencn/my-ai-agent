@@ -5,10 +5,12 @@ import pty
 import re
 import select
 import signal
+import sys
 import struct
 import termios
 import time
 from pathlib import Path
+from maa.processes import Session
 
 
 def picker(command, display_name, cwd=None):
@@ -17,14 +19,16 @@ def picker(command, display_name, cwd=None):
         os.environ['TERM'] = 'xterm-256color'
         os.chdir(cwd or Path.home())
         os.execv(command, [command, '--no-alt-screen'])
-    fcntl.ioctl(fd, termios.TIOCSWINSZ, struct.pack('HHHH', 40, 160, 0, 0))
+    scope = None
     output = b''
     started, sent, selected = time.monotonic(), False, False
     sent_at, confirmed = None, False
-    original = termios.tcgetattr(fd)
     def plain(data):
         return re.sub(r'\x1b(?:\[[0-?]*[ -/]*[@-~]|\][^\x07]*(?:\x07|\x1b\\))', '', data.decode(errors='replace'))
     try:
+        scope = Session(pid)
+        fcntl.ioctl(fd, termios.TIOCSWINSZ, struct.pack('HHHH', 40, 160, 0, 0))
+        original = termios.tcgetattr(fd)
         deadline = started + 45
         while time.monotonic() < deadline:
             if sent_at is not None and not confirmed and time.monotonic() - sent_at > 1:
@@ -78,7 +82,20 @@ def picker(command, display_name, cwd=None):
         return {'local_only': True, 'warnings_absent': True,
                 'elapsed_seconds': round(time.monotonic() - started, 3), 'picker': screen[-6000:]}
     finally:
-        if pid:
-            os.kill(pid, signal.SIGKILL)
-            os.waitpid(pid, 0)
-        os.close(fd)
+        original_error = sys.exc_info()[1]
+        try:
+            if scope is not None:
+                try:
+                    scope.stop()
+                except BaseException as cleanup:
+                    if original_error is None:
+                        raise
+                    original_error.add_note('Owned process cleanup failed: ' + str(cleanup))
+        finally:
+            if pid:
+                try:
+                    os.kill(pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                os.waitpid(pid, 0)
+            os.close(fd)

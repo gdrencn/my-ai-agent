@@ -1,0 +1,42 @@
+{
+  "version": "0.1.13",
+  "status": "passed",
+  "git_available": true,
+  "repetitions": [
+    {
+      "iteration": 1,
+      "native_tag_unchanged": true,
+      "woke": true,
+      "elapsed_seconds": 2.955
+    },
+    {
+      "iteration": 2,
+      "native_tag_unchanged": true,
+      "woke": true,
+      "elapsed_seconds": 2.908
+    },
+    {
+      "iteration": 3,
+      "native_tag_unchanged": true,
+      "woke": true,
+      "elapsed_seconds": 2.873
+    },
+    {
+      "iteration": 4,
+      "native_tag_unchanged": true,
+      "woke": true,
+      "elapsed_seconds": 2.942
+    },
+    {
+      "iteration": 5,
+      "native_tag_unchanged": true,
+      "woke": true,
+      "elapsed_seconds": 2.984
+    }
+  ],
+  "private_homes_remaining": [],
+  "permission_state": {
+    "enabled": false,
+    "managed": false
+  }
+}

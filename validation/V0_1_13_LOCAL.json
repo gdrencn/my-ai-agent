@@ -1,0 +1,90 @@
+{
+  "version": "0.1.13",
+  "channel": "test",
+  "audit": {
+    "grammar_files": 61,
+    "reproducible": true,
+    "package_boundaries": true,
+    "runtime_coupling_absent": true,
+    "sha256": {
+      "maa.pyz": "37543743e21f5d456ae525dfcc6da3ffd78cd61c23b882981ab0bbf3e0671a42",
+      "maa-test.pyz": "634cf97a376bce3efdcc8b6d654d169a43a56bbcdaa1acf0fbe34c8c4efe0496",
+      "VERSION.json": "96f9399b9291dd4b9dc99cd1b5491139bcd6910b3ba2102157efadf1c862f32f",
+      "bootstrap.py": "485573d1c435f22e2a285984ca23cac5a09000f6bbb033ef034ffb5da77add5f",
+      "install.sh": "cffe81dda195deca113c6c87b1b3a59df686dcd557d53dca6fd34e5e4336bcce",
+      "SHA256SUMS": "8785c2f7c4db94f4e485e992351f8706949d128e3e4d6be19ce56d3fd14fc854"
+    },
+    "previous_portable": 119,
+    "current_portable": 128,
+    "missing_previous": []
+  },
+  "reported_failure": {
+    "previous_version": "0.1.12",
+    "check": "ollama-expired-entry-wakes-existing-alias",
+    "error": "OSError 39 during private plugin-clone directory removal"
+  },
+  "acceptance": {
+    "source_portable_python_3_14": 128,
+    "outside_checkout_paired": 128,
+    "delivery": 13,
+    "new_process_regressions": 9,
+    "ordinary_user": {
+      "paired": 128,
+      "native": 42,
+      "baseline_retained": 35,
+      "git_available": true,
+      "python": "3.12"
+    },
+    "root": {
+      "paired": 128,
+      "native": 42,
+      "baseline_retained": 35,
+      "git_available": true,
+      "python": "3.12"
+    },
+    "targeted_regression": {
+      "repeated_actual_ollama_expired_entry": 5,
+      "all_passed": true,
+      "private_homes_remaining": []
+    },
+    "real_codex_child_observation": "Git remote-query processes remained after main CLI exit; terminated within their owned session before directory removal",
+    "autostart": {
+      "manager_archive_absent": true,
+      "native_model_autostarted": true,
+      "independent_launcher_version": "codex-cli 0.165.0",
+      "archive_restored": true
+    },
+    "cpu_status": "Real llama.cpp model/KV/compute host buffers passed; GPU explicitly unavailable",
+    "upstream": {
+      "codex": "0.165.0",
+      "llama": "b11941",
+      "ollama": "0.40.12",
+      "git": "2.43.0"
+    }
+  },
+  "boundaries": {
+    "no_plugin_features_disabled": true,
+    "ordinary_launcher_unchanged": true,
+    "native_units_unchanged": true,
+    "unrelated_session_survives": true,
+    "original_profiles_and_real_home_reinstall_retained": true,
+    "no_process_name_or_global_user_signaling": true
+  },
+  "coverage": {
+    "baseline_portable": 90,
+    "current_portable": 128,
+    "previous_portable": 119,
+    "baseline_native": 35,
+    "current_native": 42,
+    "baseline_delivery": 10,
+    "current_delivery": 13,
+    "missing": []
+  },
+  "pending": [
+    "Public default entry verification.",
+    "External-machine user acceptance."
+  ],
+  "limits": [
+    "Non-apt native distribution acceptance, large-model and MTP performance not established."
+  ]
+}

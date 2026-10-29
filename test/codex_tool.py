@@ -14,6 +14,7 @@ import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 sys.path.insert(0, str(Path.home() / '.local/share/my-ai-agent/maa.pyz'))
 from maa import codex
+from maa.processes import run as run_owned
 
 
 def main():
@@ -60,7 +61,7 @@ def main():
             (codex.home() / 'config.toml').write_text('approval_policy="never"\nsandbox_mode="danger-full-access"\n')
             runtime = {'model': 'native_fixture', 'context': 32768, 'base_url': f'http://127.0.0.1:{native.server_port}/v1'}
             codex.profile(runtime, {'reasoning': 'default'})
-            result = subprocess.run([codex.executable(), '--no-daemon', '--profile', 'maa-local', 'exec', '--skip-git-repo-check',
+            result = run_owned([codex.executable(), '--no-daemon', '--profile', 'maa-local', 'exec', '--skip-git-repo-check',
                 '--ephemeral', '-C', str(folder), 'Use a shell tool to print MAA_REAL_CODEX_TOOL_OK, then answer done.'],
                 capture_output=True, text=True, stdin=subprocess.DEVNULL, timeout=120)
             assert result.returncode == 0, result.stdout + result.stderr

@@ -1,14 +1,14 @@
-# 0.1.12 coverage compared with 0.1.9
+# 0.1.13 coverage compared with 0.1.9
 
 Every baseline functional check is present in the default paired test entry. Version 0.1.10 additions remain. Test identities and permission writes are isolated; no environment-origin requirement is restored.
 
-| Suite | 0.1.9 | 0.1.12 | Missing |
+| Suite | 0.1.9 | 0.1.13 | Missing |
 | --- | ---: | ---: | ---: |
-| Portable / real PTY | 90 | 119 | 0 |
+| Portable / real PTY | 90 | 128 | 0 |
 | Delivery | 10 | 13 | 0 |
 | Installed functional acceptance | 35 | 42 | 0 |
 
-The machine-readable correspondence is [V0_1_12_COVERAGE.json](../validation/V0_1_12_COVERAGE.json). The runtime report requires each native ID to pass, not merely exist in source. Local and public execution receipts establish execution; the inventory alone does not.
+The machine-readable correspondence is [V0_1_13_COVERAGE.json](../validation/V0_1_13_COVERAGE.json). The runtime report requires each native ID to pass, not merely exist in source. Local and public execution receipts establish execution; the inventory alone does not.
 
 ## Original native checks
 
@@ -60,8 +60,8 @@ YOLO is not inferred from shell success or a confirmation prompt. On/off and rec
 
 ## Portable and delivery additions
 
-The 0.1.10 language, environment, independence and options-menu checks remain. Six new regressions protect discovery of every baseline/previous portable ID, Agent-state disagreement, enable/restore semantics through state reads, interrupted cleanup and rejection of incomplete native coverage, and exact reuse of the written profile/catalog without regeneration. The delivery version-pin fixture now reads the actual product version rather than hardcoding a previous version.
+Every 0.1.12 test remains. The 0.1.10 language, environment, independence and options-menu checks remain. Six new regressions protect discovery of every baseline/previous portable ID, Agent-state disagreement, enable/restore semantics through state reads, interrupted cleanup and rejection of incomplete native coverage, and exact reuse of the written profile/catalog without regeneration. The delivery version-pin fixture now reads the actual product version rather than hardcoding a previous version.
 
 The former deployment-identity gate is not restored. Actual Linux/systemd/dependency checks replace it, as explicitly requested; model and Codex functional acceptance does not depend on where Linux was created. No GPU/MTP hardware claim is derived from a portable fixture.
 
-Ordinary-user and root frozen-payload acceptance each passed all 42 native checks. The actual public default entry passed 119 portable/PTY plus all 42 native checks, retained an off YOLO choice, used exact written-profile clients and executed both real-home/private-off reinstall paths. See [local evidence](../validation/V0_1_12_LOCAL.json) and [public evidence](../validation/V0_1_12_PUBLIC.json). Version 0.1.11 evidence remains historical.
+Current 0.1.13 execution receipts are added after validation. Nine additional process-lifecycle regressions cover successful/nonzero exits with surviving writers, timeout output, checked failure output, interruption with unrelated-session survival, unavailable optional pidfd syscalls, native configuration-reader cleanup, real SIGINT exit 130, normal PTY restoration and early PTY exit. None replaces a baseline test.

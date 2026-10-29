@@ -12,6 +12,7 @@ import urllib.request
 sys.path.insert(0, str(Path.home() / '.local/share/my-ai-agent/maa.pyz'))
 from maa import __version__
 from maa.store import Store, read, write
+from maa.processes import run as run_owned
 
 MAA = str(Path.home() / '.local/bin/maa')
 LOCAL = str(Path.home() / '.local/bin/codex-local')
@@ -150,7 +151,7 @@ def codex_exec():
         # Reproduce installation from an existing shell: the official installer
         # cannot add ~/.local/bin to this already-running process's PATH.
         env = dict(os.environ, PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin')
-        result = subprocess.run([LOCAL, 'exec', '--skip-git-repo-check', '--ephemeral', '-C', str(folder),
+        result = run_owned([LOCAL, 'exec', '--skip-git-repo-check', '--ephemeral', '-C', str(folder),
                                  'Reply with MAA_NATIVE_OK. Do not use tools.'], capture_output=True,
                                 text=True, timeout=600, stdin=subprocess.DEVNULL, env=env)
         assert result.returncode == 0, result.stdout + result.stderr
