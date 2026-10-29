@@ -1,0 +1,133 @@
+{
+  "version": "0.1.14",
+  "channel": "test",
+  "status": "passed",
+  "completed": "2026-10-29T10:39:21.463820+00:00",
+  "source": {
+    "tag": "v0.1.14",
+    "commit": "26029e676c9fa8b1a245ce00f56aef539512788e"
+  },
+  "public_entry": {
+    "version": "0.1.14",
+    "status": "passed",
+    "entry": "curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/test.sh | bash",
+    "python": "Python 3.14.4",
+    "sudo": "sudo-rs 0.2.13-0ubuntu1.2",
+    "password_prompts": 1,
+    "password_echoed": false,
+    "terminal_restored": true,
+    "user_permissions_unchanged": true,
+    "native_report": "/home/maatest/maa-native-20261029-103634-676729.json",
+    "checks": 42,
+    "remaining_private_homes": []
+  },
+  "portable_paired": 138,
+  "native_checks": 42,
+  "original_native_checks_retained": 35,
+  "anonymous_assets": {
+    "bootstrap.py": {
+      "sha256": "485573d1c435f22e2a285984ca23cac5a09000f6bbb033ef034ffb5da77add5f",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "install.sh": {
+      "sha256": "f365a42edfd7a5e418bb4fe6637f27e4b1705b8801477ea4f832af1ef8a123c7",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "maa-test.pyz": {
+      "sha256": "2a6fa6c7a8ce30bef2f244a2fa6332278fcf66ea1c5605a0ee48b242348d3cd9",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "maa.pyz": {
+      "sha256": "dc2319a609f5079c9f7dd0336a82ab29634f3290271f1f456179af4f26e83860",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "SHA256SUMS": {
+      "sha256": "e457a85bd9ec350d278bc8786586616ad755cc9238eb3e1aa2dcde40c642c188",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "V0_1_14_AUTHENTICATION.json": {
+      "sha256": "2d312a9d09a46d58b64e3dfac9a51fc14a04d379c97c70f7379340ebb5a47d2b",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "V0_1_14_COVERAGE.json": {
+      "sha256": "778e428f492d9f67bd5be6998374dc671bd9c8f4b4332db1ee00876103cdca1e",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "V0_1_14_LOCAL.json": {
+      "sha256": "6ae0247f181c5e156c0647316c5bf73097b29e60ecc2d85182f280e2a2142f8d",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "V0_1_14_NATIVE.json": {
+      "sha256": "e6af8c7ded80fe1f2568f6926e729824db32cfbe16773d737f393d9bf8d89d52",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "V0_1_14_ROOT_NATIVE.json": {
+      "sha256": "d6da0c20ef9b5f95b66f98d73b036664d35e91759de10436ce1028622e80d071",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "VALIDATION_SHA256SUMS": {
+      "sha256": "ac00afb67daeadaa12de2961a87c6cda98698902269c25eb9b6c5b9741ac8299",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "VERSION.json": {
+      "sha256": "9d17be5f8fd0dbe455e0e8b2b142c139ebb520e3bc41c1f64d1f95412747a79f",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    }
+  },
+  "immutable_previous": {
+    "status": "passed",
+    "historical_tags_checked": [
+      "v0.1.9",
+      "v0.1.10",
+      "v0.1.11",
+      "v0.1.12",
+      "v0.1.13",
+      "v0.2.2",
+      "stable/0.1.9"
+    ],
+    "stable": "stable/0.1.9",
+    "guidelines_unchanged": true
+  },
+  "ci": {
+    "branch": {
+      "run": 40857788187,
+      "status": "success"
+    },
+    "tag": {
+      "run": 40857999005,
+      "status": "success"
+    },
+    "main_source": {
+      "run": 40858214278,
+      "status": "success"
+    }
+  },
+  "upstream_retry": {
+    "first_attempt": "Official llama.cpp installer failed connecting to huggingface.co after 135000 ms (curl 28); no product change was made for this transient network failure.",
+    "same_default_command_retried": true,
+    "native_service_restoration_observed": true,
+    "retry_completed": true
+  },
+  "cleanup": {
+    "owned_validation_environments_removed": [
+      "maa-acceptance-0114",
+      "maa-root-acceptance-0114"
+    ],
+    "remaining_owned_environments": [],
+    "remaining_private_homes": [],
+    "host_sudo_policy_unchanged": true,
+    "host_global_codex_guidelines_unchanged": true
+  }
+}

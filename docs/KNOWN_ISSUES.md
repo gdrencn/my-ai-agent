@@ -6,4 +6,4 @@ Observed during extra 0.1.13 validation with portable CPython 3.14.10. The inter
 
 For this owned validation environment, `SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt` explicitly selects the already-installed system bundle; prerequisite checks and HTTPS then use that file. This is test-environment configuration, not a change to the Maa dependency check. The ordinary system-Python 3.12 environments and the user's reported system-Python 3.14 installation had already passed CA checks.
 
-This independent compatibility issue is recorded for separate discussion and remains unresolved in 0.1.13. No original prerequisite check was removed or suppressed. The 0.1.13 code change addresses owned Codex process termination before temporary-directory cleanup.
+This independent compatibility issue is recorded for separate discussion and remains unresolved in 0.1.14. No original prerequisite check was removed or suppressed. The 0.1.13 correction covers owned Codex process termination before temporary-directory cleanup; 0.1.14 corrects native sudo authentication output. Neither changes CA detection.
