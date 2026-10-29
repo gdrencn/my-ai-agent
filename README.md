@@ -196,4 +196,4 @@ codex-local exec --skip-git-repo-check 'Explain this directory.'
 
 仅安装而不运行上述验收，使用 `test/install.sh`。HOST 沿用实际底座环境配置，Maa 不新增地址限制。
 
-[开发说明](docs/DEVELOPMENT.md)、[独立性要求](docs/INDEPENDENCE.md) 和 [已完成核验](IMPLEMENTED.md)。历史 0.1.9 文档保存在 `docs/history/0.1.9/`，不能代替当前安装条件。
+[逐项测试覆盖对照](docs/TEST_COVERAGE.md)、[开发说明](docs/DEVELOPMENT.md)、[独立性要求](docs/INDEPENDENCE.md) 和 [已完成核验](IMPLEMENTED.md)。历史 0.1.9 文档保存在 `docs/history/0.1.9/`，不能代替当前安装条件。
