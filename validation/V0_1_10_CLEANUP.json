@@ -1,0 +1,11 @@
+{
+  "version": "0.1.10",
+  "owned_validation_environments_removed": true,
+  "owned_names": [
+    "maa-independent-0110",
+    "maa-independent-root-0110"
+  ],
+  "other_environment_resources_modified": false,
+  "global_guidelines_modified": false,
+  "global_host_codex_modified": false
+}

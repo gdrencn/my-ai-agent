@@ -1,0 +1,136 @@
+{
+  "version": "0.1.10",
+  "release": "https://github.com/gdrencn/my-ai-agent/releases/tag/v0.1.10",
+  "source_commit": "779f7da95078af836c2025285bd65b2d34c6d267",
+  "public_assets": {
+    "initial_assets": 8,
+    "byte_identical": true,
+    "manifests": true,
+    "assets": [
+      {
+        "name": "bootstrap.py",
+        "sha256": "485573d1c435f22e2a285984ca23cac5a09000f6bbb033ef034ffb5da77add5f"
+      },
+      {
+        "name": "install.sh",
+        "sha256": "2b9f30c11136f9c3b1ac91913f6f7c67fde5aa158c9fffc43f786f9580e05ed6"
+      },
+      {
+        "name": "maa-test.pyz",
+        "sha256": "96860d437da5cbba01599f607862343c79151ea27bb7f87ba82ac87c0910528f"
+      },
+      {
+        "name": "maa.pyz",
+        "sha256": "5f54863a6cd17db845518c6d14ff57b68cdf4afa5ea4866f15dd4b717a4cf849"
+      },
+      {
+        "name": "SHA256SUMS",
+        "sha256": "c08b3597f1130783b93e1d8c7cd312e240852420c316f586b441b0dda595b225"
+      },
+      {
+        "name": "V0_1_10_LOCAL.json",
+        "sha256": "596e0e7549fcaf0d02903579636a6d259430e6d23471eb0c4346e4e56f5ed8ec"
+      },
+      {
+        "name": "VALIDATION_SHA256SUMS",
+        "sha256": "99554461219fa0eb76ce84d7013504cbe9b033aa0c928a27953cc8c6e274aee7"
+      },
+      {
+        "name": "VERSION.json",
+        "sha256": "d6d7dd4fc1f136f2ca49de9b4861987c47924cd92224d53bf25ae3d74d56654b"
+      }
+    ]
+  },
+  "public_entry": {
+    "url": "https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/test.sh",
+    "arguments": [
+      "--components",
+      "none"
+    ],
+    "installed_version": "0.1.10",
+    "portable_checks": 113,
+    "installed_checks": {
+      "version": "0.1.10",
+      "kind": "read-only installed configuration checks",
+      "checks": [
+        {
+          "name": "installed-version",
+          "status": "passed",
+          "detail": "0.1.10"
+        },
+        {
+          "name": "linux-prerequisites",
+          "status": "passed",
+          "detail": {
+            "systemd": "available",
+            "dependencies": "available"
+          }
+        },
+        {
+          "name": "current-model-state",
+          "status": "passed",
+          "detail": {
+            "backend": "llamacpp",
+            "model": "unsloth/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+            "state": "paused",
+            "context": null,
+            "allocations": null,
+            "usage": null,
+            "error": null,
+            "usage_note": "Native direct connection: no maa conversation interceptor or token receipt.",
+            "mtp": "unavailable",
+            "saved_context": 4096
+          }
+        },
+        {
+          "name": "independent-launcher",
+          "status": "passed",
+          "detail": {
+            "independent_launcher": true,
+            "arguments_forwarded": true
+          }
+        },
+        {
+          "name": "codex-version",
+          "status": "passed",
+          "detail": "codex-cli 0.165.0"
+        },
+        {
+          "name": "agent-permission-state",
+          "status": "passed",
+          "detail": {
+            "source": "Codex config/read",
+            "configuration": {
+              "approval_policy": null,
+              "sandbox_mode": null
+            },
+            "model_turn_started": false
+          }
+        },
+        {
+          "name": "configuration-retained",
+          "status": "passed",
+          "detail": {
+            "configurations_unchanged": true,
+            "model_state": "paused"
+          }
+        }
+      ],
+      "status": "passed",
+      "agent_turns": 0,
+      "agent_tools": 0,
+      "finished": "2026-10-29T02:20:44.436592+00:00"
+    }
+  },
+  "ci": {
+    "source": 40805241397,
+    "tag": 40805401912,
+    "main": 40805562420,
+    "result": "success"
+  },
+  "frozen_releases": "0.1.9 stable and 0.2.2 unchanged",
+  "latest_formal_release": "stable/0.1.9",
+  "agent_turns": 0,
+  "agent_tools": 0,
+  "cleanup": "pending"
+}
