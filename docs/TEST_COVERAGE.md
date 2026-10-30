@@ -1,14 +1,14 @@
-# 0.1.14 coverage compared with 0.1.9
+# 0.1.15 coverage compared with 0.1.9
 
 Every baseline functional check is present in the default paired test entry. Version 0.1.10 additions remain. Test identities and permission writes are isolated; no environment-origin requirement is restored.
 
-| Suite | 0.1.9 | 0.1.14 | Missing |
+| Suite | 0.1.9 | 0.1.15 | Missing |
 | --- | ---: | ---: | ---: |
-| Portable / real PTY | 90 | 138 | 0 |
+| Portable / real PTY | 90 | 147 | 0 |
 | Delivery | 10 | 13 | 0 |
 | Installed functional acceptance | 35 | 42 | 0 |
 
-The machine-readable correspondence is [V0_1_14_COVERAGE.json](../validation/V0_1_14_COVERAGE.json). The runtime report requires each native ID to pass, not merely exist in source. Local and public execution receipts establish execution; the inventory alone does not.
+The machine-readable correspondence is [V0_1_15_COVERAGE.json](../validation/V0_1_15_COVERAGE.json). The runtime report requires each native ID to pass, not merely exist in source. Local and public execution receipts establish execution; the inventory alone does not.
 
 ## Original native checks
 
@@ -67,3 +67,5 @@ The former deployment-identity gate is not restored. Actual Linux/systemd/depend
 Ten additional regressions cover immediate native authentication with piped stdin, nested live stderr capture, authentication failure, interruption and terminal restoration, cached and command-specific NOPASSWD policy, noninteractive failure, root bypass, checked failure output and partial timeout diagnostics and bounded process-exit waiting after PTY EOF. All 128 portable IDs from 0.1.13 remain, in addition to every baseline and independence check. Real authentication exercises both classic sudo and sudo-rs, including a zero-duration timestamp. Execution receipts separately record full installed acceptance and authenticated public installation; portable fixtures do not establish native hardware or upstream compatibility. The historical 0.1.13 process-cleanup and CA-directory observations remain available in their immutable receipts and [KNOWN_ISSUES.md](KNOWN_ISSUES.md).
 
 The final public default entry passed 138 paired and 42 native checks after actual password authentication, with the user off permission choice retained. [Public execution evidence](../validation/V0_1_14_PUBLIC.json) includes asset-byte verification, source CI, the native report and cleanup. Both owned validation environments were removed. Earlier releases and stable selection remain unchanged.
+
+Version 0.1.15 retains all 138 portable IDs from 0.1.14 and adds five trust-store and four IPv6 regressions. The certificate fixtures are synthetic public certificates without private keys. Source and isolated packaged suites each pass 147 tests, with 13 delivery checks. Native and public execution evidence is recorded separately after completion; historical 0.1.14 public evidence above retains its original scope.

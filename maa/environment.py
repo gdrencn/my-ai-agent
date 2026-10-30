@@ -1,6 +1,7 @@
 """Linux capabilities and software prerequisites, independent of deployment."""
 import os
 from pathlib import Path
+import re
 import shutil
 import ssl
 import subprocess
@@ -24,12 +25,41 @@ def require_systemd():
                     v0=result.stderr.strip())
 
 
+def ca_available():
+    """Inspect native trust offline, including OpenSSL's lazy hashed directories."""
+    if ssl.create_default_context().get_ca_certs():
+        return True
+    paths = ssl.get_default_verify_paths()
+    directories = os.environ.get(paths.openssl_capath_env, paths.openssl_capath)
+    for directory in (directories or '').split(os.pathsep):
+        if not directory:
+            continue
+        try:
+            for certificate in Path(directory).iterdir():
+                # OpenSSL looks up certificates by subject-hash.N, not arbitrary
+                # PEM filenames or CRL hash.rN entries. Symlinks are native here.
+                if not re.fullmatch(r'[0-9a-f]{8}\.[0-9]+', certificate.name):
+                    continue
+                try:
+                    if not certificate.is_file():
+                        continue
+                    probe = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+                    probe.load_verify_locations(cafile=str(certificate))
+                    if probe.get_ca_certs():
+                        return True
+                except OSError:
+                    continue
+        except OSError:
+            continue
+    return False
+
+
 def missing_dependencies(component='none'):
     commands = {'curl': 'curl', 'install': 'coreutils', 'rm': 'coreutils', 'truncate': 'coreutils'}
     if component in ('ollama', 'all'):
         commands.update(tar='tar', gzip='gzip', zstd='zstd')
     missing = {package for command, package in commands.items() if not shutil.which(command)}
-    if not ssl.create_default_context().get_ca_certs():
+    if not ca_available():
         missing.add('ca-certificates')
     return sorted(missing)
 

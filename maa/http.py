@@ -5,6 +5,13 @@ import urllib.request
 from .store import Error
 
 
+def endpoint(host, port):
+    """Format a native client URL without changing the server's bind address."""
+    host = {'0.0.0.0': '127.0.0.1', '::': '::1'}.get(host, host)
+    authority = '[' + host + ']' if ':' in host else host
+    return f'http://{authority}:{port}'
+
+
 def request(url, value=None, timeout=30, method=None):
     data = None if value is None else json.dumps(value).encode()
     req = urllib.request.Request(url, data=data, method=method,

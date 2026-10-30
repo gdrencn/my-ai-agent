@@ -1,0 +1,32 @@
+{
+  "version": "0.1.15",
+  "status": "passed",
+  "system_python": {
+    "version": "0.1.15",
+    "status": "passed",
+    "python": "3.14.4",
+    "lazy_directory_ca_count_before": 0,
+    "ca_count_after_verified_tls": 1,
+    "dependency_install_attempts": 0,
+    "actual_verified_https": true,
+    "shared_http_verified_https": true,
+    "wrong_hostname_rejected": true,
+    "empty_trust_rejected": true,
+    "certificate_verification_preserved": true,
+    "all_private_keys_and_certificates_removed_after_run": true
+  },
+  "portable_python": {
+    "version": "0.1.15",
+    "status": "passed",
+    "python": "3.14.10",
+    "lazy_directory_ca_count_before": 0,
+    "ca_count_after_verified_tls": 1,
+    "dependency_install_attempts": 0,
+    "actual_verified_https": true,
+    "shared_http_verified_https": true,
+    "wrong_hostname_rejected": true,
+    "empty_trust_rejected": true,
+    "certificate_verification_preserved": true,
+    "all_private_keys_and_certificates_removed_after_run": true
+  }
+}

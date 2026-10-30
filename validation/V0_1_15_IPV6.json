@@ -1,0 +1,56 @@
+{
+  "version": "0.1.15",
+  "status": "passed",
+  "cases": [
+    {
+      "backend": "llamacpp",
+      "mode": "loopback",
+      "client_base_url": "http://[::1]:8080/v1",
+      "native_bind_requested": "::1",
+      "actual_af_inet6_connection": true,
+      "nonstream_response": true,
+      "stream_response": true,
+      "real_codex_conversation": true,
+      "native_gpu_model_status": true,
+      "profile_matches_native_url": true
+    },
+    {
+      "backend": "ollama",
+      "mode": "loopback",
+      "client_base_url": "http://[::1]:11434/v1",
+      "native_bind_requested": "::1",
+      "actual_af_inet6_connection": true,
+      "nonstream_response": true,
+      "stream_response": true,
+      "real_codex_conversation": true,
+      "native_gpu_model_status": true,
+      "profile_matches_native_url": true
+    },
+    {
+      "backend": "llamacpp",
+      "mode": "wildcard",
+      "client_base_url": "http://[::1]:8080/v1",
+      "native_bind_requested": "::",
+      "actual_af_inet6_connection": true,
+      "nonstream_response": true,
+      "stream_response": true,
+      "real_codex_conversation": true,
+      "native_gpu_model_status": true,
+      "profile_matches_native_url": true
+    },
+    {
+      "backend": "ollama",
+      "mode": "wildcard",
+      "client_base_url": "http://[::1]:11434/v1",
+      "native_bind_requested": "::",
+      "actual_af_inet6_connection": true,
+      "nonstream_response": true,
+      "stream_response": true,
+      "real_codex_conversation": true,
+      "native_gpu_model_status": true,
+      "profile_matches_native_url": true
+    }
+  ],
+  "user_permissions_unchanged": true,
+  "private_client_homes_remaining": []
+}

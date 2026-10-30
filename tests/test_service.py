@@ -198,3 +198,69 @@ class Service(unittest.TestCase):
         self.assertEqual(native.call_args_list[0].args[1], {
             'source': 'maa-rollback-'+'a'*32+':latest', 'destination': 'qwen:tag'})
         self.assertIsNone(self.controller.model_backup)
+
+    def test_native_endpoint_matrix_preserves_ports_and_brackets_ipv6(self):
+        from urllib.parse import urlsplit
+        cases = [
+            ('llamacpp', {}, '127.0.0.1', 8080),
+            ('llamacpp', {'LLAMA_ARG_HOST': '::1'}, '::1', 8080),
+            ('llamacpp', {'LLAMA_ARG_HOST': '[::1]', 'LLAMA_ARG_PORT': '18080'}, '::1', 18080),
+            ('llamacpp', {'LLAMA_ARG_HOST': '::'}, '::1', 8080),
+            ('llamacpp', {'LLAMA_ARG_HOST': '0.0.0.0'}, '127.0.0.1', 8080),
+            ('llamacpp', {'LLAMA_ARG_HOST': 'example.org'}, 'example.org', 8080),
+            ('ollama', {}, '127.0.0.1', 11434),
+            ('ollama', {'OLLAMA_HOST': '[::1]:11888'}, '::1', 11888),
+            ('ollama', {'OLLAMA_HOST': 'http://[2001:db8::1]:11435'}, '2001:db8::1', 11435),
+            ('ollama', {'OLLAMA_HOST': '[::]:11434'}, '::1', 11434),
+            ('ollama', {'OLLAMA_HOST': '0.0.0.0:11434'}, '127.0.0.1', 11434),
+            ('ollama', {'OLLAMA_HOST': 'example.org:11435'}, 'example.org', 11435),
+        ]
+        for backend, env, host, port in cases:
+            with self.subTest(backend=backend, env=env), patch.dict(os.environ, env, clear=True):
+                url = backends.llama_endpoint() if backend == 'llamacpp' else backends.ollama_endpoint()
+                parsed = urlsplit(url)
+                self.assertEqual((parsed.hostname, parsed.port), (host, port))
+                self.assertEqual(parsed.netloc, ('[' + host + ']' if ':' in host else host) + ':' + str(port))
+
+    def test_ipv6_profiles_and_native_status_keep_valid_authorities(self):
+        from urllib.parse import urlsplit
+        for backend, port in (('ollama', 11434), ('llamacpp', 8080)):
+            with self.subTest(backend=backend), patch.dict(os.environ, {
+                    'OLLAMA_HOST': '[::1]:11434', 'LLAMA_ARG_HOST': '::1',
+                    'CODEX_HOME': str(self.root / ('codex-' + backend))}):
+                endpoint = backends.ollama_endpoint() if backend == 'ollama' else backends.llama_endpoint()
+                runtime = {'model': 'native-model', 'context': 4096, 'upstream': endpoint, 'base_url': endpoint + '/v1'}
+                codex.profile(runtime, settings())
+                saved = codex.parse(codex.profile_path().read_text())['model_providers']['maa_local']['base_url']
+                self.assertEqual((urlsplit(saved).hostname, urlsplit(saved).port), ('::1', port))
+                def observe(url, **kwargs):
+                    self.assertEqual((urlsplit(url).hostname, urlsplit(url).port), ('::1', port))
+                    return {'models': [{'name': 'native-model', 'context_length': 4096}]} if backend == 'ollama' else {
+                        'default_generation_settings': {'n_ctx': 4096}, 'is_sleeping': False}
+                with patch('maa.backends.request', side_effect=observe):
+                    result = (backends.ollama_status if backend == 'ollama' else backends.llama_status)(runtime)
+                self.assertEqual(result['state'], 'running')
+
+    def test_llama_ipv6_client_address_keeps_native_listener_unchanged(self):
+        help_text = '--fit --fit-target --cache-type-k --cache-type-v --flash-attn --sleep-idle-seconds --spec-type --log-verbosity'
+        for configured, native in (('::1', '::1'), ('[::1]', '::1'), ('::', '::')):
+            with self.subTest(host=configured), patch.dict(os.environ, {'LLAMA_ARG_HOST': configured, 'LLAMA_ARG_PORT': '18080'}), \
+                 patch('maa.backends.llama_command', return_value=['/native/llama', 'serve']), \
+                 patch('maa.backends.subprocess.run', return_value=subprocess.CompletedProcess([], 0, help_text, '')):
+                command = backends.llama_arguments({'path': '/model.gguf', 'name': 'native-model'}, settings())
+                self.assertEqual(command[command.index('--host') + 1], native)
+                self.assertEqual(command[command.index('--port') + 1], '18080')
+
+    def test_ollama_ipv6_preload_uses_loopback_without_changing_bind(self):
+        target = {'model': {'backend': 'ollama', 'name': 'native-model', 'key': 'a'*24}, 'settings': settings()}
+        with patch.dict(os.environ, {'OLLAMA_HOST': '[::]:11434'}), \
+             patch.object(self.controller, 'ensure'), patch.object(self.controller, 'write_unit') as unit, \
+             patch('maa.service.ollama_capabilities', return_value='--fit --fit-target'), \
+             patch('maa.models.ollama_session', return_value=nullcontext()), patch('maa.service.ollama_prepare'), \
+             patch('maa.service.binary', side_effect=lambda name: '/native/' + name), \
+             patch('maa.service.request'), patch('maa.service.privileged'):
+            self.controller.prepare(target)
+        content = unit.call_args.args[1]
+        self.assertIn('Environment="OLLAMA_HOST=[::]:11434"', content)
+        line = next(line for line in content.splitlines() if line.startswith('ExecStartPost=') and line.split('=', 1)[1])
+        self.assertEqual(shlex.split(line.split('=', 1)[1])[-1], 'http://[::1]:11434/api/generate')

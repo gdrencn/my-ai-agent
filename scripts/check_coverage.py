@@ -46,7 +46,7 @@ def compare():
                                 'product-reinstall-retains-yolo-off-and-native-instance') else None}
                             for name in original],
                         'added': inventory.INSTALLED_ADDITIONS + ['user-permissions-retained'],
-                        'execution_evidence': 'V0_1_14_LOCAL.json and V0_1_14_PUBLIC.json; inventory alone is not execution evidence'}
+                        'execution_evidence': 'V0_1_15_LOCAL.json and V0_1_15_PUBLIC.json; inventory alone is not execution evidence'}
     return result
 
 

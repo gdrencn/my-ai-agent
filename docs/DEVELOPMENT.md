@@ -1,10 +1,12 @@
 # Development and publication
 
-The current requirements are in REQUIREMENTS.md and docs/INDEPENDENCE.md. Product and tests are self-contained Linux code: no sibling checkout, instance marker, container-manager command or outer-environment configuration. The immutable baseline is stable/0.1.9. The 0.1.14 tree excludes IM and Web.
+The current requirements are in REQUIREMENTS.md and docs/INDEPENDENCE.md. Product and tests are self-contained Linux code: no sibling checkout, instance marker, container-manager command or outer-environment configuration. The immutable baseline is stable/0.1.9. The 0.1.15 tree excludes IM and Web.
 
 ## Shared modules
 
-- environment: Linux/systemd prerequisites, dependency detection, one native package command table.
+- environment: Linux/systemd prerequisites, offline CA file/hashed-directory availability, dependency detection, one native package command table.
+- http: bounded native requests and IPv4/IPv6 client URL serialization.
+- bootstrap: verified version/channel asset pairing. Old frozen products retain their own historical installer contract.
 - install: language selection, dependency preparation, owned installation transaction and official component installers.
 - manager/service: model transactions, native units, pause/start, ownership checks and rollback.
 - models/gguf/backends/telemetry: model inventory/download, native arguments and read-only observations.
@@ -12,7 +14,6 @@ The current requirements are in REQUIREMENTS.md and docs/INDEPENDENCE.md. Produc
 - preferences/i18n/locales/menu/text/output/ui: shared bilingual presentation and terminal handling.
 
 All privileged management calls share service.privileged. Root runs directly. Interactive sudo inherits the controlling terminal for password input and uses the common live-output runner for diagnostics, with independently captured/redirected stdout. A noninteractive validation probe only determines when progress must yield the terminal; the real command retains native sudo policy, including command-specific NOPASSWD and zero-duration timestamps. Noninteractive calls use sudo -n. Native test CLI calls tee live stderr while keeping captured JSON stdout separate. Never read passwords, supply them through stdin, create an askpass program or change user sudo policy.
-- bootstrap: verified version/channel asset pairing. Old frozen products retain their own historical installer contract.
 
 The build generates shell entries from scripts/entry.template.sh and environment.PACKAGE_MANAGERS. Shell bootstrap only prepares tools needed to run the verified Python installer. Product dependency checks prepare operation-specific tools and CA certificates. Never infer a capability from the operating environment's origin. systemd availability includes a live manager query; command existence alone is insufficient.
 
@@ -35,6 +36,8 @@ Build twice and compare artifacts. Check Python 3.11 grammar, shell syntax, pack
 
 ## Release
 
-0.1.14 test uses tag v0.1.14 and an immutable prerelease. Generated test entries pin its version, because frozen 0.2.x experimental releases also exist. Explicit --version overrides are supported. Default numeric discovery remains available to historical bootstraps.
+0.1.15 test uses tag v0.1.15 and an immutable prerelease. Generated test entries pin its version, because frozen 0.2.x experimental releases also exist. Explicit --version overrides are supported. Default numeric discovery remains available to historical bootstraps.
 
 After source/docs and branch/tag CI pass, publish the verified assets before moving the public main entry to their version. Then verify main CI and the actual public command. Publish paired maa.pyz, maa-test.pyz, VERSION.json, bootstrap.py, install.sh and SHA256SUMS. Include validation receipts and their checksum. Download public assets again, compare bytes and run the public entry. Additional fixes after handing the user a test command need a new version. Stable requires user acceptance and must preserve the approved product/test bytes. Do not replace existing releases, tags or assets. New deployments cannot assume old frozen products support their environment.
+
+CA-directory behavior follows [Python SSLContext.get_ca_certs](https://docs.python.org/3.14/library/ssl.html#ssl.SSLContext.get_ca_certs): directory trust is loaded on demand. IPv6 authority formatting follows [RFC 3986 section 3.2.2](https://www.rfc-editor.org/rfc/rfc3986.html#section-3.2.2). The availability probe does not replace certificate/hostname verification by native HTTPS clients.

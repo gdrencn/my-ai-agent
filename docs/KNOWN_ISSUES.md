@@ -1,9 +1,13 @@
-# Known issues
+# Known issues and resolved compatibility reports
 
-## CA directories loaded lazily by a Python SSL build
+## Resolved in 0.1.15: lazy CA-directory detection
 
-Observed during extra 0.1.13 validation with portable CPython 3.14.10. The interpreter used `/etc/ssl/certs` as a valid default certificate directory and no default certificate file. A real urllib HTTPS request succeeded, but a fresh `ssl.create_default_context().get_ca_certs()` returned an empty list because OpenSSL loads CA-directory entries lazily. `maa.environment.missing_dependencies()` currently interprets that list as a missing `ca-certificates` package. Reinstalling the already-present OS package does not resolve that false positive.
+The portable-Python 3.14.10 CA-directory false positive recorded during 0.1.13 validation is corrected in 0.1.15. CA availability now accepts readable, indexed and parseable CA files in the effective OpenSSL default/SSL_CERT_DIR directory list without requiring those certificates to be loaded before a TLS request. Empty, missing, invalid, unindexed, CRL-only and leaf-only stores remain unavailable. HTTPS certificate and hostname verification remain enabled.
 
-For this owned validation environment, `SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt` explicitly selects the already-installed system bundle; prerequisite checks and HTTPS then use that file. This is test-environment configuration, not a change to the Maa dependency check. The ordinary system-Python 3.12 environments and the user's reported system-Python 3.14 installation had already passed CA checks.
+The historical observation and its explicit CA-file workaround remain part of immutable 0.1.13/0.1.14 evidence. They are not a current workaround requirement. Actual default-directory behavior is verified with portable CPython 3.14.10; synthetic directory-only HTTPS verifies successful trust, wrong-host rejection and empty-trust rejection. See [TLS evidence](../validation/V0_1_15_TLS.json).
 
-This independent compatibility issue is recorded for separate discussion and remains unresolved in 0.1.14. No original prerequisite check was removed or suppressed. The 0.1.13 correction covers owned Codex process termination before temporary-directory cleanup; 0.1.14 corrects native sudo authentication output. Neither changes CA detection.
+## Resolved in 0.1.15: native IPv6 authorities
+
+Both native client URL builders now bracket IPv6 literals. Wildcard IPv6 listeners use ::1 for clients, while native listeners retain their configured bind address. Profiles, native preload/readiness/status and real Codex conversations were verified with both Ollama and llama.cpp, using explicit ::1 and wildcard ::. See [IPv6 evidence](../validation/V0_1_15_IPV6.json).
+
+Native model/protocol limitations remain documented in README.md. A synthetic small-model check is not evidence of MTP performance or general coding quality.

@@ -7,7 +7,7 @@ import shutil
 import subprocess
 import time
 from urllib.parse import urlparse
-from .http import request
+from .http import endpoint, request
 from .output import stage
 from .settings import draft_kv, duration
 from .store import Error
@@ -41,20 +41,20 @@ def native_environment():
     return {key: value for key, value in os.environ.items() if key not in managed}
 
 
-def llama_endpoint():
+def llama_host():
     host = os.environ.get('LLAMA_ARG_HOST', '127.0.0.1')
-    if host in ('0.0.0.0', '::'):
-        host = '127.0.0.1'
-    return f'http://{host}:{os.environ.get("LLAMA_ARG_PORT", "8080")}'
+    return host[1:-1] if host.startswith('[') and host.endswith(']') else host
+
+
+def llama_endpoint():
+    return endpoint(llama_host(), os.environ.get('LLAMA_ARG_PORT', '8080'))
 
 
 def ollama_endpoint():
     host = os.environ.get('OLLAMA_HOST', '127.0.0.1:11434')
     parsed = urlparse(host if '://' in host else 'http://' + host)
     address = parsed.hostname or '127.0.0.1'
-    if address in ('0.0.0.0', '::'):
-        address = '127.0.0.1'
-    return f'http://{address}:{parsed.port or 11434}'
+    return endpoint(address, parsed.port or 11434)
 
 
 def ollama_environment(values=None):
@@ -102,7 +102,7 @@ def llama_arguments(model, values):
         check_options(help_text, ['draft-mtp', '--spec-draft-type-k', '--spec-draft-type-v'])
     check_options(help_text, ['--log-verbosity'])
     endpoint = urlparse(llama_endpoint())
-    args = command + ['--host', os.environ.get('LLAMA_ARG_HOST', '127.0.0.1'), '--port', str(endpoint.port),
+    args = command + ['--host', llama_host(), '--port', str(endpoint.port),
                       '--model', model['path'], '--alias', model['name'],
                       '--log-verbosity', '4',
                       '--parallel', '1',  # One local-agent slot; context is per conversation.

@@ -1,4 +1,4 @@
-# 0.1.14 independence contract
+# 0.1.15 independence contract
 
 This release starts from the accepted 0.1.9 product. It has no IM or Web implementation. Bilingual presentation is retained as a self-contained interface improvement.
 

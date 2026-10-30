@@ -1,0 +1,79 @@
+{
+  "version": "0.1.15",
+  "channel": "test",
+  "status": "passed",
+  "audit": {
+    "version": "0.1.15",
+    "channel": "test",
+    "grammar_files": 63,
+    "reproducible": true,
+    "package_boundaries": true,
+    "runtime_coupling_absent": true,
+    "sha256": {
+      "maa.pyz": "797b60db4b9f0f6d6ccd602229b1485a302f97971351f6aef48778708429fb92",
+      "maa-test.pyz": "9c1133bd1b3b00cc97ad52804f86350ae45b9428b7d9d722646da15172bd5458",
+      "VERSION.json": "aa3d7946e3dc71163122dfda12ed57ac6f1f282b86d46914a6b0a570405dda6a",
+      "bootstrap.py": "485573d1c435f22e2a285984ca23cac5a09000f6bbb033ef034ffb5da77add5f",
+      "install.sh": "fe2719ff2f0eccefb0aed5749176568840dbc611b2001b39ae84c7bd5a17374c",
+      "SHA256SUMS": "8f0cdb0455d7e9a2a47e1a64fdca5559602671e4cbccf0f6a7e119e6cb300688"
+    },
+    "current_portable": 147,
+    "previous_portable": {
+      "v0.1.9": {
+        "count": 90,
+        "missing": []
+      },
+      "v0.1.10": {
+        "count": 113,
+        "missing": []
+      },
+      "v0.1.11": {
+        "count": 118,
+        "missing": []
+      },
+      "v0.1.12": {
+        "count": 119,
+        "missing": []
+      },
+      "v0.1.13": {
+        "count": 128,
+        "missing": []
+      },
+      "v0.1.14": {
+        "count": 138,
+        "missing": []
+      }
+    }
+  },
+  "acceptance": {
+    "source_portable": 147,
+    "outside_checkout_paired": 147,
+    "delivery": 13,
+    "previous_portable_retained": 138,
+    "ordinary_user": {
+      "python": "3.14.4",
+      "paired": 147,
+      "native": 42
+    },
+    "root": {
+      "python": "3.12.3",
+      "paired": 147,
+      "native": 42
+    },
+    "real_ipv6_backend_cases": 4,
+    "directory_only_tls_interpreters": [
+      "3.14.4",
+      "3.14.10"
+    ]
+  },
+  "boundaries": {
+    "original_baseline_retained": true,
+    "native_https_verification_preserved": true,
+    "no_new_runtime_dependency": true,
+    "dependency_detection_offline": true,
+    "native_bind_preserved": true,
+    "host_settings_and_guidelines_unchanged": true,
+    "no_IM_or_Web": true
+  },
+  "public_entry": "pending separate public receipt after publication"
+}
