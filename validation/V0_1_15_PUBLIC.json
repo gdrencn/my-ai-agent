@@ -1,0 +1,144 @@
+{
+  "version": "0.1.15",
+  "channel": "test",
+  "status": "passed",
+  "completed": "2026-10-30T05:37:03.878360+00:00",
+  "source": {
+    "tag": "v0.1.15",
+    "commit": "fbd028e84baaab6a2373b4dd6242f4aeee9ffbd4"
+  },
+  "public_entry": {
+    "trust_environment": {
+      "python": "3.14.10",
+      "cafile": null,
+      "capath": "/etc/ssl/certs",
+      "initial_loaded": 0,
+      "SSL_CERT_FILE": null,
+      "SSL_CERT_DIR": null
+    },
+    "portable_python_default_ca_directory": true,
+    "explicit_ssl_cert_file_workaround": false,
+    "version": "0.1.15",
+    "status": "passed",
+    "entry": "curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/test.sh | bash",
+    "python": "Python 3.14.10",
+    "sudo": "sudo-rs 0.2.13-0ubuntu1.2",
+    "password_prompts": 1,
+    "password_echoed": false,
+    "terminal_restored": true,
+    "user_permissions_unchanged": true,
+    "native_report": "/home/maatest/maa-native-20261030-053330-893478.json",
+    "checks": 42,
+    "remaining_private_homes": []
+  },
+  "portable_paired": 147,
+  "native_checks": 42,
+  "original_native_checks_retained": 35,
+  "original_portable_checks_retained": 90,
+  "previous_0_1_14_portable_retained": 138,
+  "additional_native_ipv6_cases": 4,
+  "anonymous_initial_assets": {
+    "bootstrap.py": {
+      "sha256": "485573d1c435f22e2a285984ca23cac5a09000f6bbb033ef034ffb5da77add5f",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "install.sh": {
+      "sha256": "fe2719ff2f0eccefb0aed5749176568840dbc611b2001b39ae84c7bd5a17374c",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "maa-test.pyz": {
+      "sha256": "9c1133bd1b3b00cc97ad52804f86350ae45b9428b7d9d722646da15172bd5458",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "maa.pyz": {
+      "sha256": "797b60db4b9f0f6d6ccd602229b1485a302f97971351f6aef48778708429fb92",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "SHA256SUMS": {
+      "sha256": "8f0cdb0455d7e9a2a47e1a64fdca5559602671e4cbccf0f6a7e119e6cb300688",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "V0_1_15_COVERAGE.json": {
+      "sha256": "cea5896f89556ccf7ab3347111fa1a479a580ace7122bef6c1bd7485a089bd84",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "V0_1_15_IPV6.json": {
+      "sha256": "f0603400e2f1c4e517b91d7877d02774097f1eec40c6f61dd13a7554e6788e23",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "V0_1_15_LOCAL.json": {
+      "sha256": "631c149c64f976b05202a5e1afde62eec692bb5372d06f59d6b5db03e3965a40",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "V0_1_15_NATIVE.json": {
+      "sha256": "1b67690e4bb0a4c4d1d887f6d9b651acdda483fafd6bf7108ffc06eccf3eb348",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "V0_1_15_ROOT_NATIVE.json": {
+      "sha256": "76e46029d7e1ac6b773a8debfaca868085ebeb7b2d2aaa15ce4314a9d71f0ccb",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "V0_1_15_TLS.json": {
+      "sha256": "0d8e9502d3fd1c7bf3f099585ee8c34fbd8ef3102e0f9606d62629614675e87c",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "VALIDATION_SHA256SUMS": {
+      "sha256": "2debd177aa799bc107b05cf3757d9409b61c5f50b8d7ee7a829652d87c0f45dd",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "VERSION.json": {
+      "sha256": "aa3d7946e3dc71163122dfda12ed57ac6f1f282b86d46914a6b0a570405dda6a",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    }
+  },
+  "immutable_previous": {
+    "status": "passed",
+    "previous_releases_unchanged": [
+      "stable/0.1.9",
+      "v0.1.10",
+      "v0.1.11",
+      "v0.1.12",
+      "v0.1.13",
+      "v0.1.14",
+      "v0.2.2"
+    ],
+    "latest_stable": "stable/0.1.9",
+    "global_guidelines_unchanged": true
+  },
+  "ci": {
+    "branch": {
+      "run": 41008539734,
+      "status": "success"
+    },
+    "tag": {
+      "run": 41008730277,
+      "status": "success"
+    },
+    "main_source": {
+      "run": 41008980258,
+      "status": "success"
+    }
+  },
+  "cleanup": {
+    "owned_validation_environments_removed": [
+      "maa-acceptance-0115",
+      "maa-root-acceptance-0115"
+    ],
+    "remaining_owned_environments": [],
+    "private_homes_remaining": [],
+    "host_global_configuration_unchanged": true
+  }
+}
