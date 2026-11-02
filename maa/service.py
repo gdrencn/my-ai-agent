@@ -234,12 +234,13 @@ class Controller:
         privileged(['systemctl', 'start', UNITS[backend]])
 
     def wake(self, target):
+        endpoint = self.endpoint(target)
         if target['model']['backend'] == 'ollama':
             from .backends import ollama_wake
-            ollama_wake(target['model']['name'], target['settings'])
+            ollama_wake(target['model']['name'], target['settings'], endpoint=endpoint)
         else:
             stage('唤醒 llama.cpp 模型')
-            request(llama_endpoint() + '/v1/responses', {'model': target['model']['name'],
+            request(endpoint + '/v1/responses', {'model': target['model']['name'],
                     'input': 'Hi', 'max_output_tokens': 1, 'stream': False}, timeout=600)
 
     def unit_info(self, target=None):
@@ -271,23 +272,36 @@ class Controller:
         return (self.owned(target['model']['backend']) and runtime.get('native_config') is not None
                 and runtime['native_config'] == self.configuration_signature(target))
 
+    def endpoint(self, target=None):
+        target = target or self.store.selected()
+        runtime = read(self.store.path('runtime.json'), {})
+        signature = runtime.get('endpoint_config', runtime.get('native_config'))
+        if (runtime.get('upstream') and runtime.get('fingerprint') == fingerprint(target)
+                and signature is not None and self.owned(target['model']['backend'])
+                and signature == self.configuration_signature(target)):
+            return runtime['upstream']
+        return ollama_endpoint() if target['model']['backend'] == 'ollama' else llama_endpoint()
+
     def observe(self, target=None):
         target = target or self.store.selected()
         model = target['model']
-        runtime = ollama_observe(model['name'], missing_ok=True) if model['backend'] == 'ollama' else llama_observe(model['name'])
+        endpoint = self.endpoint(target)
+        runtime = (ollama_observe(model['name'], missing_ok=True, endpoint=endpoint)
+                   if model['backend'] == 'ollama' else llama_observe(model['name'], endpoint=endpoint))
         if runtime is None:
-            runtime = {'model': model['name'], 'upstream': ollama_endpoint(), 'context': None, 'resources': {}}
+            runtime = {'model': model['name'], 'upstream': endpoint, 'context': None, 'resources': {}}
         info = self.unit_info(target)
         log = self.store.path('native') / (model['backend'] + '.log')
         launch = None
         if log.exists():
             from .telemetry import launch_reference
             launch = launch_reference(log, 0, info.get('InvocationID'))
+        signature = self.configuration_signature(target)
         return {**runtime, 'model': model['name'], 'display_name': model['name'], 'backend': model['backend'],
                 'key': model['key'], 'fingerprint': fingerprint(target), 'launch': launch,
-                'native_config': self.configuration_signature(target),
+                'native_config': signature, 'endpoint_config': signature,
                 'log_path': str(log), 'pid': int(info.get('MainPID', 0)),
-                'base_url': (ollama_endpoint() if model['backend'] == 'ollama' else llama_endpoint()) + '/v1',
+                'base_url': endpoint + '/v1',
                 'capabilities': {'native_direct_connection': True}}
 
     def wait(self, target):

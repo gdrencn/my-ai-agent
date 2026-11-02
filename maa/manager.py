@@ -305,7 +305,7 @@ class Manager:
         with operation('读取本地模型清单'), self.store.lock():
             if backend == 'ollama':
                 if self._ollama_running():
-                    return ollama_inventory(self.store)
+                    return ollama_inventory(self.store, endpoint=self.controller.endpoint())
                 with self.maintenance(), ollama_session(self.store.path('native.log')):
                     return ollama_inventory(self.store)
             return [row for row in self.store.models().values() if row['backend'] == backend]
@@ -317,16 +317,17 @@ class Manager:
                 with self.store.lock('ollama-download'):
                     with self.store.lock():
                         direct = self._ollama_running()
+                        endpoint = self.controller.endpoint() if direct else None
                         if not direct:
                             with self.maintenance(), ollama_session(self.store.path('native.log')):
                                 installed = ollama_install(self.store, name, path)
                                 return self._installed_ollama(installed)
                     # The user may pause/switch during native pull. Its failure
                     # must not restore a stale target over their newer choice.
-                    installed = ollama_install(self.store, name, path)
+                    installed = ollama_install(self.store, name, path, endpoint=endpoint)
                     with self.store.lock():
                         if self._ollama_running():
-                            return self._installed_ollama(installed)
+                            return self._installed_ollama(installed, endpoint=self.controller.endpoint())
                         with self.maintenance(), ollama_session(self.store.path('native.log')):
                             return self._installed_ollama(installed)
             model = hf_download(self.store, repo, filename) if repo else local_model(path)
@@ -340,9 +341,9 @@ class Manager:
         return bool(selected and selected['model']['backend'] == 'ollama'
                     and self.controller.owned('ollama') and self.controller.running())
 
-    def _installed_ollama(self, name):
+    def _installed_ollama(self, name, endpoint=None):
         try:
-            model = next(iter(ollama_inventory(self.store, name=name)))
+            model = next(iter(ollama_inventory(self.store, name=name, endpoint=endpoint)))
         except StopIteration:
             raise Error('Native installation completed but model is absent from the native inventory') from None
         selected = self.store.selected()
@@ -351,7 +352,8 @@ class Manager:
             # identical weights. Next explicit start/select must revalidate it.
             runtime = read(self.store.path('runtime.json'))
             if runtime:
-                write(self.store.path('runtime.json'), {**runtime, 'native_config': None})
+                write(self.store.path('runtime.json'), {**runtime, 'native_config': None,
+                      'endpoint_config': runtime.get('endpoint_config', runtime.get('native_config'))})
         return model
 
     def install(self, component):

@@ -89,8 +89,10 @@ def client():
 
 
 def command(*args, structured=True, success=True, timeout=900):
-    result = run_live([MAA, *args], native=True, stdout=subprocess.PIPE, tee_stderr=True,
+    result = run_live([MAA, *args], native=True, owned=True, stdout=subprocess.PIPE, tee_stderr=True,
                       text=True, timeout=timeout)
+    if result.returncode in (130, -2):
+        raise KeyboardInterrupt
     if success and result.returncode:
         raise RuntimeError(result.stdout + result.stderr)
     if not success:

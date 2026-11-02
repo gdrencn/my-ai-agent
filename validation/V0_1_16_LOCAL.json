@@ -1,0 +1,168 @@
+{
+  "version": "0.1.16",
+  "stage": "prepublication local and complete native acceptance",
+  "status": "passed",
+  "recorded_at": "2026-11-02T06:42:56.228528+00:00",
+  "source_base_revision": "81335ad836ab03ca0031895d96160d41b77fa668",
+  "working_tree_changes": true,
+  "python": "3.14.4",
+  "system": "Linux",
+  "suites": {
+    "source": {
+      "status": "passed",
+      "tests": 158,
+      "seconds": 29.47,
+      "log_sha256": "5ca0e012e9aaa2a0dfce74186b8ce0e1165564897e62b3c8e0135d23e4c04333"
+    },
+    "packaged": {
+      "status": "passed",
+      "tests": 158,
+      "seconds": 30.825,
+      "log_sha256": "d76bbd16acec314d8acb5f85bd59286d80168cc903b599fdbdcebdbe17267f0d"
+    },
+    "delivery": {
+      "status": "passed",
+      "tests": 13,
+      "seconds": 0.014,
+      "log_sha256": "28ff716645badefcaa5aece8d4e831d7dbc70a9fc06c353335b09ca17f2eda3f"
+    }
+  },
+  "coverage": {
+    "previous_0_1_15_portable": 147,
+    "current_portable": 158,
+    "removed": [],
+    "added": [
+      "tests/test_core.py:Core.test_interrupt_during_official_cleanup_keeps_original_failure_and_130",
+      "tests/test_core.py:Core.test_official_cleanup_failure_after_success_still_fails",
+      "tests/test_core.py:Core.test_official_cleanup_retains_primary_failure_and_interrupt_exit_code",
+      "tests/test_privilege.py:Privilege.test_owned_fast_commands_restore_terminal_foreground",
+      "tests/test_privilege.py:Privilege.test_owned_native_calls_preserve_authentication_cancel_and_foreground",
+      "tests/test_processes.py:Processes.test_native_management_interrupt_cleans_temporary_ollama_and_keeps_130",
+      "tests/test_processes.py:Processes.test_native_management_timeout_and_exit_clean_temporary_ollama",
+      "tests/test_service.py:Service.test_candidate_endpoint_and_rollback_do_not_reuse_an_old_listener",
+      "tests/test_service.py:Service.test_running_ollama_inventory_pull_and_import_keep_saved_endpoint",
+      "tests/test_service.py:Service.test_saved_endpoint_is_used_by_paused_start_and_resident_wake",
+      "tests/test_service.py:Service.test_saved_endpoint_survives_environment_changes_for_wake_observe_and_wait"
+    ],
+    "baseline_portable_missing": [],
+    "baseline_delivery_missing": [],
+    "native_required": 42,
+    "native_execution": "All 42 checks passed under ordinary-user and root Linux identities; see V0_1_16_NATIVE.json and V0_1_16_ROOT_NATIVE.json"
+  },
+  "isolated_reproductions_after_correction": {
+    "interrupt": {
+      "reported_exception": "KeyboardInterrupt",
+      "reported_command": null,
+      "original_is_top_level": true
+    },
+    "installer_error": {
+      "reported_exception": "CalledProcessError",
+      "reported_command": [
+        "official-installer"
+      ],
+      "original_is_top_level": true
+    },
+    "saved_address_llamacpp": {
+      "saved_url": "http://127.0.0.1:18080",
+      "native_signature_unchanged": true,
+      "actually_queried": "http://127.0.0.1:18080/props"
+    },
+    "saved_address_ollama": {
+      "saved_url": "http://127.0.0.1:11435",
+      "native_signature_unchanged": true,
+      "actually_queried": "http://127.0.0.1:11435/api/ps"
+    },
+    "native_test_timeout": {
+      "temporary_server_survived_timeout": false
+    }
+  },
+  "verification": {
+    "deterministic_paired_build": true,
+    "python_3_11_grammar": true,
+    "shell_syntax": true,
+    "clean_product_package_boundary": true,
+    "piped_stdin_authentication_success_cancel_and_timeout": true,
+    "authentication_timeout_restores_echo": true,
+    "foreground_restoration_after_20_fast_commands": true,
+    "temporary_server_timeout_and_interrupt_cleanup": true,
+    "unrelated_process_group_survives": true,
+    "saved_candidate_and_rollback_addresses": true,
+    "current_tag_invalidation_preserves_endpoint": true,
+    "actual_backend_gpu_or_native_sudo_retested": true
+  },
+  "artifacts": {
+    "V0_1_9_ROOT_NATIVE.json": "c81331e57185983d004158c30a7f96f58059229b107b1095610febfa29d535ce",
+    "maa-test.pyz": "fe7fcba85e4d6bf4ed9c994105f71835f72676294b56dceaced66d450e31811e",
+    "bootstrap.py": "485573d1c435f22e2a285984ca23cac5a09000f6bbb033ef034ffb5da77add5f",
+    "maa.pyz": "f83044d8bad999dd7b077b3eb21a38f0f6e267c13753d2e32483c4bd9f1347f1",
+    "V0_1_9_NATIVE.json": "2b2e44d36a1418b19de4fcd14d9317e9439b5c518d1d632021039e7432f79d7f",
+    "SHA256SUMS": "b6d9df775b7109fa8888e74f89fe97f803de865f1193a03f741000f9c3fbf90f",
+    "PUBLIC_SHA256SUMS": "d8996f4a9202a3ccc228b2db55acccb52f1ae209326a4190089475256fd6df8c",
+    "VERSION.json": "6e03a9ed390ef35cd01d6c30373c7f36a7bec10ad1e33fb55b2aa6d6d15a10a5",
+    "VALIDATION_SHA256SUMS": "0facd4d6435519ae701142d0a319f7cb11762f817f23be6c89a36a397cb88e00",
+    "V0_1_9_PUBLIC.json": "21837edc90238b0e710c8a1a100578c76c640da2487ac1c32d55bb21c703de8b",
+    "install.sh": "ffb0845ce7054591b6ed0d56f4ca6a3cf334d44661f4f745175d5f89364aef27",
+    "V0_1_9_LOCAL.json": "b7babf7b5ef4f68f0821e4d08157c853473fea5d60e95aa223cb80bf486123fb",
+    "V0_1_9_TERMINAL.json": "0aa6b797adad4b1f25c7ebdfafbf170c51cc26be55e0af24f34843ec4ef9ef3a"
+  },
+  "publication": {
+    "published": false,
+    "remote_test_version": "0.1.15",
+    "stable_version": "0.1.9",
+    "old_releases_modified": false
+  },
+  "native_evidence": [
+    "V0_1_16_NATIVE.json",
+    "V0_1_16_ROOT_NATIVE.json",
+    "V0_1_16_ENDPOINTS.json",
+    "V0_1_16_TIMEOUT.json",
+    "V0_1_16_AUTHENTICATION.json"
+  ],
+  "source_audit": {
+    "version": "0.1.16",
+    "channel": "test",
+    "grammar_files": 63,
+    "reproducible": true,
+    "package_boundaries": true,
+    "runtime_coupling_absent": true,
+    "sha256": {
+      "maa.pyz": "f83044d8bad999dd7b077b3eb21a38f0f6e267c13753d2e32483c4bd9f1347f1",
+      "maa-test.pyz": "fe7fcba85e4d6bf4ed9c994105f71835f72676294b56dceaced66d450e31811e",
+      "VERSION.json": "6e03a9ed390ef35cd01d6c30373c7f36a7bec10ad1e33fb55b2aa6d6d15a10a5",
+      "bootstrap.py": "485573d1c435f22e2a285984ca23cac5a09000f6bbb033ef034ffb5da77add5f",
+      "install.sh": "ffb0845ce7054591b6ed0d56f4ca6a3cf334d44661f4f745175d5f89364aef27",
+      "SHA256SUMS": "b6d9df775b7109fa8888e74f89fe97f803de865f1193a03f741000f9c3fbf90f"
+    },
+    "current_portable": 158,
+    "previous_portable": {
+      "v0.1.9": {
+        "count": 90,
+        "missing": []
+      },
+      "v0.1.10": {
+        "count": 113,
+        "missing": []
+      },
+      "v0.1.11": {
+        "count": 118,
+        "missing": []
+      },
+      "v0.1.12": {
+        "count": 119,
+        "missing": []
+      },
+      "v0.1.13": {
+        "count": 128,
+        "missing": []
+      },
+      "v0.1.14": {
+        "count": 138,
+        "missing": []
+      },
+      "v0.1.15": {
+        "count": 147,
+        "missing": []
+      }
+    }
+  }
+}

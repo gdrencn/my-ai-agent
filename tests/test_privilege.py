@@ -105,7 +105,8 @@ class Privilege(unittest.TestCase):
                     output += value
                 if b'AUTH_PASSWORD:' in output and not answered:
                     self.assertNotIn(b'COMMAND_FINISHED', output)
-                    os.write(fd, b'\x03' if cancel else password)
+                    if cancel or password is not None:
+                        os.write(fd, b'\x03' if cancel else password)
                     answered = True
                 if pid:
                     done, status_value = os.waitpid(pid, os.WNOHANG)
@@ -193,6 +194,50 @@ class Privilege(unittest.TestCase):
         self.assertTrue(answered)
         self.assertIn('AUTH_REJECTED', output)
         self.assertIn('\x1b[?25h', output)
+
+    def test_owned_native_calls_preserve_authentication_cancel_and_foreground(self):
+        root = str(Path(__file__).resolve().parent.parent)
+        child = (f'import sys;sys.path.insert(0,{root!r})\n'
+                 'import subprocess;from unittest.mock import patch;from maa.service import privileged\n'
+                 "with patch('maa.service.os.geteuid',return_value=1000):\n"
+                 " privileged(['true'],stdout=subprocess.DEVNULL)\n"
+                 "print('{\"ok\":true}')\n")
+        for mode in ('success', 'cancel', 'timeout', 'auth-timeout'):
+            cancel = mode == 'cancel'
+            program = child + ('import time;time.sleep(60)\n' if mode == 'timeout' else '')
+            with self.subTest(mode=mode):
+                (self.base / 'cached').unlink(missing_ok=True)
+                code = ('try:from maa_testing import native\nexcept ImportError:from test import native\n'
+                    'native.MAA=sys.executable\n'
+                    'r,w=os.pipe();os.close(w);os.dup2(r,0);os.close(r)\n'
+                    'terminal=os.open("/dev/tty",os.O_RDWR);before_group=os.tcgetpgrp(terminal)\n'
+                    'try:\n'
+                    f' result=native.command("-c",{program!r},timeout={1 if "timeout" in mode else 5})\n'
+                    f' assert {mode!r}=="success" and result=={{"ok":True}}\n'
+                    'except KeyboardInterrupt:\n'
+                    f' assert {cancel!r}\n'
+                    ' print("AUTH_CANCELLED")\n'
+                    'except subprocess.TimeoutExpired:\n'
+                    f' assert "timeout" in {mode!r}\n'
+                    'assert os.tcgetpgrp(terminal)==before_group==os.getpgrp()\n'
+                    'os.close(terminal)\nprint("COMMAND_FINISHED")\n')
+                status, output, answered = self.terminal(code, cancel=cancel,
+                    password=None if mode == 'auth-timeout' else b'fixture-secret\n')
+                self.assertEqual(status, 0, output)
+                self.assertTrue(answered)
+                self.assertIn('COMMAND_FINISHED', output)
+                self.assertIn('AUTH_CANCELLED' if cancel else 'AUTH_PASSWORD:' if mode == 'auth-timeout' else 'AUTH_OK', output)
+
+    def test_owned_fast_commands_restore_terminal_foreground(self):
+        code = ('terminal=os.open("/dev/tty",os.O_RDWR)\n'
+                'for _ in range(20):\n'
+                ' result=run(["true"],native=True,owned=True,stdout=subprocess.PIPE,tee_stderr=True,timeout=2)\n'
+                ' assert result.returncode==0\n'
+                ' assert os.tcgetpgrp(terminal)==os.getpgrp()\n'
+                'os.close(terminal)\nprint("COMMAND_FINISHED")\n')
+        status, output, answered = self.terminal(code)
+        self.assertEqual(status, 0, output)
+        self.assertFalse(answered)
 
     def test_interrupt_during_authentication_restores_terminal(self):
         code = ("try:\n"

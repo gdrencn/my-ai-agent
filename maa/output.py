@@ -201,32 +201,39 @@ def diagnostic(value):
         writer.write(value)
 
 
-def run(command, *, native=False, tee_stderr=False, **kwargs):
+def run(command, *, native=False, tee_stderr=False, owned=False, **kwargs):
     """Run a command with one output policy, shared by all management entries.
 
     Normal commands keep the elapsed timer alive and replay actual output after
     completion. Explicitly captured/redirected streams retain subprocess.run's
     contract. Native installers/downloaders forward live output through a PTY
     on terminals so their own progress behavior remains available.
+    Owned management calls also stop their private process group on every exit
+    path while keeping controlling-terminal authentication available.
     """
+    runner = subprocess.run
+    if owned:
+        from functools import partial
+        from .processes import run as run_owned
+        runner = partial(run_owned, preserve_terminal=True)
     if tee_stderr and (not native or kwargs.get('capture_output') or kwargs.get('stderr') is not None):
         raise ValueError('Live stderr capture requires native mode and inherited stderr')
     if kwargs.get('capture_output'):
-        return subprocess.run(command, **kwargs)
+        return runner(command, **kwargs)
     inherited = [name for name in ('stdout', 'stderr') if kwargs.get(name) is None]
     if not inherited:
-        return subprocess.run(command, **kwargs)
+        return runner(command, **kwargs)
     if native:
         if tee_stderr and inherited != ['stderr']:
             raise ValueError('Live stderr capture requires independently redirected stdout')
         for name in inherited:
             kwargs.pop(name, None)
-        return _run_native(command, kwargs, inherited, tee_stderr)
+        return _run_native(command, kwargs, inherited, tee_stderr, runner=runner)
     check = kwargs.pop('check', False)
     for name in inherited:
         kwargs[name] = subprocess.PIPE
     try:
-        result = subprocess.run(command, check=False, **kwargs)
+        result = runner(command, check=False, **kwargs)
     except subprocess.TimeoutExpired as exc:
         _replay(exc, inherited)
         raise
@@ -245,7 +252,7 @@ def _replay(result, streams):
             writer.write(value.decode(errors='replace') if isinstance(value, bytes) else value)
 
 
-def _run_native(command, kwargs, inherited=('stdout', 'stderr'), tee_stderr=False):
+def _run_native(command, kwargs, inherited=('stdout', 'stderr'), tee_stderr=False, *, runner=subprocess.run):
     import select
     stream = activity.get().stream if activity.get() else sys.stderr
     if stream.isatty():
@@ -299,7 +306,7 @@ def _run_native(command, kwargs, inherited=('stdout', 'stderr'), tee_stderr=Fals
         reader.start()
         try:
             try:
-                result = subprocess.run(command, check=False, **{**kwargs, **{name: destination for name in inherited}})
+                result = runner(command, check=False, **{**kwargs, **{name: destination for name in inherited}})
             finally:
                 os.close(destination)
                 finished.set()

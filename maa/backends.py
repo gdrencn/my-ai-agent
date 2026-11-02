@@ -164,21 +164,22 @@ def ollama_prepare(target, store):
     return model['name'], info.get('parameters', '')
 
 
-def ollama_wake(alias, values):
+def ollama_wake(alias, values, endpoint=None):
     stage('加载 Ollama 模型')
-    endpoint = ollama_endpoint()
+    endpoint = endpoint or ollama_endpoint()
     request(endpoint + '/api/generate', {'model': alias, 'prompt': '', 'stream': False,
                                         'keep_alive': values['keep_alive']}, timeout=600)
-    return ollama_observe(alias)
+    return ollama_observe(alias, endpoint=endpoint)
 
 
-def ollama_observe(alias, missing_ok=False):
-    for model in request(ollama_endpoint() + '/api/ps')['models']:
+def ollama_observe(alias, missing_ok=False, endpoint=None):
+    endpoint = endpoint or ollama_endpoint()
+    for model in request(endpoint + '/api/ps')['models']:
         if model.get('name') == alias or model.get('model') == alias:
             context = model.get('context_length')
             if type(context) is not int or context <= 0:
                 raise Error('Ollama /api/ps did not report effective context_length')
-            return {'model': alias, 'context': context, 'upstream': ollama_endpoint(),
+            return {'model': alias, 'context': context, 'upstream': endpoint,
                     'native_digest': model.get('digest'),
                     'resources': {k: model.get(k) for k in ('size', 'size_vram', 'expires_at')}}
     if missing_ok:

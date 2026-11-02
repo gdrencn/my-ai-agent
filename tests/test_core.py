@@ -42,6 +42,8 @@ class FakeController:
         self.valid = False
     def owned(self, backend):
         return True
+    def endpoint(self, target=None):
+        return 'http://127.0.0.1:8080'
     def configuration_matches(self, target):
         return self.valid
     def ensure(self):
@@ -76,6 +78,48 @@ class FakeController:
 
 
 class Core(unittest.TestCase):
+    def test_official_cleanup_retains_primary_failure_and_interrupt_exit_code(self):
+        from maa import install, cli
+        exists = Path.exists
+        def present(path):
+            return True if str(path) == '/etc/systemd/system/ollama.service' else exists(path)
+        for primary, code in [(KeyboardInterrupt(), 130), (subprocess.CalledProcessError(7, ['official-installer']), 1)]:
+            with self.subTest(primary=type(primary).__name__), \
+                 patch('maa.install.prepare_dependencies'), patch.object(Path, 'exists', present), \
+                 patch('maa.install.run', side_effect=[subprocess.CompletedProcess([], 0), primary]), \
+                 patch('maa.install.privileged', side_effect=OSError('CLEANUP_FAILED')), \
+                 patch('maa.cli.Manager', return_value=Manager(self.store, FakeController())), \
+                 patch('sys.stderr', new_callable=io.StringIO) as output:
+                self.assertEqual(cli.run(['install', 'ollama']), code)
+                self.assertIn('CLEANUP_FAILED', output.getvalue())
+                if code == 1:
+                    self.assertIn('official-installer', output.getvalue())
+                self.assertTrue(any('CLEANUP_FAILED' in note for note in primary.__notes__))
+
+    def test_official_cleanup_failure_after_success_still_fails(self):
+        from maa import install
+        exists = Path.exists
+        cleanup = OSError('CLEANUP_FAILED')
+        with patch('maa.install.prepare_dependencies'), \
+             patch.object(Path, 'exists', lambda p: str(p) == '/etc/systemd/system/ollama.service' or exists(p)), \
+             patch('maa.install.run', return_value=subprocess.CompletedProcess([], 0)), \
+             patch('maa.install.privileged', side_effect=cleanup):
+            with self.assertRaises(OSError) as caught:
+                install._component('ollama')
+        self.assertIs(caught.exception, cleanup)
+
+    def test_interrupt_during_official_cleanup_keeps_original_failure_and_130(self):
+        from maa import cli
+        exists = Path.exists
+        with patch('maa.install.prepare_dependencies'), \
+             patch.object(Path, 'exists', lambda p: str(p) == '/etc/systemd/system/ollama.service' or exists(p)), \
+             patch('maa.install.run', side_effect=[subprocess.CompletedProcess([], 0), subprocess.CalledProcessError(7, ['official-installer'])]), \
+             patch('maa.install.privileged', side_effect=KeyboardInterrupt), \
+             patch('maa.cli.Manager', return_value=Manager(self.store, FakeController())), \
+             patch('sys.stderr', new_callable=io.StringIO) as output:
+            self.assertEqual(cli.run(['install', 'ollama']), 130)
+            self.assertIn('official-installer', output.getvalue())
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.root = Path(self.temp.name)
@@ -487,7 +531,7 @@ class Core(unittest.TestCase):
         manager = Manager(self.store, ctrl)
         manager.select(model['key'])
         before = ctrl.starts
-        def transfer(*args):
+        def transfer(*args, **kwargs):
             manager.pause()  # Would deadlock if the transfer kept control.lock.
             raise Error('Native transfer interrupted by service stop')
         with patch('maa.manager.ollama_install', side_effect=transfer), self.assertRaisesRegex(Error, 'transfer interrupted'):

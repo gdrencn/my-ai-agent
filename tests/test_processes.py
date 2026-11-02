@@ -92,6 +92,65 @@ class Processes(unittest.TestCase):
         self.temp.cleanup()
     def command(self,mode):
         return [sys.executable,str(self.actor),str(self.folder),str(self.trace),mode]
+
+    def native_driver(self, mode):
+        root = str(Path(processes.__file__).parent.parent)
+        server = self.root / 'ollama'
+        server.write_text('#!' + sys.executable + '\nimport os,time,signal,json\nfrom pathlib import Path\n'
+            'signal.signal(signal.SIGTERM,signal.SIG_IGN)\n'
+            f'trace=Path({str(self.trace)!r});folder=Path({str(self.folder)!r})\n'
+            'folder.mkdir(parents=True)\n'
+            "trace.write_text(json.dumps({'pid':os.getpid(),'sid':os.getsid(0),'group':os.getpgrp()}))\n"
+            'while True:\n (folder/"writer").write_text("active");time.sleep(.01)\n')
+        server.chmod(0o755)
+        self.actor.write_text('#!' + sys.executable + '\nimport sys,os,time,json\n'
+            f'sys.path.insert(0,{root!r})\n'
+            'from unittest.mock import patch\nfrom maa.models import ollama_session\nfrom maa.store import Error\n'
+            f"with patch('maa.models.request',side_effect=Error('not running')),patch('maa.models.wait_api'),patch('maa.models.binary',return_value={str(server)!r}):\n"
+            f' with ollama_session({str(self.root / "native.log")!r}):\n'
+            f'  while not __import__("pathlib").Path({str(self.trace)!r}).exists():time.sleep(.01)\n'
+            '  print(json.dumps({"ok":True}),flush=True)\n'
+            '  print("NATIVE_DIAGNOSTIC",file=sys.stderr,flush=True)\n' +
+            ('  time.sleep(60)\n' if mode == 'wait' else f'  os._exit({mode})\n'))
+        self.actor.chmod(0o755)
+        return (f'import sys,subprocess,json\nsys.path.insert(0,{root!r})\n'
+            'try:from maa_testing import native\nexcept ImportError:from test import native\n'
+            f'native.MAA={str(self.actor)!r}\n'
+            'other=subprocess.Popen([sys.executable,"-c","import time;time.sleep(60)"],process_group=0)\n'
+            'try:\n'
+            ' try:\n'
+            f'  result=native.command(success={mode != "7"!r},timeout={.4 if mode == "wait" else 5})\n'
+            '  print(json.dumps({"result":result}))\n'
+            ' except subprocess.TimeoutExpired as error:\n'
+            '  assert b"ok" in error.output and "NATIVE_DIAGNOSTIC" in error.stderr\n'
+            '  print(json.dumps({"timeout":True}))\n'
+            ' except KeyboardInterrupt:raise SystemExit(130)\n'
+            'finally:\n'
+            ' assert other.poll() is None,"Unrelated process group was stopped"\n'
+            ' other.terminate();other.wait(timeout=3)\n')
+
+    def test_native_management_timeout_and_exit_clean_temporary_ollama(self):
+        for mode in ('0', '7', 'wait'):
+            with self.subTest(mode=mode):
+                self.trace.unlink(missing_ok=True)
+                code = self.native_driver(mode)
+                # The outer session is a test guard, including when the inner
+                # cleanup regresses. No real backend, service or installer runs.
+                result = processes.run([sys.executable, '-c', code], capture_output=True, text=True, timeout=8)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                report = json.loads(result.stdout)
+                self.assertEqual(report, {'timeout': True} if mode == 'wait' else {
+                    'result': 'NATIVE_DIAGNOSTIC\n' if mode == '7' else {'ok': True}})
+                self.assert_stopped()
+
+    def test_native_management_interrupt_cleans_temporary_ollama_and_keeps_130(self):
+        code = self.native_driver('wait').replace('timeout=0.4', 'timeout=60')
+        with processes.owned([sys.executable, '-c', code], stdout=subprocess.PIPE, stderr=subprocess.PIPE) as driver:
+            ready(self.trace)
+            driver.send_signal(signal.SIGINT)
+            stdout, stderr = driver.communicate(timeout=8)
+            self.assertEqual(driver.returncode, 130, (stdout, stderr))
+            self.assert_stopped()
     def assert_stopped(self):
         row=ready(self.trace)
         self.assertFalse(alive(row['pid']))

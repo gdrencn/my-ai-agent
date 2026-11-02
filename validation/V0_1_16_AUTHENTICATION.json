@@ -1,0 +1,68 @@
+{
+  "version": "0.1.16",
+  "status": "passed",
+  "implementations": [
+    {
+      "version": "0.1.16",
+      "status": "passed",
+      "sudo": "Sudo version 1.9.15p5",
+      "cases": [
+        {
+          "mode": "success",
+          "real_password_prompt": true,
+          "piped_stdin": true,
+          "captured_json_stdout": true,
+          "password_echoed": false,
+          "foreground_and_terminal_modes_restored": true
+        },
+        {
+          "mode": "cancel",
+          "real_password_prompt": true,
+          "piped_stdin": true,
+          "captured_json_stdout": true,
+          "password_echoed": false,
+          "foreground_and_terminal_modes_restored": true
+        },
+        {
+          "mode": "timeout",
+          "real_password_prompt": true,
+          "piped_stdin": true,
+          "captured_json_stdout": true,
+          "password_echoed": false,
+          "foreground_and_terminal_modes_restored": true
+        }
+      ]
+    },
+    {
+      "version": "0.1.16",
+      "status": "passed",
+      "sudo": "sudo-rs 0.2.13-0ubuntu1.2",
+      "cases": [
+        {
+          "mode": "success",
+          "real_password_prompt": true,
+          "piped_stdin": true,
+          "captured_json_stdout": true,
+          "password_echoed": false,
+          "foreground_and_terminal_modes_restored": true
+        },
+        {
+          "mode": "cancel",
+          "real_password_prompt": true,
+          "piped_stdin": true,
+          "captured_json_stdout": true,
+          "password_echoed": false,
+          "foreground_and_terminal_modes_restored": true
+        },
+        {
+          "mode": "timeout",
+          "real_password_prompt": true,
+          "piped_stdin": true,
+          "captured_json_stdout": true,
+          "password_echoed": false,
+          "foreground_and_terminal_modes_restored": true
+        }
+      ]
+    }
+  ]
+}

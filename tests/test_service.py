@@ -22,6 +22,110 @@ class Service(unittest.TestCase):
     def tearDown(self):
         self.temp.cleanup()
 
+    def saved_target(self, backend, url):
+        target = {'model': {'backend': backend, 'name': 'fixture:latest', 'key': 'fixture',
+                            'mtp_supported': False}, 'settings': settings()}
+        unit = self.root / (backend + '.service')
+        unit.write_text(self.controller.marker + '\n[Service]\n# saved custom listener\n')
+        if not hasattr(self, 'saved_units'):
+            self.saved_units = patch.object(self.controller, 'unit_path', side_effect=lambda b: self.root / (b + '.service'))
+            self.saved_units.start()
+            self.addCleanup(self.saved_units.stop)
+        runtime = {'model': target['model']['name'], 'backend': backend, 'context': 4096,
+                   'upstream': url, 'base_url': url + '/v1', 'fingerprint': fingerprint(target),
+                   'native_config': self.controller.configuration_signature(target)}
+        write(self.store.path('runtime.json'), runtime)
+        write(self.store.path('selected.json'), target)
+        write(self.store.path('target.json'), target)
+        return target, runtime
+
+    def test_saved_endpoint_survives_environment_changes_for_wake_observe_and_wait(self):
+        for backend, url in [('ollama', 'http://[::1]:11435'), ('llamacpp', 'http://127.0.0.1:18080')]:
+            with self.subTest(backend=backend):
+                target, saved = self.saved_target(backend, url)
+                calls = []
+                def api(address, *args, **kwargs):
+                    calls.append(address)
+                    self.assertTrue(address.startswith(url + '/'), address)
+                    if address.endswith('/api/ps'):
+                        return {'models': [{'name': 'fixture:latest', 'context_length': 4096}]}
+                    return {'default_generation_settings': {'n_ctx': 4096}}
+                with patch.dict(os.environ, {'OLLAMA_HOST': '127.0.0.1:11434', 'LLAMA_ARG_PORT': '8080'}), \
+                     patch('maa.backends.request', side_effect=api), patch('maa.service.request', side_effect=api), \
+                     patch.object(self.controller, 'unit_info', return_value={'ActiveState': 'active', 'MainPID': '0'}):
+                    self.controller.wake(target)
+                    self.assertEqual(self.controller.observe(target)['upstream'], url)
+                    actual = self.controller.wait(target)
+                self.assertEqual(actual['base_url'], saved['base_url'])
+                self.assertEqual(actual['endpoint_config'], actual['native_config'])
+                self.assertTrue(calls)
+
+    def test_candidate_endpoint_and_rollback_do_not_reuse_an_old_listener(self):
+        target, runtime = self.saved_target('ollama', 'http://127.0.0.1:11435')
+        with patch.object(self.controller, 'ensure'), patch.object(self.controller, 'enabled', return_value=False):
+            snapshot = self.controller.snapshot()
+        candidate = {**target, 'settings': {**target['settings'], 'context': 8192}}
+        with patch.dict(os.environ, {'OLLAMA_HOST': '127.0.0.1:11436'}):
+            self.assertEqual(self.controller.endpoint(candidate), 'http://127.0.0.1:11436')
+            self.controller.unit_path('ollama').write_text(self.controller.marker + '\n# changed listener\n')
+            self.assertEqual(self.controller.endpoint(target), 'http://127.0.0.1:11436')
+            with patch('maa.service.privileged'):
+                self.controller.restore(snapshot)
+            self.assertEqual(self.controller.endpoint(target), runtime['upstream'])
+
+    def test_saved_endpoint_is_used_by_paused_start_and_resident_wake(self):
+        from maa.manager import Manager
+        for paused in (True, False):
+            with self.subTest(paused=paused):
+                target, runtime = self.saved_target('ollama', 'http://127.0.0.1:11435')
+                manager = Manager(self.store, self.controller)
+                calls = []
+                def api(url, *args, **kwargs):
+                    calls.append(url)
+                    self.assertTrue(url.startswith(runtime['upstream'] + '/'), url)
+                    if url.endswith('/api/ps'):
+                        return {'models': [] if not paused and len(calls) == 1 else [
+                            {'name': target['model']['name'], 'context_length': 4096}]}
+                    return {}
+                with patch.dict(os.environ, {'OLLAMA_HOST': '127.0.0.1:11434'}), \
+                     patch.object(self.controller, 'ensure'), patch.object(self.controller, 'enabled', return_value=False), \
+                     patch.object(self.controller, 'running', return_value=not paused), \
+                     patch.object(self.controller, 'unit_info', return_value={'ActiveState': 'active', 'MainPID': '0'}), \
+                     patch.object(self.controller, 'start') as start, patch.object(self.controller, 'stop') as stop, \
+                     patch.object(self.controller, 'commit'), patch('maa.codex.profile') as profile, \
+                     patch('maa.backends.request', side_effect=api), patch.object(manager, 'status', return_value={}):
+                    manager.start()
+                self.assertEqual(profile.call_args.args[0]['base_url'], runtime['base_url'])
+                self.assertEqual(start.call_count, int(paused))
+                stop.assert_not_called()
+
+    def test_running_ollama_inventory_pull_and_import_keep_saved_endpoint(self):
+        from maa.manager import Manager
+        target, runtime = self.saved_target('ollama', 'http://127.0.0.1:11435')
+        manager = Manager(self.store, self.controller)
+        model_file = self.root / 'import.gguf'; model_file.write_bytes(b'GGUF\x03\0\0\0' + b'\0' * 16)
+        calls = []
+        def api(url, *args, **kwargs):
+            calls.append(url)
+            self.assertTrue(url.startswith(runtime['upstream'] + '/'), url)
+            if url.endswith('/api/tags'):
+                return {'models': [{'name': target['model']['name'], 'digest': 'weights'}]}
+            return {'model_info': {'general.architecture': 'fixture'}}
+        with patch.dict(os.environ, {'OLLAMA_HOST': '127.0.0.1:11434'}), \
+             patch.object(self.controller, 'running', return_value=True), \
+             patch.object(self.controller, 'stop') as stop, patch('maa.models.request', side_effect=api), \
+             patch('maa.models.binary', return_value='/fixture/ollama'), \
+             patch('maa.models.run', return_value=subprocess.CompletedProcess([], 0)) as run:
+            manager.inventory('ollama')
+            for path in (None, str(model_file)):
+                manager.add_model('ollama', name=target['model']['name'], path=path)
+                self.assertEqual(run.call_args.kwargs['env']['OLLAMA_HOST'], runtime['upstream'])
+                self.assertIsNone(read(self.store.path('runtime.json'))['native_config'])
+                self.assertEqual(self.controller.endpoint(), runtime['upstream'])
+                manager.inventory('ollama')
+        stop.assert_not_called()
+        self.assertTrue(calls)
+
     def test_launcher_executes_codex_after_manager_is_removed(self):
         folder = self.root / 'bin'; folder.mkdir()
         fake = folder / 'codex'

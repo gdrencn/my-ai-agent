@@ -1,0 +1,30 @@
+{
+  "version": "0.1.16",
+  "status": "passed",
+  "cases": [
+    {
+      "backend": "llamacpp",
+      "saved_base_url": "http://127.0.0.1:18080/v1",
+      "old_0_1_15_runtime_upgraded_without_reconfiguration": true,
+      "paused_start_without_environment": true,
+      "explicit_wake_without_restart": true,
+      "idle_wake_without_restart": false,
+      "nonstream_and_stream_responses": true,
+      "real_codex_conversation": true
+    },
+    {
+      "backend": "ollama",
+      "saved_base_url": "http://127.0.0.1:11435/v1",
+      "old_0_1_15_runtime_upgraded_without_reconfiguration": true,
+      "paused_start_without_environment": true,
+      "explicit_wake_without_restart": true,
+      "idle_wake_without_restart": true,
+      "nonstream_and_stream_responses": true,
+      "real_codex_conversation": true,
+      "failed_candidate_restored_custom_port": true,
+      "native_pull_and_inventory_keep_custom_endpoint": true
+    }
+  ],
+  "user_permissions_unchanged": true,
+  "private_client_homes_remaining": []
+}

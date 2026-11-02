@@ -492,3 +492,4 @@ TEXT = {'%(prog)s: error: %(message)s\n': '%(prog)s: error: %(message)s\n',
  '重新下载校验失败的 GGUF 缓存：{v0}': 'Redownload GGUF cache that failed verification: {v0}'}
 
 TEXT['sudo authentication: enter your password at the native prompt; command output follows.\n'] = 'sudo authentication: enter your password at the native prompt; command output follows.\n'
+TEXT['Official installer cleanup failed: {v0}'] = 'Official installer cleanup failed: {v0}'

@@ -1,0 +1,8 @@
+{
+  "version": "0.1.16",
+  "status": "passed",
+  "real_official_ollama_server_observed": true,
+  "real_native_download_interrupted_by_timeout": true,
+  "temporary_listener_removed": true,
+  "systemd_model_target_installed": false
+}

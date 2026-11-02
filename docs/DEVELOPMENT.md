@@ -1,6 +1,6 @@
 # Development and publication
 
-The current requirements are in REQUIREMENTS.md and docs/INDEPENDENCE.md. Product and tests are self-contained Linux code: no sibling checkout, instance marker, container-manager command or outer-environment configuration. The immutable baseline is stable/0.1.9. The 0.1.15 tree excludes IM and Web.
+The current requirements are in REQUIREMENTS.md and docs/INDEPENDENCE.md. Product and tests are self-contained Linux code: no sibling checkout, instance marker, container-manager command or outer-environment configuration. The immutable baseline is stable/0.1.9. The unreleased 0.1.16 tree excludes IM and Web; the public test entry remains on published 0.1.15.
 
 ## Shared modules
 
@@ -14,6 +14,8 @@ The current requirements are in REQUIREMENTS.md and docs/INDEPENDENCE.md. Produc
 - preferences/i18n/locales/menu/text/output/ui: shared bilingual presentation and terminal handling.
 
 All privileged management calls share service.privileged. Root runs directly. Interactive sudo inherits the controlling terminal for password input and uses the common live-output runner for diagnostics, with independently captured/redirected stdout. A noninteractive validation probe only determines when progress must yield the terminal; the real command retains native sudo policy, including command-specific NOPASSWD and zero-duration timestamps. Noninteractive calls use sudo -n. Native test CLI calls tee live stderr while keeping captured JSON stdout separate. Never read passwords, supply them through stdin, create an askpass program or change user sudo policy.
+
+Native test management calls use output.run(owned=True), backed by the common process module. They own a new process group in the existing Linux session and temporarily acquire the foreground controlling terminal. Terminal modes are captured before spawning and restored with the original foreground group after bounded cleanup, including timeouts during password entry. Preserve this distinction from Codex clients, which own a separate session. Moving interactive sudo into a detached session would lose native authentication. Saved backend addresses are resolved by Controller.endpoint; running Ollama operations pass that address to both HTTP requests and native CLI environment. Do not independently reconstruct accepted endpoints from the current shell.
 
 The build generates shell entries from scripts/entry.template.sh and environment.PACKAGE_MANAGERS. Shell bootstrap only prepares tools needed to run the verified Python installer. Product dependency checks prepare operation-specific tools and CA certificates. Never infer a capability from the operating environment's origin. systemd availability includes a live manager query; command existence alone is insufficient.
 
@@ -36,7 +38,7 @@ Build twice and compare artifacts. Check Python 3.11 grammar, shell syntax, pack
 
 ## Release
 
-0.1.15 test uses tag v0.1.15 and an immutable prerelease. Generated test entries pin its version, because frozen 0.2.x experimental releases also exist. Explicit --version overrides are supported. Default numeric discovery remains available to historical bootstraps.
+Published 0.1.15 test uses tag v0.1.15 and an immutable prerelease. The working tree prepares 0.1.16 product/test payloads and generated entries; it is not a published release. Keep the remote public entry at 0.1.15 until the new paired release has been verified and published. Generated test entries pin their version, because frozen 0.2.x experimental releases also exist. Explicit --version overrides are supported. Default numeric discovery remains available to historical bootstraps.
 
 After source/docs and branch/tag CI pass, publish the verified assets before moving the public main entry to their version. Then verify main CI and the actual public command. Publish paired maa.pyz, maa-test.pyz, VERSION.json, bootstrap.py, install.sh and SHA256SUMS. Include validation receipts and their checksum. Download public assets again, compare bytes and run the public entry. Additional fixes after handing the user a test command need a new version. Stable requires user acceptance and must preserve the approved product/test bytes. Do not replace existing releases, tags or assets. New deployments cannot assume old frozen products support their environment.
 

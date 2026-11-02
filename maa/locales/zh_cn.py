@@ -379,3 +379,4 @@ TEXT = {'%(prog)s: error: %(message)s\n': '%(prog)s：错误：%(message)s\n',
  '重新下载校验失败的 GGUF 缓存：{v0}': '重新下载校验失败的 GGUF 缓存：{v0}'}
 
 TEXT['sudo authentication: enter your password at the native prompt; command output follows.\n'] = 'sudo 认证：请在原生提示中输入密码；随后显示命令执行结果。\n'
+TEXT['Official installer cleanup failed: {v0}'] = '官方安装程序清理失败：{v0}'

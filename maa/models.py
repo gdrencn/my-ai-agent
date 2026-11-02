@@ -99,9 +99,10 @@ def ollama_session(log, values=None):
             stop_process(process)
 
 
-def ollama_inventory(store, name=None):
+def ollama_inventory(store, name=None, endpoint=None):
+    endpoint = endpoint or ollama_endpoint()
     stage('读取 Ollama 原生模型清单')
-    rows = request(ollama_endpoint() + '/api/tags')['models']
+    rows = request(endpoint + '/api/tags')['models']
     if name is not None:
         rows = [row for row in rows if row['name'] == name]
     registered = store.models()
@@ -124,7 +125,7 @@ def ollama_inventory(store, name=None):
             # architecture. Untracked digests receive a new identity and show.
             result.append(cached)
             continue
-        info = request(ollama_endpoint() + '/api/show', {'model': model_name}, timeout=60)
+        info = request(endpoint + '/api/show', {'model': model_name}, timeout=60)
         data = info.get('model_info', {})
         arch = data.get('general.architecture', '')
         tensors = info.get('tensors', [])
@@ -147,7 +148,7 @@ def ollama_input(name, gguf=None):
             metadata(shard)
 
 
-def ollama_install(store, name, gguf=None):
+def ollama_install(store, name, gguf=None, endpoint=None):
     ollama_input(name, gguf)
     if gguf:
         path = Path(gguf).expanduser().resolve(strict=True)
@@ -157,7 +158,10 @@ def ollama_install(store, name, gguf=None):
     else:
         cmd = [binary('ollama'), 'pull', name]
     stage('执行 Ollama 原生下载 / 导入')
-    run(cmd, native=True, check=True, env=ollama_environment())
+    env = ollama_environment()
+    if endpoint:
+        env['OLLAMA_HOST'] = endpoint
+    run(cmd, native=True, check=True, env=env)
     return name if ':' in name else name + ':latest'
 
 

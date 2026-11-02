@@ -34,14 +34,27 @@ def _component(name):
             # official CDN frontends reject Python's default HTTP user agent.
             run(['curl', '-fsSL', URLS[item], '-o', source.name], check=True)
             env = dict(os.environ, CODEX_NON_INTERACTIVE='true')
+            primary = None
             try:
                 stage('官方安装：{v0}', v0=item)
                 diagnostic(text('官方安装：{v0} — {v1}\n', v0=item, v1=URLS[item]))
                 run(['sh', source.name], native=True, env=env, cwd=Path.home(), check=True)
+            except BaseException as exc:
+                primary = exc
+                raise
             finally:
                 if item == 'ollama' and Path('/etc/systemd/system/ollama.service').exists():
                     # Also quiesce a partially installed official daemon on error.
-                    privileged(['systemctl', 'disable', '--now', 'ollama.service'])
+                    try:
+                        privileged(['systemctl', 'disable', '--now', 'ollama.service'])
+                    except BaseException as cleanup:
+                        if primary is None:
+                            raise
+                        if isinstance(cleanup, KeyboardInterrupt) and not isinstance(primary, KeyboardInterrupt):
+                            raise KeyboardInterrupt(str(primary)) from primary
+                        detail = text('Official installer cleanup failed: {v0}', v0=cleanup)
+                        primary.add_note(detail)
+                        diagnostic(detail + '\n')
 
 
 def product(archive, components='all', *, language=None):
