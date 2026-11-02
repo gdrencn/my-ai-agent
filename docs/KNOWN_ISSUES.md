@@ -6,7 +6,7 @@ Previously, start/wake/readiness rebuilt endpoints from the invoking shell. A sa
 
 Native acceptance timeouts previously killed only the direct Maa subprocess, leaving its temporary Ollama server running. Native management calls now own and clean a separate process group while preserving the existing controlling terminal for sudo authentication and restoring foreground ownership. Official installer cleanup also preserves the primary error and cancellation status when a secondary cleanup fails.
 
-Portable, packaged, isolated real-process and PTY fixtures verify these corrections. Both ordinary-user and root environments passed all 42 native checks. Real custom-port legacy upgrades, temporary Ollama timeout cleanup and classic sudo/sudo-rs authentication, cancellation and timeout passed. The paired 0.1.16 assets are published and verified; default public installer acceptance is in progress; the published 0.1.15 assets have not been changed.
+Portable, packaged, isolated real-process and PTY fixtures verify these corrections. Both ordinary-user and root environments passed all 42 native checks. Real custom-port legacy upgrades, temporary Ollama timeout cleanup and classic sudo/sudo-rs authentication, cancellation and timeout passed. The paired 0.1.16 assets are published and verified. The actual default public entry passed 158 paired tests and all 42 native checks after real password authentication, with unchanged user permission/recovery files and restored terminal modes. Both owned validation environments were removed. Published 0.1.15 assets remain unchanged.
 
 ## Resolved in 0.1.15: lazy CA-directory detection
 

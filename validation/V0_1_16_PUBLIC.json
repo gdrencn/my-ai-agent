@@ -1,0 +1,136 @@
+{
+  "trust_environment": {
+    "python": "3.14.4",
+    "cafile": "/usr/lib/ssl/cert.pem",
+    "capath": "/usr/lib/ssl/certs",
+    "initial_loaded": 121,
+    "SSL_CERT_FILE": null,
+    "SSL_CERT_DIR": null
+  },
+  "native_python_trust_defaults": true,
+  "explicit_ssl_cert_file_workaround": false,
+  "version": "0.1.16",
+  "status": "passed",
+  "entry": "curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/test.sh | bash",
+  "python": "Python 3.14.4",
+  "sudo": "sudo-rs 0.2.13-0ubuntu1.2",
+  "password_prompts": 1,
+  "password_echoed": false,
+  "terminal_restored": true,
+  "user_permissions_unchanged": true,
+  "native_report": "/home/maatest/maa-native-20261102-074639-392951.json",
+  "checks": 42,
+  "remaining_private_homes": [],
+  "source_tag_commit": "c4175efd99d05bb11f7961375f6c0318deb1afd6",
+  "main_source_commit": "100303e7fe5773dbf4ab7dc594868abc28e0db70",
+  "ci": {
+    "branch": {
+      "id": 41407263186,
+      "conclusion": "success"
+    },
+    "tag": {
+      "id": 41407509611,
+      "conclusion": "success"
+    },
+    "main_source": {
+      "id": 41408167546,
+      "conclusion": "success"
+    }
+  },
+  "public_payloads": {
+    "bootstrap.py": {
+      "sha256": "485573d1c435f22e2a285984ca23cac5a09000f6bbb033ef034ffb5da77add5f",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "install.sh": {
+      "sha256": "ffb0845ce7054591b6ed0d56f4ca6a3cf334d44661f4f745175d5f89364aef27",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "maa-test.pyz": {
+      "sha256": "fe7fcba85e4d6bf4ed9c994105f71835f72676294b56dceaced66d450e31811e",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "maa.pyz": {
+      "sha256": "f83044d8bad999dd7b077b3eb21a38f0f6e267c13753d2e32483c4bd9f1347f1",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "SHA256SUMS": {
+      "sha256": "b6d9df775b7109fa8888e74f89fe97f803de865f1193a03f741000f9c3fbf90f",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "V0_1_16_AUTHENTICATION.json": {
+      "sha256": "825b6b646e8f4df079adb035d16e6d70d335f2c653d442d99f38b237ee078e51",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "V0_1_16_COVERAGE.json": {
+      "sha256": "2829a8fd91a331042d1a9f15fc1d3c1fb6c3e4bdde129cd231f24e8900b4a895",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "V0_1_16_ENDPOINTS.json": {
+      "sha256": "71d13d01163a54e71cda3aa21a4e7a0f9f30cba775e0aed6e3b6525274bc47c1",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "V0_1_16_LOCAL.json": {
+      "sha256": "88e37abeeaf673c8024316f702846d51d1eca439200d6935f186d504535bfdf1",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "V0_1_16_NATIVE.json": {
+      "sha256": "aa347d38af767a473f6ae16eb9b7690dc000422ed5cb5e2414593e9e8d8d1cf9",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "V0_1_16_ROOT_NATIVE.json": {
+      "sha256": "118f712de6c59dd4b7fc1456b131be34e40fa2cabba19513f1038b2ee345f5fb",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "V0_1_16_TIMEOUT.json": {
+      "sha256": "e16768b23ece3fc91dfeb2d1ab8f275a1e3cb8877d6022c3b8ba8ac54d06a141",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "VALIDATION_SHA256SUMS": {
+      "sha256": "61a2867959a3df1f7b0e0d34a62cbae93d25f0198a8ad3982412ba6f40424c04",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "VERSION.json": {
+      "sha256": "6e03a9ed390ef35cd01d6c30373c7f36a7bec10ad1e33fb55b2aa6d6d15a10a5",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    }
+  },
+  "portable_tests": 158,
+  "native_tests": 42,
+  "previous_release_assets_unchanged": true,
+  "owned_validation_cleanup": {
+    "status": "passed",
+    "ordinary_user_environment_removed": true,
+    "root_environment_removed": true,
+    "final_states": {
+      "ordinary": {
+        "status": "passed",
+        "test_model_paused": true,
+        "registered_models_retained": 2,
+        "private_homes_remaining": [],
+        "maa_service_exists": false
+      },
+      "root": {
+        "status": "passed",
+        "test_model_paused": true,
+        "registered_models_retained": 2,
+        "private_homes_remaining": [],
+        "maa_service_exists": false
+      }
+    }
+  }
+}
