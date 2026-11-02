@@ -1,6 +1,6 @@
 # Development and publication
 
-The current requirements are in REQUIREMENTS.md and docs/INDEPENDENCE.md. Product and tests are self-contained Linux code: no sibling checkout, instance marker, container-manager command or outer-environment configuration. The immutable baseline is stable/0.1.9. The unreleased 0.1.16 tree excludes IM and Web; the public test entry remains on published 0.1.15.
+The current requirements are in REQUIREMENTS.md and docs/INDEPENDENCE.md. Product and tests are self-contained Linux code: no sibling checkout, instance marker, container-manager command or outer-environment configuration. The immutable baseline is stable/0.1.9. The 0.1.16 tree excludes IM and Web; the public test entry selects 0.1.16.
 
 ## Shared modules
 
@@ -38,7 +38,7 @@ Build twice and compare artifacts. Check Python 3.11 grammar, shell syntax, pack
 
 ## Release
 
-Published 0.1.15 test uses tag v0.1.15 and an immutable prerelease. The working tree prepares 0.1.16 product/test payloads and generated entries; it is not a published release. Keep the remote public entry at 0.1.15 until the new paired release has been verified and published. Generated test entries pin their version, because frozen 0.2.x experimental releases also exist. Explicit --version overrides are supported. Default numeric discovery remains available to historical bootstraps.
+Published 0.1.16 test uses tag v0.1.16 and an immutable prerelease. The frozen product/test payloads passed branch/tag CI, complete ordinary-user/root native acceptance and public asset verification before the main public entry moved to 0.1.16. Generated test entries pin their version, because frozen 0.2.x experimental releases also exist. Explicit --version overrides are supported. Default numeric discovery remains available to historical bootstraps.
 
 After source/docs and branch/tag CI pass, publish the verified assets before moving the public main entry to their version. Then verify main CI and the actual public command. Publish paired maa.pyz, maa-test.pyz, VERSION.json, bootstrap.py, install.sh and SHA256SUMS. Include validation receipts and their checksum. Download public assets again, compare bytes and run the public entry. Additional fixes after handing the user a test command need a new version. Stable requires user acceptance and must preserve the approved product/test bytes. Do not replace existing releases, tags or assets. New deployments cannot assume old frozen products support their environment.
 

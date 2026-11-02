@@ -1,14 +1,14 @@
-# 0.1.15 coverage compared with 0.1.9
+# Coverage compared with 0.1.9
 
 Every baseline functional check is present in the default paired test entry. Version 0.1.10 additions remain. Test identities and permission writes are isolated; no environment-origin requirement is restored.
 
-| Suite | 0.1.9 | 0.1.15 | Missing |
+| Suite | 0.1.9 | 0.1.16 | Missing |
 | --- | ---: | ---: | ---: |
-| Portable / real PTY | 90 | 147 | 0 |
+| Portable / real PTY | 90 | 158 | 0 |
 | Delivery | 10 | 13 | 0 |
 | Installed functional acceptance | 35 | 42 | 0 |
 
-The machine-readable correspondence is [V0_1_15_COVERAGE.json](../validation/V0_1_15_COVERAGE.json). The runtime report requires each native ID to pass, not merely exist in source. Local and public execution receipts establish execution; the inventory alone does not.
+The machine-readable correspondence is [V0_1_16_COVERAGE.json](../validation/V0_1_16_COVERAGE.json). The runtime report requires each native ID to pass, not merely exist in source. Local and public execution receipts establish execution; the inventory alone does not.
 
 ## Original native checks
 
@@ -72,8 +72,8 @@ Version 0.1.15 retains all 138 portable IDs from 0.1.14 and adds five trust-stor
 
 The actual 0.1.15 public default entry passed 147 paired and all 42 native checks with portable Python 3.14.10 and its native lazy CA directory, without a certificate-file workaround. Actual password authentication and unchanged permission recovery were verified. [Execution evidence](../validation/V0_1_15_PUBLIC.json) records source CI, asset checksums and removal of the owned validation environments.
 
-## Unreleased 0.1.16 corrections
+## 0.1.16 corrections
 
 All 147 portable tests from 0.1.15 remain, with 11 additions. Source and packaged suites each pass 158 tests; all 13 delivery checks pass. Added coverage exercises persisted endpoints after environment changes, candidate/rollback routing, paused start and resident wake, running Ollama inventory/pull/import and current-tag invalidation, primary and secondary installation failures, timeout and interruption of actual temporary-server processes, unrelated group survival, and real PTY foreground restoration with native-style authentication. The new authentication case uses piped stdin and checks success, cancellation and timeout. The fast-command case checks foreground restoration across 20 invocations.
 
-Both ordinary-user and root Linux acceptance passed all 42 required native checks, with actual backend GPU assertions. Saved custom-port upgrades from legacy 0.1.15, actual temporary Ollama timeout cleanup, and actual classic sudo/sudo-rs authentication, cancellation and authentication timeout also passed. Public installer acceptance and publication remain pending. Historical 0.1.15 evidence above remains scoped to that release. Current evidence is [V0_1_16_LOCAL.json](../validation/V0_1_16_LOCAL.json).
+Both ordinary-user and root Linux acceptance passed all 42 required native checks, with actual backend GPU assertions. Saved custom-port upgrades from legacy 0.1.15, actual temporary Ollama timeout cleanup, and actual classic sudo/sudo-rs authentication, cancellation and authentication timeout also passed. The paired 0.1.16 assets are published and verified; default public installer acceptance is in progress. Historical 0.1.15 evidence above remains scoped to that release. Current evidence is [V0_1_16_LOCAL.json](../validation/V0_1_16_LOCAL.json).
