@@ -19,3 +19,9 @@ All 42 native acceptance checks passed in both ordinary-user and root Linux envi
 Evidence: [local correction verification](validation/V0_1_16_LOCAL.json), [ordinary-user native acceptance](validation/V0_1_16_NATIVE.json), [root native acceptance](validation/V0_1_16_ROOT_NATIVE.json), [saved native endpoints](validation/V0_1_16_ENDPOINTS.json), [real timeout cleanup](validation/V0_1_16_TIMEOUT.json), [native sudo authentication](validation/V0_1_16_AUTHENTICATION.json).
 
 Public evidence: [authenticated default installation](validation/V0_1_16_PUBLIC.json), [complete public native report](validation/V0_1_16_PUBLIC_NATIVE.json), [public receipt checksums](validation/V0_1_16_PUBLIC_SHA256SUMS). These reports are appended to the release without replacing its initial 14 assets.
+
+## Stable promotion (authorized, publication in progress)
+
+The user accepted external upgrade and fresh-install logs, each showing 158 portable and 42 native checks, and explicitly authorized stable publication. The stable candidate preserves the exact approved v0.1.16 maa.pyz and maa-test.pyz bytes, as confirmed against anonymously downloaded public test assets. Business source, runtime behavior and the paired tester do not change. The stable channel metadata, channel installer and manifests are generated separately and reproducibly. Delivery checks pass. Stable/default and exact-version public installation, final channel selection, anonymous downloads, CI and validation-resource cleanup are the remaining publication checks and will be recorded separately. Existing releases and tags remain immutable.
+
+Promotion review: [STABLE_0_1_16_REVIEW.json](validation/STABLE_0_1_16_REVIEW.json).

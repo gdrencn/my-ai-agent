@@ -1,0 +1,52 @@
+{
+  "version": "0.1.16",
+  "channel": "stable",
+  "stage": "prepublication promotion review",
+  "approved_test_tag": "v0.1.16",
+  "approved_test_commit": "c4175efd99d05bb11f7961375f6c0318deb1afd6",
+  "product_changes": false,
+  "product_source_unchanged_since_approved_tag": true,
+  "approved_pair_sha256": {
+    "maa.pyz": "f83044d8bad999dd7b077b3eb21a38f0f6e267c13753d2e32483c4bd9f1347f1",
+    "maa-test.pyz": "fe7fcba85e4d6bf4ed9c994105f71835f72676294b56dceaced66d450e31811e"
+  },
+  "stable_assets_sha256": {
+    "maa.pyz": "f83044d8bad999dd7b077b3eb21a38f0f6e267c13753d2e32483c4bd9f1347f1",
+    "maa-test.pyz": "fe7fcba85e4d6bf4ed9c994105f71835f72676294b56dceaced66d450e31811e",
+    "VERSION.json": "92cb6a6cfec1218e421647911664281eed95f416f38e810646766317d7c09ec8",
+    "bootstrap.py": "485573d1c435f22e2a285984ca23cac5a09000f6bbb033ef034ffb5da77add5f",
+    "install.sh": "4db4f7724ab285438e6f43c021e8e06a1eafc856dfeb04bfde7dbcae6db9e962",
+    "SHA256SUMS": "b84e93c764e06eb90d7ce829832df5822532fc110f5b65782dd7693abc890097"
+  },
+  "reproducible": true,
+  "python_311_grammar": true,
+  "shell_syntax": true,
+  "user_authorization": "Explicit approval to publish stable after the user supplied successful external upgrade and fresh-install logs.",
+  "user_supplied_acceptance": [
+    {
+      "kind": "upgrade",
+      "portable_passed": 158,
+      "native_passed": 42,
+      "report_basename": "maa-native-20261102-020859-672082.json"
+    },
+    {
+      "kind": "fresh install",
+      "portable_passed": 158,
+      "native_passed": 42,
+      "report_basename": "maa-native-20261102-153715-474730.json"
+    }
+  ],
+  "prior_native_acceptance": {
+    "ordinary_user": 42,
+    "root": 42,
+    "source": "V0_1_16_NATIVE.json and V0_1_16_ROOT_NATIVE.json",
+    "public_test_entry": 42,
+    "public_test_source": "V0_1_16_PUBLIC.json"
+  },
+  "stable_public_acceptance": "pending and recorded separately",
+  "prior_releases_to_preserve": [
+    "stable/0.1.9",
+    "v0.1.16"
+  ],
+  "recorded_at": "2026-11-03T00:48:56.344038+00:00"
+}
