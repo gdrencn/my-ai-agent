@@ -1,0 +1,180 @@
+{
+  "version": "0.1.16",
+  "channel": "stable",
+  "status": "passed",
+  "entry": "curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/install.sh | bash",
+  "first_install": {
+    "version": "0.1.16",
+    "status": "passed",
+    "fresh_language_selection": "en_us",
+    "approved_product_bytes": true,
+    "no_models_downloaded_by_default_installer": true,
+    "first_install_permission_state_source": "Codex config/read"
+  },
+  "paired_portable_tests": 158,
+  "native_checks": 42,
+  "native_report": "/home/maatest/maa-native-20261103-005955-967236.json",
+  "channel_smoke": {
+    "version": "0.1.16",
+    "status": "passed",
+    "cases": [
+      {
+        "entry": "install.sh",
+        "exact_version": false,
+        "status": "passed",
+        "approved_product_bytes": true,
+        "configuration_and_native_instance_retained": true,
+        "permission_state_source": "Codex config/read"
+      },
+      {
+        "entry": "install.sh",
+        "exact_version": true,
+        "status": "passed",
+        "approved_product_bytes": true,
+        "configuration_and_native_instance_retained": true,
+        "permission_state_source": "Codex config/read"
+      },
+      {
+        "entry": "test/install.sh",
+        "exact_version": false,
+        "status": "passed",
+        "approved_product_bytes": true,
+        "configuration_and_native_instance_retained": true,
+        "permission_state_source": "Codex config/read"
+      },
+      {
+        "entry": "test/install.sh",
+        "exact_version": true,
+        "status": "passed",
+        "approved_product_bytes": true,
+        "configuration_and_native_instance_retained": true,
+        "permission_state_source": "Codex config/read"
+      }
+    ],
+    "previous_stable_exact_resolution": "stable/0.1.9",
+    "previous_stable_metadata_verified": true
+  },
+  "password_prompts": 1,
+  "password_echoed": false,
+  "terminal_restored": true,
+  "private_homes_remaining": [],
+  "approved_test_tag": "v0.1.16",
+  "stable_tag_commit": "5ce3f35b2d88016ca856d25928d080c93793e6b6",
+  "product_and_tester_unchanged": true,
+  "anonymous_asset_verification": {
+    "bootstrap.py": {
+      "sha256": "485573d1c435f22e2a285984ca23cac5a09000f6bbb033ef034ffb5da77add5f",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "install.sh": {
+      "sha256": "4db4f7724ab285438e6f43c021e8e06a1eafc856dfeb04bfde7dbcae6db9e962",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "maa-test.pyz": {
+      "sha256": "fe7fcba85e4d6bf4ed9c994105f71835f72676294b56dceaced66d450e31811e",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "maa.pyz": {
+      "sha256": "f83044d8bad999dd7b077b3eb21a38f0f6e267c13753d2e32483c4bd9f1347f1",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "SHA256SUMS": {
+      "sha256": "b84e93c764e06eb90d7ce829832df5822532fc110f5b65782dd7693abc890097",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "STABLE_0_1_16_REVIEW.json": {
+      "sha256": "9894e07fa1f89da1a73b0dbc59889e21636b6c418f5a29d9de15a3f5fc9a50e2",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "V0_1_16_AUTHENTICATION.json": {
+      "sha256": "825b6b646e8f4df079adb035d16e6d70d335f2c653d442d99f38b237ee078e51",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "V0_1_16_COVERAGE.json": {
+      "sha256": "2829a8fd91a331042d1a9f15fc1d3c1fb6c3e4bdde129cd231f24e8900b4a895",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "V0_1_16_ENDPOINTS.json": {
+      "sha256": "71d13d01163a54e71cda3aa21a4e7a0f9f30cba775e0aed6e3b6525274bc47c1",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "V0_1_16_LOCAL.json": {
+      "sha256": "88e37abeeaf673c8024316f702846d51d1eca439200d6935f186d504535bfdf1",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "V0_1_16_NATIVE.json": {
+      "sha256": "aa347d38af767a473f6ae16eb9b7690dc000422ed5cb5e2414593e9e8d8d1cf9",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "V0_1_16_PUBLIC.json": {
+      "sha256": "eb4af0d576675192f927aaa5ecd1669a1e218669123b3deef87b48efb81c2438",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "V0_1_16_PUBLIC_NATIVE.json": {
+      "sha256": "dc7ba204a700ce65820b240988461233467389f19e2c0da932ca15a01c2e0fa5",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "V0_1_16_PUBLIC_SHA256SUMS": {
+      "sha256": "f8eb965560c8b9aef223a1a6edb395f3c4aac521d78ad6925894aab3d38b5207",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "V0_1_16_ROOT_NATIVE.json": {
+      "sha256": "118f712de6c59dd4b7fc1456b131be34e40fa2cabba19513f1038b2ee345f5fb",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "V0_1_16_TIMEOUT.json": {
+      "sha256": "e16768b23ece3fc91dfeb2d1ab8f275a1e3cb8877d6022c3b8ba8ac54d06a141",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "VALIDATION_SHA256SUMS": {
+      "sha256": "287779f6bd66e82c3f868e50021bd1871b3d02e6fc0da72e3864a409d07a2994",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    },
+    "VERSION.json": {
+      "sha256": "92cb6a6cfec1218e421647911664281eed95f416f38e810646766317d7c09ec8",
+      "github_digest_match": true,
+      "local_bytes_match": true
+    }
+  },
+  "ci": [
+    {
+      "id": 41555578507,
+      "ref": "release/stable-0.1.16",
+      "conclusion": "success"
+    },
+    {
+      "id": 41556066801,
+      "ref": "stable/0.1.16",
+      "conclusion": "success"
+    }
+  ],
+  "previous_releases_and_tags_unchanged": true,
+  "validation_environment_cleanup": {
+    "status": "passed",
+    "owned_environment_removed": true,
+    "final_state": {
+      "status": "passed",
+      "test_model_paused": true,
+      "registered_models_retained": 2,
+      "private_homes_remaining": [],
+      "maa_service_exists": false
+    }
+  }
+}

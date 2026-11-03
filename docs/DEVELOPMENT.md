@@ -1,6 +1,6 @@
 # Development and publication
 
-The current requirements are in REQUIREMENTS.md and docs/INDEPENDENCE.md. Product and tests are self-contained Linux code: no sibling checkout, instance marker, container-manager command or outer-environment configuration. The immutable baseline is stable/0.1.9. The 0.1.16 tree excludes IM and Web; the public test entry selects 0.1.16.
+The current requirements are in REQUIREMENTS.md and docs/INDEPENDENCE.md. Product and tests are self-contained Linux code: no sibling checkout, instance marker, container-manager command or outer-environment configuration. The immutable baseline is stable/0.1.9. The 0.1.16 tree excludes IM and Web. The root entry selects latest stable (currently stable/0.1.16); the test entry remains pinned to v0.1.16.
 
 ## Shared modules
 
@@ -45,4 +45,4 @@ After source/docs and branch/tag CI pass, publish the verified assets before mov
 CA-directory behavior follows [Python SSLContext.get_ca_certs](https://docs.python.org/3.14/library/ssl.html#ssl.SSLContext.get_ca_certs): directory trust is loaded on demand. IPv6 authority formatting follows [RFC 3986 section 3.2.2](https://www.rfc-editor.org/rfc/rfc3986.html#section-3.2.2). The availability probe does not replace certificate/hostname verification by native HTTPS clients.
 
 
-For user-authorized stable promotion, copy the approved public test product and paired tester without changing either byte sequence. Generate VERSION.json with channel stable, use the stable-channel root installer, regenerate the manifests and publish a separate stable/0.1.16 formal release as latest. Preserve v0.1.16, stable/0.1.9 and their existing asset IDs/digests. Verify the normal root install entry and explicit stable version, then append stable-public evidence without replacing the initial assets. The public test entry remains pinned to the approved test release.
+The user-authorized stable/0.1.16 promotion is complete. For stable promotion, copy the approved public test product and paired tester without changing either byte sequence. Generate VERSION.json with channel stable, use the stable-channel root installer, regenerate the manifests and stage all assets in a separate draft stable/0.1.16 formal release, then publish it as latest only when the complete asset set and CI are verified. Preserve v0.1.16, stable/0.1.9 and their existing asset IDs/digests. Verify the normal root install entry and explicit stable version, then append stable-public evidence without replacing the initial assets. The public test entry remains pinned to the approved test release.

@@ -1,4 +1,4 @@
-# my-ai-agent 0.1.16 implementation (test)
+# my-ai-agent 0.1.16 implementation (stable)
 
 ## Verified corrections
 
@@ -20,8 +20,10 @@ Evidence: [local correction verification](validation/V0_1_16_LOCAL.json), [ordin
 
 Public evidence: [authenticated default installation](validation/V0_1_16_PUBLIC.json), [complete public native report](validation/V0_1_16_PUBLIC_NATIVE.json), [public receipt checksums](validation/V0_1_16_PUBLIC_SHA256SUMS). These reports are appended to the release without replacing its initial 14 assets.
 
-## Stable promotion (authorized, publication in progress)
+## Stable promotion
 
-The user accepted external upgrade and fresh-install logs, each showing 158 portable and 42 native checks, and explicitly authorized stable publication. The stable candidate preserves the exact approved v0.1.16 maa.pyz and maa-test.pyz bytes, as confirmed against anonymously downloaded public test assets. Business source, runtime behavior and the paired tester do not change. The stable channel metadata, channel installer and manifests are generated separately and reproducibly. Delivery checks pass. Stable/default and exact-version public installation, final channel selection, anonymous downloads, CI and validation-resource cleanup are the remaining publication checks and will be recorded separately. Existing releases and tags remain immutable.
+After the user accepted external upgrade and fresh-install logs, each with 158 portable and 42 native checks, the user explicitly authorized stable publication. The new stable/0.1.16 formal release preserves the exact approved v0.1.16 maa.pyz and maa-test.pyz bytes. Business source, runtime behavior and the paired tester do not change. Only stable channel metadata, its installer, manifests and release evidence differ. The channel assets are reproducible, and branch/tag CI passed before the complete draft became the latest stable release. All 18 initial assets were downloaded anonymously and verified against local bytes, GitHub digests and manifests.
 
-Promotion review: [STABLE_0_1_16_REVIEW.json](validation/STABLE_0_1_16_REVIEW.json).
+A fresh ordinary Linux identity executed the exact normal public install.sh command with first-run language selection and real sudo password authentication. The normal installer did not download test models. First-install permission defaults were checked solely through Codex config/read. The unchanged stable paired tester then passed 158 portable and all 42 native checks, including actual GPU observations. Subsequent stable/test default and exact-version reinstallations retained configuration bytes, Agent-reported permission state, native PID and invocation. Explicit stable/0.1.9 resolution and channel metadata remain available; no historical product was executed to claim new compatibility. Terminal modes were restored, private homes removed, the test target paused and downloaded models retained before removing the owned validation environment. Existing releases, asset IDs/digests, tags and global guidelines remain unchanged; the latest stable selection is now stable/0.1.16.
+
+Evidence: [promotion review](validation/STABLE_0_1_16_REVIEW.json), [formal public installation](validation/STABLE_0_1_16_PUBLIC.json), [formal native report](validation/STABLE_0_1_16_NATIVE.json), [public receipt checksums](validation/STABLE_0_1_16_PUBLIC_SHA256SUMS). Public-stage receipts are appended without replacing initial stable assets. The test entry remains pinned to v0.1.16.

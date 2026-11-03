@@ -2,27 +2,39 @@
 
 在 Linux 中安装并管理 Ollama、llama.cpp 和 Codex CLI。Maa 不依赖容器管理程序，不判断自身运行在容器、WSL 还是服务器中。
 
-当前测试版本：**0.1.16 test**，基于已验收的 0.1.9，解除环境身份绑定。中英文界面保留，语言和关于位于“选项”中。本版不含 IM 或 Web；后续功能继续在 Maa 内开发。既有 0.1.9 stable 和 0.2.x test 保持不变。
+当前正式版：**0.1.16 stable**。对应测试版：**0.1.16 test**。正式版原样采用已验收 test 的产品和配对测试包。本版是独立 Linux 工具，不含 IM 或 Web；后续功能继续在 Maa 内开发。旧 stable、已发布 test 和各自资产保留不变。
 
-本版修复保存的底座地址复用、原生测试超时后的临时进程清理，以及安装清理错误覆盖原始异常。普通用户和 root 各 42 项原生验收已通过，classic sudo 与 sudo-rs 的认证、取消和认证超时均已验证；原有 147 项测试全部保留，新增 11 项。公开默认入口已通过真实密码认证、158 项配对测试和全部 42 项原生验收。
+本版修复保存的底座地址复用、原生测试超时后的临时进程清理，以及安装清理错误覆盖原始异常。原有 147 项测试全部保留，新增 11 项。普通用户和 root 各 42 项原生验收、classic sudo / sudo-rs 认证与恢复均已通过；正式入口的新装、158 项配对测试和 42 项原生验收也已通过。
 
 ## Install and test
 
-在目标 Linux 环境中执行：
+正式安装：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/install.sh | bash
+```
+
+默认选择 latest stable，当前为 **0.1.16 stable**。正常安装不自动运行配对测试，也不下载验收小模型。需要安装后执行完整配对验收时使用：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/install.sh | bash -s -- --test
+```
+
+test 入口继续固定使用 **0.1.16 test**，安装后运行同一套完整验收，不会因历史 0.2.x 实验版的版本号更高而切换到它：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/test.sh | bash
 ```
 
-该入口固定默认安装 **0.1.16 test**，安装所选官方程序后运行配对检查。不会因为已有更高版本号的实验版而装到 0.2.x。可使用 `--version` 明确选择其他已发布版本。
+底座和 Codex 已安装时，可用 `--components none` 跳过官方组件安装。若同时指定 `--test`，完整验收仍会执行。test 渠道不运行配对测试时，将 `test/test.sh` 换成 `test/install.sh`。
 
-底座和 Codex 已安装时，可跳过组件安装；配对检查仍执行完整功能验收：
+固定正式版本安装示例：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/test/test.sh | bash -s -- --components none
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-agent/main/install.sh | bash -s -- --version 0.1.16
 ```
 
-不运行配对测试时，将 `test/test.sh` 换成 `test/install.sh`。根 `install.sh` 仍选择已发布的 latest stable；0.1.16 需要用户验收后才晋升。普通 Linux 部署请使用本轮 test 入口，旧 stable 不具备本轮解耦能力。
+历史 stable/0.1.9 的标签和资产仍保留，可将显式版本改为 `0.1.9` 选择它。历史版本继续适用各自的环境要求。
 
 安装器要求 Linux、Python 3.11+ 和正在运行的 systemd 系统管理器。Shell 入口会尝试准备 curl、CA 证书和系统仓库提供的 Python；如果仓库 Python 版本不足，会明确提示安装支持的版本，不添加软件源。Maa 通过共享依赖表调用现有 apt-get、dnf、yum、zypper 或 pacman，安装缺少的所需工具；不进行整机升级，不启动或安装 init 系统，不改变容器权限。需要系统修改时使用当前环境的 root 或 sudo。没有受支持的软件包工具时，提示缺少的依赖。
 
