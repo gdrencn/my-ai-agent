@@ -1,5 +1,6 @@
 # my-ai-agent project instructions
 
+- 换机器或新会话接手时先读 docs/HANDOFF.md，再核对当前 REQUIREMENTS.md、IMPLEMENTED.md 与 Git 状态；交接中的后续路线不代替新功能实施授权。
 - 默认中文沟通，先讨论后执行。已授权的开发和 test 发布持续完成，stable 需用户验收授权。
 - 当前需求以 REQUIREMENTS.md 为准；先核验代码，再更新 IMPLEMENTED.md。历史资料不替代当前需求。
 - 本项目是独立 Linux 产品。产品、安装器、构建和测试不识别容器来源、不访问外层管理接口、不依赖其他项目或预装镜像。只检查实际运行条件，自行维护依赖。
